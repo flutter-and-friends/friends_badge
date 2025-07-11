@@ -1,0 +1,16 @@
+name: friends_badge
+description: "Control the Flutter & Friends conference badge."
+version: 0.1.0
+repository: https://github.com/spydon/friends_badge
+
+environment:
+  sdk: ^3.8.1
+  flutter: ">=3.32.5"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+dev_dependencies:
+  flame_lint: ^1.4.0
+
