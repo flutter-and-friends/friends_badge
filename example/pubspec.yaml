@@ -1,0 +1,17 @@
+name: example
+description: "An example app for how to use the friends_badge package."
+publish_to: 'none'
+version: 0.1.0
+
+environment:
+  sdk: ^3.8.1
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+dev_dependencies:
+  flame_lint: ^1.4.1
+
+flutter:
+  uses-material-design: true
