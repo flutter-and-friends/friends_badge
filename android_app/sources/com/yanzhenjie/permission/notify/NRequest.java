@@ -1,0 +1,47 @@
+package com.yanzhenjie.permission.notify;
+
+import com.yanzhenjie.permission.RequestExecutor;
+import com.yanzhenjie.permission.bridge.BridgeRequest;
+import com.yanzhenjie.permission.bridge.RequestManager;
+import com.yanzhenjie.permission.source.Source;
+
+/* loaded from: classes.dex */
+class NRequest extends BaseRequest implements RequestExecutor, BridgeRequest.Callback {
+    private Source mSource;
+
+    NRequest(Source source) {
+        super(source);
+        this.mSource = source;
+    }
+
+    @Override // com.yanzhenjie.permission.notify.PermissionRequest
+    public void start() {
+        if (this.mSource.canNotify()) {
+            callbackSucceed();
+        } else {
+            showRationale(this);
+        }
+    }
+
+    @Override // com.yanzhenjie.permission.RequestExecutor
+    public void execute() {
+        BridgeRequest bridgeRequest = new BridgeRequest(this.mSource);
+        bridgeRequest.setType(1);
+        bridgeRequest.setCallback(this);
+        RequestManager.get().add(bridgeRequest);
+    }
+
+    @Override // com.yanzhenjie.permission.RequestExecutor
+    public void cancel() {
+        callbackFailed();
+    }
+
+    @Override // com.yanzhenjie.permission.bridge.BridgeRequest.Callback
+    public void onCallback() {
+        if (this.mSource.canNotify()) {
+            callbackSucceed();
+        } else {
+            callbackFailed();
+        }
+    }
+}
