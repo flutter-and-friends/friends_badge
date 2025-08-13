@@ -10,7 +10,9 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  flutter_blue_plus: ^1.35.5
+  nfc_manager: ^4.0.2
+  nfc_manager_ndef: ^1.0.1
 
 dev_dependencies:
-  flame_lint: ^1.4.0
-
+  flame_lint: ^1.4.1

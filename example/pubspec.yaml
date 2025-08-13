@@ -9,6 +9,8 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  friends_badge:
+    path: ..
 
 dev_dependencies:
   flame_lint: ^1.4.1

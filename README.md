@@ -8,3 +8,7 @@ want to show on it.
 
 Also, don't miss the Flutter & Friends conference!
 https://flutterfriends.dev
+
+## Notes for development
+
+WriteActivity has some relevant NFC and BLE code.
