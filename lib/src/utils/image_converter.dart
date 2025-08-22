@@ -46,13 +46,35 @@ class ImageConverter {
     return buffer;
   }
 
+  img.Color findClosestColor(img.Color color, List<img.Color> palette) {
+    var closestColor = palette[0];
+    var minDistance = double.maxFinite;
+
+    for (final c in palette) {
+      final distance = _colorDistance(color, c);
+      if (distance < minDistance) {
+        minDistance = distance;
+        closestColor = c;
+      }
+    }
+
+    return closestColor;
+  }
+
+  double _colorDistance(img.Color c1, img.Color c2) {
+    final r = c1.r - c2.r;
+    final g = c1.g - c2.g;
+    final b = c1.b - c2.b;
+    return (r * r + g * g + b * b).toDouble();
+  }
+
   img.Image floydSteinbergDither(img.Image src, List<img.Color> palette) {
     final image = img.copyResize(src, width: src.width, height: src.height);
 
     for (var y = 0; y < image.height; y++) {
       for (var x = 0; x < image.width; x++) {
         final oldPixel = image.getPixel(x, y);
-        final newPixel = img.findClosestColor(oldPixel, palette);
+        final newPixel = findClosestColor(oldPixel, palette);
         image.setPixel(x, y, newPixel);
 
         final error = (

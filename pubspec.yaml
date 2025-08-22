@@ -11,9 +11,9 @@ dependencies:
   barcode_widget: ^2.0.4
   flutter:
     sdk: flutter
-  flutter_blue_plus: ^1.31.16
-  image: ^4.0.17
-  nfc_manager: ^3.4.0
+  flutter_blue_plus: ^1.35.5
+  image: ^4.5.4
+  nfc_manager: ^4.0.2
   qr_flutter: ^4.1.0
 
 dev_dependencies:

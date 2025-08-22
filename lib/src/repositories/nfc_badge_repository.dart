@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:friends_badge/src/repositories/badge_repository.dart';
 import 'package:nfc_manager/nfc_manager.dart';
+import 'package:nfc_manager/nfc_manager_android.dart';
 
 class NfcBadgeRepository implements BadgeRepository {
   @override
@@ -22,9 +23,14 @@ class NfcBadgeRepository implements BadgeRepository {
     final completer = Completer<void>();
 
     NfcManager.instance.startSession(
+      pollingOptions: {
+        NfcPollingOption.iso14443,
+        NfcPollingOption.iso15693,
+        NfcPollingOption.iso18092,
+      },
       onDiscovered: (NfcTag tag) async {
         try {
-          final nfcA = NfcA.from(tag);
+          final nfcA = NfcAAndroid.from(tag);
           if (nfcA == null) {
             completer.completeError(Exception('Tag is not NfcA compatible'));
             return;

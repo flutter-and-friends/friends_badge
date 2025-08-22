@@ -14,11 +14,14 @@ class BleBadgeRepository implements BadgeRepository {
 
   @override
   Stream<List<String>> scanForBleDevices() {
-    final completer = StreamController<List<String>>(
-      onCancel: () {
-        FlutterBluePlus.stopScan();
-      },
-    );
+    final completer = StreamController<List<String>>();
+
+    void onCancel() {
+      FlutterBluePlus.stopScan();
+      completer.close();
+    }
+
+    completer.onCancel = onCancel;
 
     FlutterBluePlus.adapterState.listen((state) {
       if (state == BluetoothAdapterState.on) {
