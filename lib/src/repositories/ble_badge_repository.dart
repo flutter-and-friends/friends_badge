@@ -44,23 +44,47 @@ class BleBadgeRepository implements BadgeRepository {
 
       await notifyCharacteristic.setNotifyValue(true);
       final notifications = notifyCharacteristic.onValueReceived;
+      final completer = Completer<void>();
 
-      // Listen for notifications
       final notificationSubscription = notifications.listen((value) {
-        // TODO: Handle status updates from the badge
-        print('Received notification: $value');
+        // TODO: Properly parse the response
+        if (value.isNotEmpty && value[0] == 0x01) {
+          completer.complete();
+        } else {
+          completer.completeError(Exception('Badge returned an error'));
+        }
       });
 
       const chunkSize = 20;
       for (var i = 0; i < data.length; i += chunkSize) {
         final chunk = data.sublist(i, i + chunkSize > data.length ? data.length : i + chunkSize);
-        await characteristic.write(chunk);
+        final packet = _createBlePacket(i ~/ chunkSize, 0x07, chunk);
+        await characteristic.write(packet);
       }
 
+      await completer.future;
       await notificationSubscription.cancel();
     } finally {
       await device.disconnect();
     }
+  }
+
+  List<int> _createBlePacket(int address, int command, List<int> data) {
+    final packet = <int>[];
+    packet.add(0xBB);
+    packet.add(address);
+    packet.add(command);
+    packet.add(data.length);
+    packet.addAll(data);
+
+    int checksum = 0;
+    for (int i = 1; i < packet.length; i++) {
+      checksum += packet[i];
+    }
+    packet.add(checksum & 0xFF);
+
+    packet.add(0x7E);
+    return packet;
   }
 
   @override

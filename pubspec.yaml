@@ -10,7 +10,9 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  flutter_blue_plus: ^1.31.18
+  dependencies:
+  flutter_blue_plus: ^1.31.16
+  nfc_manager: ^3.4.0
   nfc_manager: ^3.4.0
   image: ^4.0.17
   qr_flutter: ^4.1.0
