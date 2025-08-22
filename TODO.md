@@ -23,9 +23,9 @@
 - [x] Add a path dependency to the `friends_badge` package in the example app's `pubspec.yaml`.
 - [x] Refactor the example app's UI to use the public API of the `friends_badge` package.
 - [x] Build the UI screens for the template editor, home screen, and write screen.
+- [x] Implement BLE device selection in the example app.
 
 ## Phase 4: Testing and Debugging
 
 - [ ] Write unit tests for the package's logic.
-- [ ] Implement BLE device selection in the example app.
 - [ ] Perform integration testing with a physical badge using the example app.

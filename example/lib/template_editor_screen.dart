@@ -90,15 +90,10 @@ class _TemplateEditorScreenState extends State<TemplateEditorScreen> {
           ElevatedButton(
             onPressed: () {
               if (_convertedImage != null) {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => WriteScreen(convertedImage: _convertedImage),
-                  ),
-                );
+                Navigator.pop(context, _convertedImage);
               }
             },
-            child: const Text('Write to Badge'),
+            child: const Text('Done'),
           ),
         ],
       ),

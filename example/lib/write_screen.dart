@@ -4,9 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:friends_badge/friends_badge.dart';
 
 class WriteScreen extends StatefulWidget {
-  final Uint8List? convertedImage;
+  final String deviceAddress;
 
-  const WriteScreen({super.key, this.convertedImage});
+  const WriteScreen({super.key, required this.deviceAddress});
 
   @override
   State<WriteScreen> createState() => _WriteScreenState();
@@ -15,24 +15,39 @@ class WriteScreen extends StatefulWidget {
 class _WriteScreenState extends State<WriteScreen> {
   final BadgeRepository _bleBadgeRepository = BleBadgeRepository();
   final BadgeRepository _nfcBadgeRepository = NfcBadgeRepository();
+  Uint8List? _convertedImage;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Write to Badge'),
+        title: Text('Write to ${widget.deviceAddress}'),
       ),
       body: Column(
         children: [
-          if (widget.convertedImage != null)
-            Image.memory(widget.convertedImage!)
+          if (_convertedImage != null)
+            Image.memory(_convertedImage!)
           else
-            const Text('No image to write'),
+            ElevatedButton(
+              onPressed: () async {
+                final result = await Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const TemplateEditorScreen(),
+                  ),
+                );
+                if (result is Uint8List) {
+                  setState(() {
+                    _convertedImage = result;
+                  });
+                }
+              },
+              child: const Text('Create Template'),
+            ),
           ElevatedButton(
             onPressed: () {
-              if (widget.convertedImage != null) {
-                // TODO: Select a device
-                // _bleBadgeRepository.writeOverBle('device_address', widget.convertedImage!);
+              if (_convertedImage != null) {
+                _bleBadgeRepository.writeOverBle(widget.deviceAddress, _convertedImage!);
                 print('Writing over BLE...');
               }
             },
@@ -40,8 +55,8 @@ class _WriteScreenState extends State<WriteScreen> {
           ),
           ElevatedButton(
             onPressed: () {
-              if (widget.convertedImage != null) {
-                _nfcBadgeRepository.writeOverNfc(widget.convertedImage!);
+              if (_convertedImage != null) {
+                _nfcBadgeRepository.writeOverNfc(_convertedImage!);
                 print('Writing over NFC...');
               }
             },

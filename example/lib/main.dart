@@ -69,12 +69,20 @@ class _HomePageState extends State<HomePage> {
             },
             child: const Text('Scan for BLE Devices'),
           ),
-          Expanded(
+                    Expanded(
             child: ListView.builder(
               itemCount: _devices.length,
               itemBuilder: (context, index) {
                 return ListTile(
                   title: Text(_devices[index]),
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => WriteScreen(deviceAddress: _devices[index]),
+                      ),
+                    );
+                  },
                 );
               },
             ),
