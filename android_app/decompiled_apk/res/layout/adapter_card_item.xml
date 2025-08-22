@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout android:orientation="vertical" android:layout_width="@dimen/dp_104" android:layout_height="@dimen/dp_180" android:layout_marginStart="@dimen/dp_8"
+  xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto">
+    <androidx.cardview.widget.CardView android:gravity="center" android:layout_width="fill_parent" android:layout_height="fill_parent" app:cardCornerRadius="@dimen/dp_8" app:cardElevation="@dimen/dp_0">
+        <ImageView android:gravity="center" android:id="@id/ivImg" android:layout_width="fill_parent" android:layout_height="fill_parent" />
+    </androidx.cardview.widget.CardView>
+</LinearLayout>

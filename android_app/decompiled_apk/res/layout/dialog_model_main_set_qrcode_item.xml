@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout android:layout_width="fill_parent" android:layout_height="wrap_content"
+  xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto">
+    <LinearLayout android:orientation="vertical" android:background="@drawable/shape_dialog_so_bai_st_0_co_12" android:layout_width="fill_parent" android:layout_height="@dimen/dp_350" app:layout_constraintLeft_toLeftOf="parent" app:layout_constraintTop_toTopOf="parent">
+        <RelativeLayout android:layout_width="fill_parent" android:layout_height="@dimen/dp_48">
+            <ImageView android:id="@id/qrCancel" android:padding="@dimen/dp_5" android:layout_width="wrap_content" android:layout_height="wrap_content" android:src="@mipmap/model_cancel" android:layout_centerVertical="true" android:layout_marginStart="@dimen/dp_11" />
+            <LinearLayout android:gravity="center" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_centerInParent="true">
+                <com.google.android.material.tabs.TabLayout android:id="@id/QCTabLayout" android:layout_width="wrap_content" android:layout_height="@dimen/dp_30" app:tabIndicatorColor="@color/black" app:tabIndicatorFullWidth="false" app:tabMode="scrollable" app:tabSelectedTextColor="@color/text_color_3" app:tabTextAppearance="@style/TabText" app:tabTextColor="@color/text_color_6">
+                    <com.google.android.material.tabs.TabItem android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/model_qrcode_edit" />
+                    <com.google.android.material.tabs.TabItem android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/model_qrcode_style" />
+                </com.google.android.material.tabs.TabLayout>
+            </LinearLayout>
+            <ImageView android:id="@id/qrSure" android:padding="@dimen/dp_5" android:layout_width="wrap_content" android:layout_height="wrap_content" android:src="@mipmap/model_sure" android:layout_centerVertical="true" android:layout_marginEnd="@dimen/dp_11" android:layout_alignParentEnd="true" />
+        </RelativeLayout>
+        <RelativeLayout android:layout_width="fill_parent" android:layout_height="fill_parent" android:layout_marginTop="@dimen/dp_12" android:layout_marginStart="@dimen/dp_16" android:layout_marginEnd="@dimen/dp_16">
+            <LinearLayout android:gravity="center" android:orientation="horizontal" android:id="@id/linearEdit" android:visibility="visible" android:layout_width="fill_parent" android:layout_height="@dimen/dp_45">
+                <EditText android:textSize="@dimen/sp_13" android:gravity="center" android:id="@id/qrEdit" android:background="#fff7f7f7" android:layout_width="fill_parent" android:layout_height="@dimen/dp_45" android:hint="@string/model_text_edit_tip" android:maxLines="3" android:paddingStart="@dimen/dp_5" android:paddingEnd="@dimen/dp_5" />
+            </LinearLayout>
+            <LinearLayout android:orientation="vertical" android:id="@id/linearStyle" android:visibility="gone" android:layout_width="fill_parent" android:layout_height="fill_parent">
+                <LinearLayout android:gravity="center_vertical" android:orientation="horizontal" android:layout_width="fill_parent" android:layout_height="@dimen/dp_30">
+                    <TextView android:textSize="@dimen/sp_12" android:textColor="@color/text_color_3" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/model_qrcode_style_bg" />
+                    <androidx.recyclerview.widget.RecyclerView android:id="@id/bgRecyclerView" android:layout_width="fill_parent" android:layout_height="fill_parent" android:layout_marginStart="@dimen/dp_16" />
+                </LinearLayout>
+                <LinearLayout android:gravity="center_vertical" android:orientation="horizontal" android:layout_width="fill_parent" android:layout_height="@dimen/dp_30" android:layout_marginTop="@dimen/dp_28">
+                    <TextView android:textSize="@dimen/sp_12" android:textColor="@color/text_color_3" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/model_qrcode_style_fg" />
+                    <androidx.recyclerview.widget.RecyclerView android:id="@id/fgRecyclerView" android:layout_width="fill_parent" android:layout_height="fill_parent" android:layout_marginStart="@dimen/dp_16" />
+                </LinearLayout>
+            </LinearLayout>
+        </RelativeLayout>
+    </LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

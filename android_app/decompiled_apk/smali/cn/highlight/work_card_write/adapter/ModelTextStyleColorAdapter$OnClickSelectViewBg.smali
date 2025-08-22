@@ -1,0 +1,19 @@
+.class public interface abstract Lcn/highlight/work_card_write/adapter/ModelTextStyleColorAdapter$OnClickSelectViewBg;
+.super Ljava/lang/Object;
+.source "ModelTextStyleColorAdapter.java"
+
+
+# annotations
+.annotation system Ldalvik/annotation/EnclosingClass;
+    value = Lcn/highlight/work_card_write/adapter/ModelTextStyleColorAdapter;
+.end annotation
+
+.annotation system Ldalvik/annotation/InnerClass;
+    accessFlags = 0x609
+    name = "OnClickSelectViewBg"
+.end annotation
+
+
+# virtual methods
+.method public abstract onClickSelectBg(Ljava/lang/String;)V
+.end method

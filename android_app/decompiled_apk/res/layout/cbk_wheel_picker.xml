@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout android:gravity="center" android:orientation="horizontal" android:layout_width="fill_parent" android:layout_height="wrap_content" android:weightSum="11.0"
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <com.codbking.widget.view.WheelView android:id="@id/year" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_weight="3.0" />
+    <com.codbking.widget.view.WheelView android:id="@id/month" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_weight="2.0" />
+    <com.codbking.widget.view.WheelView android:id="@id/day" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_weight="2.0" />
+    <TextView android:gravity="center" android:id="@id/week" android:layout_width="wrap_content" android:layout_height="fill_parent" android:text="星期二" />
+    <com.codbking.widget.view.WheelView android:id="@id/hour" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_weight="2.0" />
+    <com.codbking.widget.view.WheelView android:id="@id/minute" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_weight="2.0" />
+</LinearLayout>

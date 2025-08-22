@@ -9,6 +9,10 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  friends_badge:
+    path: ../
+  flutter_bloc: ^8.1.3
+  image_picker: ^1.0.4
 
 dev_dependencies:
   flame_lint: ^1.4.1

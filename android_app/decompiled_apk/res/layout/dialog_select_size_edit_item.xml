@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout android:orientation="vertical" android:layout_width="fill_parent" android:layout_height="wrap_content"
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <LinearLayout android:orientation="vertical" android:background="@drawable/shape_dialog_so_bai_st_0_co_12" android:layout_width="fill_parent" android:layout_height="@dimen/dp_230">
+        <RelativeLayout android:padding="@dimen/dp_10" android:layout_width="fill_parent" android:layout_height="@dimen/dp_50">
+            <TextView android:textSize="@dimen/sp_14" android:textColor="@color/text_color_4" android:gravity="center" android:id="@id/tvCancel" android:padding="@dimen/dp_5" android:layout_width="wrap_content" android:layout_height="fill_parent" android:text="@string/edit_new_cancel" />
+            <TextView android:textSize="@dimen/sp_14" android:textColor="@color/text_color_2" android:gravity="center" android:padding="@dimen/dp_5" android:layout_width="wrap_content" android:layout_height="fill_parent" android:text="@string/edit_new_size" android:layout_centerInParent="true" />
+            <TextView android:textSize="@dimen/sp_14" android:textColor="@color/device" android:gravity="center" android:id="@id/tvSure" android:padding="@dimen/dp_5" android:layout_width="wrap_content" android:layout_height="fill_parent" android:text="@string/edit_new_sure" android:layout_alignParentEnd="true" />
+        </RelativeLayout>
+        <LinearLayout android:orientation="horizontal" android:padding="@dimen/dp_10" android:layout_width="fill_parent" android:layout_height="fill_parent">
+            <cn.highlight.work_card_write.view.CycleWheelView android:id="@id/wheelViewSize" android:layout_width="0.0dip" android:layout_height="fill_parent" android:layout_weight="1.0" />
+        </LinearLayout>
+    </LinearLayout>
+</LinearLayout>

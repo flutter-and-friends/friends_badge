@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout android:orientation="vertical" android:layout_width="fill_parent" android:layout_height="fill_parent"
+  xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto">
+    <RelativeLayout android:background="@color/white" android:paddingTop="@dimen/dp_5" android:paddingBottom="@dimen/dp_5" android:layout_width="fill_parent" android:layout_height="wrap_content" android:paddingStart="@dimen/dp_11" android:paddingEnd="@dimen/dp_16">
+        <ImageView android:id="@id/imgBack" android:padding="@dimen/dp_5" android:layout_width="wrap_content" android:layout_height="wrap_content" android:src="@mipmap/back_icon1" android:layout_centerVertical="true" />
+        <TextView android:textSize="@dimen/sp_18" android:textColor="@color/text_color_3" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/my_userinfo" android:layout_centerInParent="true" />
+    </RelativeLayout>
+    <LinearLayout android:orientation="vertical" android:layout_width="fill_parent" android:layout_height="0.0dip" android:layout_marginTop="@dimen/dp_12" android:layout_weight="1.0">
+        <LinearLayout android:gravity="center_vertical" android:orientation="horizontal" android:id="@id/linearZh" android:background="@color/white" android:layout_width="fill_parent" android:layout_height="@dimen/dp_60" android:paddingStart="@dimen/dp_20" android:paddingEnd="@dimen/dp_16">
+            <TextView android:textSize="@dimen/sp_16" android:textColor="@color/text_color_3" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/my_username" />
+            <TextView android:textSize="@dimen/sp_16" android:textColor="@color/text_color_4" android:gravity="end" android:id="@id/tv_userName" android:layout_width="fill_parent" android:layout_height="wrap_content" android:text="@string/my_username" />
+        </LinearLayout>
+    </LinearLayout>
+    <TextView android:textSize="@dimen/sp_16" android:textColor="#ffff0000" android:gravity="center" android:id="@id/tv_login_out" android:background="@color/white" android:layout_width="fill_parent" android:layout_height="@dimen/dp_60" android:text="@string/login_out" />
+</LinearLayout>

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout android:background="@color/white" android:layout_width="fill_parent" android:layout_height="fill_parent"
+  xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto">
+    <ImageView android:layout_width="fill_parent" android:layout_height="wrap_content" android:src="@mipmap/bg_login_top" android:scaleType="centerCrop" />
+    <LinearLayout android:orientation="vertical" android:paddingTop="@dimen/dp_20" android:layout_width="fill_parent" android:layout_height="fill_parent">
+        <LinearLayout android:gravity="center" android:layout_gravity="right" android:id="@id/ll_language" android:paddingTop="@dimen/dp_5" android:paddingBottom="@dimen/dp_5" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="@dimen/dp_12" android:layout_marginRight="@dimen/dp_15">
+            <ImageView android:layout_width="@dimen/dp_20" android:layout_height="@dimen/dp_20" android:src="@mipmap/img_login_language" />
+            <TextView android:textSize="@dimen/sp_16" android:textColor="#ff333333" android:id="@id/tv_language" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginLeft="@dimen/dp_4" android:layout_marginRight="@dimen/dp_4" android:text="@string/login_language" />
+            <ImageView android:id="@id/iv_arrow" android:layout_width="@dimen/dp_12" android:layout_height="@dimen/dp_12" android:src="@mipmap/img_arrow_down" />
+        </LinearLayout>
+        <TextView android:textSize="@dimen/sp_28" android:textColor="#ff1e2121" android:gravity="center" android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_marginTop="@dimen/dp_60" android:text="@string/welcome_to_use" android:paddingStart="@dimen/dp_32" android:paddingEnd="@dimen/dp_32" />
+        <TextView android:textSize="@dimen/sp_16" android:textColor="#ff1e2121" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginLeft="@dimen/dp_32" android:layout_marginTop="@dimen/dp_50" android:layout_marginRight="@dimen/dp_32" android:text="@string/login_account" />
+        <EditText android:textSize="@dimen/sp_14" android:textColor="#ff333333" android:textColorHint="#ff9fabab" android:id="@id/edit_account" android:background="@drawable/bg_edit" android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_marginLeft="@dimen/dp_32" android:layout_marginTop="@dimen/dp_12" android:layout_marginRight="@dimen/dp_32" android:hint="@string/login_input_acc" android:lines="1" android:inputType="text" />
+        <ImageView android:background="#ffedf0f0" android:layout_width="fill_parent" android:layout_height="@dimen/dp_1" android:layout_marginLeft="@dimen/dp_32" android:layout_marginTop="@dimen/dp_8" android:layout_marginRight="@dimen/dp_32" />
+        <TextView android:textSize="@dimen/sp_16" android:textColor="#ff1e2121" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginLeft="@dimen/dp_32" android:layout_marginTop="@dimen/dp_22" android:layout_marginRight="@dimen/dp_32" android:text="@string/login_password" />
+        <EditText android:textSize="@dimen/sp_14" android:textColor="#ff333333" android:textColorHint="#ff9fabab" android:id="@id/edit_password" android:background="@color/white" android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_marginLeft="@dimen/dp_32" android:layout_marginTop="@dimen/dp_12" android:layout_marginRight="@dimen/dp_32" android:hint="@string/login_input_pwd" android:lines="1" android:inputType="textPassword" />
+        <ImageView android:background="#ffedf0f0" android:layout_width="fill_parent" android:layout_height="@dimen/dp_1" android:layout_marginLeft="@dimen/dp_32" android:layout_marginTop="@dimen/dp_8" android:layout_marginRight="@dimen/dp_32" />
+        <TextView android:textSize="@dimen/sp_16" android:textColor="@color/white" android:gravity="center" android:id="@id/btn_login" android:background="@drawable/btn_bg_login" android:layout_width="fill_parent" android:layout_height="@dimen/dp_44" android:layout_marginLeft="@dimen/dp_32" android:layout_marginTop="@dimen/dp_50" android:layout_marginRight="@dimen/dp_32" android:text="@string/login" android:textAllCaps="false" />
+        <RelativeLayout android:layout_width="fill_parent" android:layout_height="fill_parent" android:layout_marginLeft="@dimen/dp_32" android:layout_marginRight="@dimen/dp_32" android:layout_marginBottom="@dimen/dp_20">
+            <LinearLayout android:orientation="horizontal" android:id="@id/ll_person" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_alignParentLeft="true" android:layout_alignParentBottom="true">
+                <ImageView android:layout_gravity="center_vertical" android:layout_width="@dimen/dp_14" android:layout_height="@dimen/dp_14" android:layout_marginRight="@dimen/dp_4" android:src="@mipmap/img_login_person" />
+                <TextView android:textSize="@dimen/sp_14" android:textColor="#ff999999" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/login_person" />
+            </LinearLayout>
+            <LinearLayout android:layout_gravity="right" android:orientation="horizontal" android:id="@id/ll_service" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_alignParentRight="true" android:layout_alignParentBottom="true">
+                <ImageView android:layout_gravity="center_vertical" android:layout_width="@dimen/dp_14" android:layout_height="@dimen/dp_14" android:layout_marginRight="@dimen/dp_4" android:src="@mipmap/img_login_setting" />
+                <TextView android:textSize="@dimen/sp_14" android:textColor="#fff66821" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/login_service" />
+            </LinearLayout>
+        </RelativeLayout>
+    </LinearLayout>
+</RelativeLayout>

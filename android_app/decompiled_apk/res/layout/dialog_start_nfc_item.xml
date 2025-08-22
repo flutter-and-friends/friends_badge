@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout android:orientation="vertical" android:layout_width="fill_parent" android:layout_height="wrap_content"
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <LinearLayout android:orientation="vertical" android:background="@drawable/shape_dialog_so_bai_st_0_co_12" android:layout_width="fill_parent" android:layout_height="wrap_content">
+        <TextView android:textSize="@dimen/sp_22" android:textColor="@color/text_color_5" android:gravity="center" android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_marginTop="@dimen/dp_25" android:text="@string/edit_start_nfc" />
+        <ImageView android:layout_gravity="center" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="@dimen/dp_28" android:src="@mipmap/nfc_tip" />
+        <TextView android:textSize="@dimen/sp_16" android:textColor="@color/text_color_3" android:gravity="center" android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_marginTop="@dimen/dp_36" android:text="@string/edit_start_nfc_tip" />
+        <TextView android:textSize="@dimen/sp_16" android:textColor="@color/text_color_3" android:gravity="center" android:id="@id/tvCancel" android:background="#fff9f9f9" android:layout_width="fill_parent" android:layout_height="@dimen/dp_50" android:layout_marginTop="@dimen/dp_30" android:foreground="?selectableItemBackground" android:text="@string/edit_start_nfc_cancel" />
+    </LinearLayout>
+</LinearLayout>
