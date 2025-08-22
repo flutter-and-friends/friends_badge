@@ -1,33 +1,51 @@
+import 'dart:typed_data';
+
 import 'package:image/image.dart' as img;
 
+enum ColorPalette {
+  blackAndWhite,
+  blackWhiteRed,
+  blackWhiteYellow,
+}
+
 class ImageConverter {
-  static const List<img.Color> paletteBlackAndWhite = [
-    img.ColorRgb8(0, 0, 0),
-    img.ColorRgb8(255, 255, 255),
-  ];
+  final Map<ColorPalette, List<img.Color>> _palettes = {
+    ColorPalette.blackAndWhite: [
+      img.ColorRgb8(0, 0, 0),
+      img.ColorRgb8(255, 255, 255),
+    ],
+    ColorPalette.blackWhiteRed: [
+      img.ColorRgb8(0, 0, 0),
+      img.ColorRgb8(255, 255, 255),
+      img.ColorRgb8(255, 0, 0),
+    ],
+    ColorPalette.blackWhiteYellow: [
+      img.ColorRgb8(0, 0, 0),
+      img.ColorRgb8(255, 255, 255),
+      img.ColorRgb8(255, 255, 0),
+    ],
+  };
 
-  static const List<img.Color> paletteBlackWhiteRed = [
-    img.ColorRgb8(0, 0, 0),
-    img.ColorRgb8(255, 255, 255),
-    img.ColorRgb8(255, 0, 0),
-  ];
-
-  static const List<img.Color> paletteBlackWhiteYellow = [
-    img.ColorRgb8(0, 0, 0),
-    img.ColorRgb8(255, 255, 255),
-    img.ColorRgb8(255, 255, 0),
-  ];
-
-  static img.Image convertImage(img.Image image, List<img.Color> palette) {
-    return floydSteinbergDither(image, palette);
+  Uint8List convertImage(img.Image image, ColorPalette palette) {
+    final convertedImage = floydSteinbergDither(image, _palettes[palette]!);
+    return _imageToBytes(convertedImage);
   }
 
-  static int getGrayscale(img.Color c) {
-    final l = c.luminance;
-    return (l * 255).toInt();
+  Uint8List _imageToBytes(img.Image image) {
+    final buffer = Uint8List(image.width * image.height ~/ 8);
+    for (var y = 0; y < image.height; y++) {
+      for (var x = 0; x < image.width; x++) {
+        final pixel = image.getPixel(x, y);
+        final bit = pixel.r > 128 ? 1 : 0;
+        final byteIndex = (y * image.width + x) ~/ 8;
+        final bitIndex = (y * image.width + x) % 8;
+        buffer[byteIndex] = (buffer[byteIndex] & ~(1 << (7 - bitIndex))) | (bit << (7 - bitIndex));
+      }
+    }
+    return buffer;
   }
 
-  static img.Image floydSteinbergDither(img.Image src, List<img.Color> palette) {
+  img.Image floydSteinbergDither(img.Image src, List<img.Color> palette) {
     final image = img.copyResize(src, width: src.width, height: src.height);
 
     for (var y = 0; y < image.height; y++) {
