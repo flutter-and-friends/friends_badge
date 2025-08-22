@@ -8,15 +8,13 @@ environment:
   flutter: ">=3.32.5"
 
 dependencies:
+  barcode_widget: ^2.0.4
   flutter:
     sdk: flutter
-  dependencies:
   flutter_blue_plus: ^1.31.16
-  nfc_manager: ^3.4.0
-  nfc_manager: ^3.4.0
   image: ^4.0.17
+  nfc_manager: ^3.4.0
   qr_flutter: ^4.1.0
-  barcode_widget: ^2.0.4
 
 dev_dependencies:
   flame_lint: ^1.4.0

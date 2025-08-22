@@ -1,12 +1,16 @@
 import 'dart:typed_data';
 
+import 'package:example/template_editor_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:friends_badge/friends_badge.dart';
 
 class WriteScreen extends StatefulWidget {
-  final String deviceAddress;
+  const WriteScreen({
+    required this.deviceAddress,
+    super.key,
+  });
 
-  const WriteScreen({super.key, required this.deviceAddress});
+  final String deviceAddress;
 
   @override
   State<WriteScreen> createState() => _WriteScreenState();
@@ -47,8 +51,10 @@ class _WriteScreenState extends State<WriteScreen> {
           ElevatedButton(
             onPressed: () {
               if (_convertedImage != null) {
-                _bleBadgeRepository.writeOverBle(widget.deviceAddress, _convertedImage!);
-                print('Writing over BLE...');
+                _bleBadgeRepository.writeOverBle(
+                  widget.deviceAddress,
+                  _convertedImage!,
+                );
               }
             },
             child: const Text('Write over BLE'),
@@ -57,7 +63,6 @@ class _WriteScreenState extends State<WriteScreen> {
             onPressed: () {
               if (_convertedImage != null) {
                 _nfcBadgeRepository.writeOverNfc(_convertedImage!);
-                print('Writing over NFC...');
               }
             },
             child: const Text('Write over NFC'),

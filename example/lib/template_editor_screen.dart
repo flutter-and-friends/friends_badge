@@ -3,7 +3,6 @@ import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:friends_badge/friends_badge.dart';
-import 'package:friends_badge_example/write_screen.dart';
 import 'package:image/image.dart' as img;
 import 'package:image_picker/image_picker.dart';
 

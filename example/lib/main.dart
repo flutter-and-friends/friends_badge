@@ -1,7 +1,6 @@
+import 'package:example/write_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:friends_badge/friends_badge.dart';
-import 'package:friends_badge_example/template_editor_screen.dart';
-import 'package:friends_badge_example/write_screen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -43,24 +42,6 @@ class _HomePageState extends State<HomePage> {
         children: [
           ElevatedButton(
             onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const TemplateEditorScreen()),
-              );
-            },
-            child: const Text('Template Editor'),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const WriteScreen()),
-              );
-            },
-            child: const Text('Write to Badge'),
-          ),
-          ElevatedButton(
-            onPressed: () {
               _badgeRepository.scanForBleDevices().listen((devices) {
                 setState(() {
                   _devices = devices;
@@ -69,7 +50,7 @@ class _HomePageState extends State<HomePage> {
             },
             child: const Text('Scan for BLE Devices'),
           ),
-                    Expanded(
+          Expanded(
             child: ListView.builder(
               itemCount: _devices.length,
               itemBuilder: (context, index) {
@@ -79,7 +60,8 @@ class _HomePageState extends State<HomePage> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => WriteScreen(deviceAddress: _devices[index]),
+                        builder: (context) =>
+                            WriteScreen(deviceAddress: _devices[index]),
                       ),
                     );
                   },

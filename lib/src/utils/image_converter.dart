@@ -39,7 +39,8 @@ class ImageConverter {
         final bit = pixel.r > 128 ? 1 : 0;
         final byteIndex = (y * image.width + x) ~/ 8;
         final bitIndex = (y * image.width + x) % 8;
-        buffer[byteIndex] = (buffer[byteIndex] & ~(1 << (7 - bitIndex))) | (bit << (7 - bitIndex));
+        buffer[byteIndex] = (buffer[byteIndex] & ~(1 << (7 - bitIndex))) |
+            (bit << (7 - bitIndex));
       }
     }
     return buffer;
@@ -55,9 +56,9 @@ class ImageConverter {
         image.setPixel(x, y, newPixel);
 
         final error = (
-          (oldPixel.r - newPixel.r),
-          (oldPixel.g - newPixel.g),
-          (oldPixel.b - newPixel.b),
+          oldPixel.r - newPixel.r,
+          oldPixel.g - newPixel.g,
+          oldPixel.b - newPixel.b,
         );
 
         if (x + 1 < image.width) {
