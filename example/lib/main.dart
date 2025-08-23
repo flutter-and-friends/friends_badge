@@ -1,6 +1,7 @@
 import 'package:example/write_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:friends_badge/friends_badge.dart';
+import 'package:image/image.dart' as img;
 
 void main() {
   runApp(const MyApp());
@@ -49,6 +50,29 @@ class _HomePageState extends State<HomePage> {
               });
             },
             child: const Text('Scan for BLE Devices'),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              final image = img.Image(width: 256, height: 256);
+              // Iterate over its pixels
+              for (var pixel in image) {
+                // Set the pixels red value to its x position value, creating a gradient.
+                pixel
+                  ..r = pixel.x
+                  // Set the pixels green value to its y position value.
+                  ..g = pixel.y;
+              }
+              await NfcBadgeRepository().writeOverNfc(
+                ImageConverter().convertImage(
+                  image,
+                  ColorPalette.blackWhiteRed,
+                ),
+              );
+              // if (_convertedImage != null) {
+              //   _nfcBadgeReposito ry.writeOverNfc(_convertedImage!);
+              // }
+            },
+            child: const Text('Write over NFC'),
           ),
           Expanded(
             child: ListView.builder(

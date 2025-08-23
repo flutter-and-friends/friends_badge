@@ -35,12 +35,14 @@ class NfcBadgeRepository implements BadgeRepository {
             completer.completeError(Exception('Tag is not NfcA compatible'));
             return;
           }
+          
+          await Future.delayed(const Duration(seconds: 2));
 
           // 1. Send "Set Status" command with status 0x0000 (SUCCESS).
           await nfcA.transceive(Uint8List.fromList([0xa2, 0x06, 0x00, 0x00]));
 
           // 2. Send "Read Status" command.
-          await nfcA.transceive(Uint8List.fromList([0x30, 0x06]));
+          final status = await nfcA.transceive(Uint8List.fromList([0x30, 0x06]));
           // TODO(lohnn): Check status
 
           // 3. Send image data in 4-byte chunks.
@@ -58,8 +60,8 @@ class NfcBadgeRepository implements BadgeRepository {
               .transceive(Uint8List.fromList([0xa2, 0x06, 0x02, 0x00]));
 
           completer.complete();
-        } catch (e) {
-          completer.completeError(e);
+        } catch (e, stackTrace) {
+          completer.completeError(e, stackTrace);
         } finally {
           NfcManager.instance.stopSession();
         }
