@@ -52,9 +52,19 @@ class NfcBadgeRepository implements BadgeRepository {
           }
 
           // 2. Handshake
-          await isoDep.transceive(
-            Uint8List.fromList([0xc0, 0xc1, 0x00, 0x00, 0x00]),
+          final handshakeResponse = await isoDep.transceive(
+            Uint8List.fromList([-48, -47, 0, 0, 0]),
           );
+
+          final hex = handshakeResponse
+              .map((b) => b.toRadixString(16).padLeft(2, '0'))
+              .join();
+
+          // Handhsake success
+          if (hex != '9000') {
+            throw Exception('Handshake failed with response: $hex');
+          }
+          debugPrint("Handshake success, let's proceed");
 
           // 3. Send image data
           for (var i = 0; i < chunkedData.length; i++) {
@@ -68,6 +78,10 @@ class NfcBadgeRepository implements BadgeRepository {
               chunk.length,
               ...chunk,
             ];
+            debugPrint(
+              'Sending chunk ${i + 1}/${chunkedData.length} '
+              '(${chunk.length} bytes)',
+            );
             await isoDep.transceive(Uint8List.fromList(command));
           }
 
@@ -75,6 +89,7 @@ class NfcBadgeRepository implements BadgeRepository {
           await isoDep.transceive(
             Uint8List.fromList([0xd0, 0xd1, 0x03, 0x00, 0x00]),
           );
+          debugPrint('Image data sent successfully');
 
           completer.complete();
         } catch (e, stackTrace) {

@@ -38,16 +38,27 @@ class _HomePageState extends State<HomePage> {
 
   @override
   void initState() {
-    final image = _image = img.Image(width: 256, height: 256);
-    // Iterate over its pixels
-    for (final pixel in image) {
-      // Set the pixels red value to its x position value,
-      // creating a gradient.
-      pixel
-        ..r = pixel.x
-        // Set the pixels green value to its y position value.
-        ..g = pixel.y;
+    final image = _image = img.Image(width: 240, height: 416);
+    for (var y = 0; y < image.height; y++) {
+      for (var x = 0; x < image.width; x++) {
+        if ((x ~/ 8 + y ~/ 8).isEven) {
+          image.setPixel(x, y, img.ColorRgb8(0, 0, 0));
+        } else {
+          image.setPixel(x, y, img.ColorRgb8(255, 0, 0));
+        }
+      }
     }
+
+    // final image = _image = img.Image(width: 256, height: 256);
+    // Iterate over its pixels
+    // for (final pixel in image) {
+    // Set the pixels red value to its x position value,
+    // creating a gradient.
+    // pixel
+    //   ..r = pixel.x
+    // Set the pixels green value to its y position value.
+    // ..g = pixel.y;
+    // }
     super.initState();
   }
 

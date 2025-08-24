@@ -43,10 +43,7 @@ class ImageConverter {
       size.height,
     );
     final paletteIndex = palette.index;
-    final ditheredImage = _floydSteinbergDither(
-      resizedImage,
-      _palettes[paletteIndex],
-    );
+    final ditheredImage = _noDither(resizedImage, _palettes[paletteIndex]);
     return _imageToBytes(ditheredImage, paletteIndex);
   }
 
@@ -83,7 +80,7 @@ class ImageConverter {
     return Uint8List.fromList(blackAndWhite + redOrYellow);
   }
 
-  img.Image _floydSteinbergDither(img.Image src, List<img.Color> palette) {
+  img.Image _noDither(img.Image src, List<img.Color> palette) {
     final image = img.copyResize(src, width: src.width, height: src.height);
 
     for (var y = 0; y < image.height; y++) {
@@ -91,25 +88,6 @@ class ImageConverter {
         final oldPixel = image.getPixel(x, y);
         final newPixel = _findNearestColor(oldPixel, palette);
         image.setPixel(x, y, newPixel);
-
-        final error = (
-          oldPixel.r - newPixel.r.toDouble(),
-          oldPixel.g - newPixel.g.toDouble(),
-          oldPixel.b - newPixel.b.toDouble(),
-        );
-
-        if (x + 1 < image.width) {
-          _distributeError(image, x + 1, y, error, 7 / 16);
-        }
-        if (x - 1 >= 0 && y + 1 < image.height) {
-          _distributeError(image, x - 1, y + 1, error, 3 / 16);
-        }
-        if (y + 1 < image.height) {
-          _distributeError(image, x, y + 1, error, 5 / 16);
-        }
-        if (x + 1 < image.width && y + 1 < image.height) {
-          _distributeError(image, x + 1, y + 1, error, 1 / 16);
-        }
       }
     }
 
@@ -136,18 +114,5 @@ class ImageConverter {
     final g = c1.g - c2.g;
     final b = c1.b - c2.b;
     return (r * r + g * g + b * b).toDouble();
-  }
-
-  void _distributeError(
-    img.Image image,
-    int x,
-    int y,
-    (double, double, double) error,
-    double factor,
-  ) {
-    final pixel = image.getPixel(x, y);
-    pixel.r = (pixel.r + error.$1 * factor).clamp(0, 255);
-    pixel.g = (pixel.g + error.$2 * factor).clamp(0, 255);
-    pixel.b = (pixel.b + error.$3 * factor).clamp(0, 255);
   }
 }

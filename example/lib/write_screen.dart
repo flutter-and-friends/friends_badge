@@ -62,14 +62,21 @@ class _WriteScreenState extends State<WriteScreen> {
           ),
           ElevatedButton(
             onPressed: () {
-              if (_convertedImage != null) {
-                final image = img.decodeImage(_convertedImage!)!;
-                final convertedImage = ImageConverter().convertImage(
-                  image,
-                  ColorPalette.blackWhiteRed,
-                );
-                _nfcBadgeRepository.writeOverNfc(convertedImage);
+              final image = img.Image(width: 240, height: 416);
+              for (var y = 0; y < image.height; y++) {
+                for (var x = 0; x < image.width; x++) {
+                  if ((x ~/ 8 + y ~/ 8) % 2 == 0) {
+                    image.setPixel(x, y, img.ColorRgb8(0, 0, 0));
+                  } else {
+                    image.setPixel(x, y, img.ColorRgb8(255, 0, 0));
+                  }
+                }
               }
+              final convertedImage = ImageConverter().convertImage(
+                image,
+                ColorPalette.blackWhiteRed,
+              );
+              _nfcBadgeRepository.writeOverNfc(convertedImage);
             },
             child: const Text('Write over NFC'),
           ),
