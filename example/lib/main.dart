@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:example/write_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:friends_badge/friends_badge.dart';
@@ -30,6 +32,25 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  late img.Image _image;
+
+  Uint8List get bytes => Uint8List.fromList(img.encodePng(_image));
+
+  @override
+  void initState() {
+    final image = _image = img.Image(width: 256, height: 256);
+    // Iterate over its pixels
+    for (final pixel in image) {
+      // Set the pixels red value to its x position value,
+      // creating a gradient.
+      pixel
+        ..r = pixel.x
+        // Set the pixels green value to its y position value.
+        ..g = pixel.y;
+    }
+    super.initState();
+  }
+
   final BadgeRepository _badgeRepository = BleBadgeRepository();
   List<String> _devices = [];
 
@@ -53,28 +74,16 @@ class _HomePageState extends State<HomePage> {
           ),
           ElevatedButton(
             onPressed: () async {
-              final image = img.Image(width: 256, height: 256);
-              // Iterate over its pixels
-              for (final pixel in image) {
-                // Set the pixels red value to its x position value,
-                // creating a gradient.
-                pixel
-                  ..r = pixel.x
-                  // Set the pixels green value to its y position value.
-                  ..g = pixel.y;
-              }
               await NfcBadgeRepository().writeOverNfc(
                 ImageConverter().convertImage(
-                  image,
+                  _image,
                   ColorPalette.blackWhiteRed,
                 ),
               );
-              // if (_convertedImage != null) {
-              //   _nfcBadgeReposito ry.writeOverNfc(_convertedImage!);
-              // }
             },
             child: const Text('Write over NFC'),
           ),
+          Image.memory(bytes),
           Expanded(
             child: ListView.builder(
               itemCount: _devices.length,

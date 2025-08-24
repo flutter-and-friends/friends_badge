@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'package:example/template_editor_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:friends_badge/friends_badge.dart';
+import 'package:image/image.dart' as img;
 
 class WriteScreen extends StatefulWidget {
   const WriteScreen({
@@ -62,7 +63,12 @@ class _WriteScreenState extends State<WriteScreen> {
           ElevatedButton(
             onPressed: () {
               if (_convertedImage != null) {
-                _nfcBadgeRepository.writeOverNfc(_convertedImage!);
+                final image = img.decodeImage(_convertedImage!)!;
+                final convertedImage = ImageConverter().convertImage(
+                  image,
+                  ColorPalette.blackWhiteRed,
+                );
+                _nfcBadgeRepository.writeOverNfc(convertedImage);
               }
             },
             child: const Text('Write over NFC'),

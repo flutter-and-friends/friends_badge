@@ -8,6 +8,15 @@ enum ColorPalette {
   blackWhiteYellow,
 }
 
+enum BadgeSize {
+  size3_7inch(width: 240, height: 416);
+
+  final int height;
+  final int width;
+
+  const BadgeSize({required this.width, required this.height});
+}
+
 class ImageConverter {
   final List<List<img.Color>> _palettes = [
     [img.ColorRgb8(0, 0, 0), img.ColorRgb8(255, 255, 255)],
@@ -23,14 +32,26 @@ class ImageConverter {
     ],
   ];
 
-  img.Image resizeImage(img.Image image, int width, int height) {
-    return img.copyResize(image, width: width, height: height);
+  Uint8List convertImage(
+    img.Image image,
+    ColorPalette palette, [
+    BadgeSize size = BadgeSize.size3_7inch,
+  ]) {
+    final resizedImage = resizeImage(
+      image,
+      size.width,
+      size.height,
+    );
+    final paletteIndex = palette.index;
+    final ditheredImage = _floydSteinbergDither(
+      resizedImage,
+      _palettes[paletteIndex],
+    );
+    return _imageToBytes(ditheredImage, paletteIndex);
   }
 
-  Uint8List convertImage(img.Image image, ColorPalette palette) {
-    final paletteIndex = palette.index;
-    final ditheredImage = _floydSteinbergDither(image, _palettes[paletteIndex]);
-    return _imageToBytes(ditheredImage, paletteIndex);
+  img.Image resizeImage(img.Image image, int width, int height) {
+    return img.copyResize(image, width: width, height: height);
   }
 
   Uint8List _imageToBytes(img.Image image, int paletteIndex) {
