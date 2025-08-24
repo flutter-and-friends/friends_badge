@@ -1,7 +1,8 @@
 import 'dart:async';
 
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
-import 'package:friends_badge/src/repositories/badge_repository.dart';
+import 'package:friends_badge/friends_badge.dart';
+import 'package:image/image.dart' as img;
 
 class BleBadgeRepository implements BadgeRepository {
   static final Guid serviceUuid = Guid('6e400001-b5a3-f393-e0a9-e50e24dcca9e');
@@ -106,7 +107,10 @@ class BleBadgeRepository implements BadgeRepository {
   }
 
   @override
-  Future<void> writeOverNfc(List<int> data) {
+  Future<void> writeOverNfc(
+    img.Image image, [
+    ColorPalette colorPalette = ColorPalette.blackWhiteRed,
+  ]) {
     // This repository does not handle NFC
     throw UnimplementedError('This repository does not handle NFC');
   }

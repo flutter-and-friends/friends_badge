@@ -1,7 +1,8 @@
 import 'dart:async';
 
 import 'package:flutter/foundation.dart';
-import 'package:friends_badge/src/repositories/badge_repository.dart';
+import 'package:friends_badge/friends_badge.dart';
+import 'package:image/image.dart' as img;
 import 'package:nfc_manager/nfc_manager.dart';
 import 'package:nfc_manager/nfc_manager_android.dart';
 
@@ -19,7 +20,11 @@ class NfcBadgeRepository implements BadgeRepository {
   }
 
   @override
-  Future<void> writeOverNfc(List<int> data) async {
+  Future<void> writeOverNfc(
+    img.Image image, [
+    ColorPalette colorPalette = ColorPalette.blackWhiteRed,
+  ]) async {
+    final data = ImageConverter().convertImage(image, colorPalette);
     final completer = Completer<void>();
 
     NfcManager.instance.startSession(
@@ -37,59 +42,149 @@ class NfcBadgeRepository implements BadgeRepository {
             return;
           }
 
-          // The passive badge protocol is not well documented, so this is a
-          // best guess based on the decompiled code.
-          // 1. It seems to send the data in larger chunks
-          const chunkSize = 245;
-          final chunkedData = <List<int>>[];
-          for (var i = 0; i < data.length; i += chunkSize) {
-            chunkedData.add(
-              data.sublist(
-                i,
-                i + chunkSize > data.length ? data.length : i + chunkSize,
-              ),
-            );
-          }
-
-          // 2. Handshake
+          // 1. Handshake
           final handshakeResponse = await isoDep.transceive(
-            Uint8List.fromList([-48, -47, 0, 0, 0]),
+            Uint8List.fromList([0xd0, 0xd1, 0x00, 0x00, 0x00]),
           );
 
-          final hex = handshakeResponse
-              .map((b) => b.toRadixString(16).padLeft(2, '0'))
-              .join();
-
-          // Handhsake success
-          if (hex != '9000') {
-            throw Exception('Handshake failed with response: $hex');
-          }
-          debugPrint("Handshake success, let's proceed");
-
-          // 3. Send image data
-          for (var i = 0; i < chunkedData.length; i++) {
-            final chunk = chunkedData[i];
-            final isLastChunk = i == chunkedData.length - 1;
-            final command = [
-              0xd0,
-              0xd1,
-              if (isLastChunk) 0x02 else 0x01,
-              0x00,
-              chunk.length,
-              ...chunk,
-            ];
-            debugPrint(
-              'Sending chunk ${i + 1}/${chunkedData.length} '
-              '(${chunk.length} bytes)',
+          if (listEquals(handshakeResponse, Uint8List.fromList([0x90, 0x00]))) {
+            debugPrint('Handshake successful');
+          } else {
+            completer.completeError(
+              Exception('Handshake failed'),
+              StackTrace.current,
             );
-            await isoDep.transceive(Uint8List.fromList(command));
+            return;
+          }
+          final dataSet1 = data[0];
+
+          const chunkSize = 248;
+          var totalBytesSent = 0;
+
+          final numChunks1 = (dataSet1.length / chunkSize).ceil();
+
+          for (var i = 0; i < numChunks1; i++) {
+            final isLastChunk = (i == numChunks1 - 1);
+            final currentChunkSize = isLastChunk
+                ? dataSet1.length % chunkSize
+                : chunkSize;
+
+            final command = Uint8List(5 + currentChunkSize);
+            command[0] = 0xD0;
+            command[1] = 0xD1;
+            command[2] = isLastChunk
+                ? 0x02
+                : 0x01; // Data type (0x01 for more, 0x02 for last)
+            command[3] = 0x00; // Unused
+            command[4] = currentChunkSize;
+
+            // Copy the data chunk into the command buffer.
+            final sourceOffset = i * chunkSize;
+            for (var j = 0; j < currentChunkSize; j++) {
+              command[j + 5] = dataSet1[sourceOffset + j];
+            }
+
+            await isoDep.transceive(command);
+            totalBytesSent += command.length;
+            debugPrint(
+              'Sending chunk ${i + 1}/$numChunks1 (${command.length} bytes)',
+            );
+            // onProcessUpdated(totalBytesSent);
           }
 
-          // 4. Terminate connection
+          // Second data set: writeImgData[1]
+          final dataSet2 = data[1];
+          final numChunks2 = (dataSet2.length / chunkSize).ceil();
+
+          for (var i = 0; i < numChunks2; i++) {
+            final isLastChunk = (i == numChunks2 - 1);
+            final currentChunkSize = isLastChunk
+                ? dataSet2.length % chunkSize
+                : chunkSize;
+
+            final command = Uint8List(5 + currentChunkSize);
+            command[0] = 0xD0;
+            command[1] = 0xD1;
+            command[2] = isLastChunk
+                ? 0x05
+                : 0x04; // Data type (0x04 for more, 0x05 for last)
+            command[3] = 0x00; // Unused
+            command[4] = currentChunkSize;
+
+            // Copy the data chunk into the command buffer.
+            final sourceOffset = i * chunkSize;
+            for (var j = 0; j < currentChunkSize; j++) {
+              command[j + 5] = dataSet2[sourceOffset + j];
+            }
+
+            await isoDep.transceive(command);
+            totalBytesSent += command.length;
+            debugPrint(
+              'Sending chunk ${i + 1}/$numChunks2 (${command.length} bytes)',
+            );
+            // onProcessUpdated(totalBytesSent);
+          }
+
+          // 2. Split data into black/white and red/yellow planes
+          // final planeSize = data.length ~/ 2;
+          // final blackAndWhite = data.sublist(0, planeSize);
+          // final redOrYellow = data.sublist(planeSize);
+          //
+          // // 3. Send black/white data
+          // const chunkSize = 248;
+          // for (var i = 0; i < blackAndWhite.length; i += chunkSize) {
+          //   final chunk = blackAndWhite.sublist(
+          //     i,
+          //     i + chunkSize > blackAndWhite.length
+          //         ? blackAndWhite.length
+          //         : i + chunkSize,
+          //   );
+          //   final isLastChunk = i + chunkSize >= blackAndWhite.length;
+          //   final command = [
+          //     0xd0,
+          //     0xd1,
+          //     isLastChunk ? 0x02 : 0x01,
+          //     0x00,
+          //     chunk.length,
+          //     ...chunk,
+          //   ];
+          //   debugPrint(
+          //     'Sending chunk ${i + 1}/${blackAndWhite.length} '
+          //     '(${chunk.length} bytes)',
+          //   );
+          //   await isoDep.transceive(Uint8List.fromList(command));
+          // }
+          //
+          // // 4. Send red/yellow data
+          // for (var i = 0; i < redOrYellow.length; i += chunkSize) {
+          //   final chunk = redOrYellow.sublist(
+          //     i,
+          //     i + chunkSize > redOrYellow.length
+          //         ? redOrYellow.length
+          //         : i + chunkSize,
+          //   );
+          //   final isLastChunk = i + chunkSize >= redOrYellow.length;
+          //   final command = [
+          //     0xd0,
+          //     0xd1,
+          //     isLastChunk ? 0x05 : 0x04,
+          //     0x00,
+          //     chunk.length,
+          //     ...chunk,
+          //   ];
+          //   debugPrint(
+          //     'Sending chunk ${i + 1}/${redOrYellow.length} '
+          //     '(${chunk.length} bytes)',
+          //   );
+          //   await isoDep.transceive(Uint8List.fromList(command));
+          // }
+
+          // 5. Terminate connection
+          await Future.delayed(const Duration(milliseconds: 50));
           await isoDep.transceive(
             Uint8List.fromList([0xd0, 0xd1, 0x03, 0x00, 0x00]),
           );
-          debugPrint('Image data sent successfully');
+          debugPrint('Total bytes sent: $totalBytesSent');
 
           completer.complete();
         } catch (e, stackTrace) {
