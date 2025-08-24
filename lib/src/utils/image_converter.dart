@@ -9,44 +9,93 @@ enum ColorPalette {
 }
 
 class ImageConverter {
-  final Map<ColorPalette, List<img.Color>> _palettes = {
-    ColorPalette.blackAndWhite: [
-      img.ColorRgb8(0, 0, 0),
-      img.ColorRgb8(255, 255, 255),
-    ],
-    ColorPalette.blackWhiteRed: [
+  final List<List<img.Color>> _palettes = [
+    [img.ColorRgb8(0, 0, 0), img.ColorRgb8(255, 255, 255)],
+    [
       img.ColorRgb8(0, 0, 0),
       img.ColorRgb8(255, 255, 255),
       img.ColorRgb8(255, 0, 0),
     ],
-    ColorPalette.blackWhiteYellow: [
+    [
       img.ColorRgb8(0, 0, 0),
       img.ColorRgb8(255, 255, 255),
       img.ColorRgb8(255, 255, 0),
     ],
-  };
+  ];
+
+  img.Image resizeImage(img.Image image, int width, int height) {
+    return img.copyResize(image, width: width, height: height);
+  }
 
   Uint8List convertImage(img.Image image, ColorPalette palette) {
-    final convertedImage = floydSteinbergDither(image, _palettes[palette]!);
-    return _imageToBytes(convertedImage);
+    final paletteIndex = palette.index;
+    final ditheredImage = _floydSteinbergDither(image, _palettes[paletteIndex]);
+    return _imageToBytes(ditheredImage, paletteIndex);
   }
 
-  Uint8List _imageToBytes(img.Image image) {
-    final buffer = Uint8List(image.width * image.height ~/ 8);
-    for (var y = 0; y < image.height; y++) {
-      for (var x = 0; x < image.width; x++) {
+  Uint8List _imageToBytes(img.Image image, int paletteIndex) {
+    final width = image.width;
+    final height = image.height;
+    final blackAndWhite = Uint8List(width * height ~/ 8);
+    final redOrYellow = Uint8List(width * height ~/ 8);
+    final palette = _palettes[paletteIndex];
+
+    for (var y = 0; y < height; y++) {
+      for (var x = 0; x < width; x++) {
         final pixel = image.getPixel(x, y);
-        final bit = pixel.r > 128 ? 1 : 0;
-        final byteIndex = (y * image.width + x) ~/ 8;
-        final bitIndex = (y * image.width + x) % 8;
-        buffer[byteIndex] = (buffer[byteIndex] & ~(1 << (7 - bitIndex))) |
-            (bit << (7 - bitIndex));
+        final isBlack = pixel == palette[0];
+        final isRedOrYellow = pixel == palette.last;
+
+        final bwBit = isBlack ? 0 : 1;
+        final redOrYellowBit = isRedOrYellow ? 1 : 0;
+
+        final byteIndex = (x ~/ 8) * height + (height - 1 - y);
+
+        blackAndWhite[byteIndex] = (blackAndWhite[byteIndex] << 1) | bwBit;
+        redOrYellow[byteIndex] = redOrYellowBit | (redOrYellow[byteIndex] << 1);
       }
     }
-    return buffer;
+
+    if (paletteIndex == 0) {
+      return blackAndWhite;
+    }
+    return Uint8List.fromList(blackAndWhite + redOrYellow);
   }
 
-  img.Color findClosestColor(img.Color color, List<img.Color> palette) {
+  img.Image _floydSteinbergDither(img.Image src, List<img.Color> palette) {
+    final image = img.copyResize(src, width: src.width, height: src.height);
+
+    for (var y = 0; y < image.height; y++) {
+      for (var x = 0; x < image.width; x++) {
+        final oldPixel = image.getPixel(x, y);
+        final newPixel = _findNearestColor(oldPixel, palette);
+        image.setPixel(x, y, newPixel);
+
+        final error = (
+          oldPixel.r - newPixel.r.toDouble(),
+          oldPixel.g - newPixel.g.toDouble(),
+          oldPixel.b - newPixel.b.toDouble(),
+        );
+
+        if (x + 1 < image.width) {
+          _distributeError(image, x + 1, y, error, 7 / 16);
+        }
+        if (x - 1 >= 0 && y + 1 < image.height) {
+          _distributeError(image, x - 1, y + 1, error, 3 / 16);
+        }
+        if (y + 1 < image.height) {
+          _distributeError(image, x, y + 1, error, 5 / 16);
+        }
+        if (x + 1 < image.width && y + 1 < image.height) {
+          _distributeError(image, x + 1, y + 1, error, 1 / 16);
+        }
+      }
+    }
+
+    return image;
+  }
+
+  img.Color _findNearestColor(img.Color color, List<img.Color> palette) {
     var closestColor = palette[0];
     var minDistance = double.maxFinite;
 
@@ -68,51 +117,16 @@ class ImageConverter {
     return (r * r + g * g + b * b).toDouble();
   }
 
-  img.Image floydSteinbergDither(img.Image src, List<img.Color> palette) {
-    final image = img.copyResize(src, width: src.width, height: src.height);
-
-    for (var y = 0; y < image.height; y++) {
-      for (var x = 0; x < image.width; x++) {
-        final oldPixel = image.getPixel(x, y);
-        final newPixel = findClosestColor(oldPixel, palette);
-        image.setPixel(x, y, newPixel);
-
-        final error = (
-          oldPixel.r - newPixel.r,
-          oldPixel.g - newPixel.g,
-          oldPixel.b - newPixel.b,
-        );
-
-        if (x + 1 < image.width) {
-          final pixel = image.getPixel(x + 1, y);
-          pixel.r = (pixel.r + error.$1 * 7 / 16).clamp(0, 255);
-          pixel.g = (pixel.g + error.$2 * 7 / 16).clamp(0, 255);
-          pixel.b = (pixel.b + error.$3 * 7 / 16).clamp(0, 255);
-        }
-
-        if (x - 1 >= 0 && y + 1 < image.height) {
-          final pixel = image.getPixel(x - 1, y + 1);
-          pixel.r = (pixel.r + error.$1 * 3 / 16).clamp(0, 255);
-          pixel.g = (pixel.g + error.$2 * 3 / 16).clamp(0, 255);
-          pixel.b = (pixel.b + error.$3 * 3 / 16).clamp(0, 255);
-        }
-
-        if (y + 1 < image.height) {
-          final pixel = image.getPixel(x, y + 1);
-          pixel.r = (pixel.r + error.$1 * 5 / 16).clamp(0, 255);
-          pixel.g = (pixel.g + error.$2 * 5 / 16).clamp(0, 255);
-          pixel.b = (pixel.b + error.$3 * 5 / 16).clamp(0, 255);
-        }
-
-        if (x + 1 < image.width && y + 1 < image.height) {
-          final pixel = image.getPixel(x + 1, y + 1);
-          pixel.r = (pixel.r + error.$1 * 1 / 16).clamp(0, 255);
-          pixel.g = (pixel.g + error.$2 * 1 / 16).clamp(0, 255);
-          pixel.b = (pixel.b + error.$3 * 1 / 16).clamp(0, 255);
-        }
-      }
-    }
-
-    return image;
+  void _distributeError(
+    img.Image image,
+    int x,
+    int y,
+    (double, double, double) error,
+    double factor,
+  ) {
+    final pixel = image.getPixel(x, y);
+    pixel.r = (pixel.r + error.$1 * factor).clamp(0, 255);
+    pixel.g = (pixel.g + error.$2 * factor).clamp(0, 255);
+    pixel.b = (pixel.b + error.$3 * factor).clamp(0, 255);
   }
 }

@@ -55,8 +55,9 @@ class _HomePageState extends State<HomePage> {
             onPressed: () async {
               final image = img.Image(width: 256, height: 256);
               // Iterate over its pixels
-              for (var pixel in image) {
-                // Set the pixels red value to its x position value, creating a gradient.
+              for (final pixel in image) {
+                // Set the pixels red value to its x position value,
+                // creating a gradient.
                 pixel
                   ..r = pixel.x
                   // Set the pixels green value to its y position value.

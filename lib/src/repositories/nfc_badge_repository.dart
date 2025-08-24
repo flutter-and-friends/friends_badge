@@ -25,39 +25,56 @@ class NfcBadgeRepository implements BadgeRepository {
     NfcManager.instance.startSession(
       pollingOptions: {
         NfcPollingOption.iso14443,
-        NfcPollingOption.iso15693,
-        NfcPollingOption.iso18092,
       },
       onDiscovered: (NfcTag tag) async {
         try {
-          final nfcA = NfcAAndroid.from(tag);
-          if (nfcA == null) {
-            completer.completeError(Exception('Tag is not NfcA compatible'));
+          final isoDep = IsoDepAndroid.from(tag);
+          if (isoDep == null) {
+            completer.completeError(
+              Exception('Tag is not IsoDep compatible'),
+              StackTrace.current,
+            );
             return;
           }
-          
-          await Future.delayed(const Duration(seconds: 2));
 
-          // 1. Send "Set Status" command with status 0x0000 (SUCCESS).
-          await nfcA.transceive(Uint8List.fromList([0xa2, 0x06, 0x00, 0x00]));
-
-          // 2. Send "Read Status" command.
-          final status = await nfcA.transceive(Uint8List.fromList([0x30, 0x06]));
-          // TODO(lohnn): Check status
-
-          // 3. Send image data in 4-byte chunks.
-          const chunkSize = 4;
+          // The passive badge protocol is not well documented, so this is a
+          // best guess based on the decompiled code.
+          // 1. It seems to send the data in larger chunks
+          const chunkSize = 245;
+          final chunkedData = <List<int>>[];
           for (var i = 0; i < data.length; i += chunkSize) {
-            final chunk = data.sublist(
-                i, i + chunkSize > data.length ? data.length : i + chunkSize);
-            final address = i ~/ chunkSize;
-            final command = [0xa2, address, ...chunk];
-            await nfcA.transceive(Uint8List.fromList(command));
+            chunkedData.add(
+              data.sublist(
+                i,
+                i + chunkSize > data.length ? data.length : i + chunkSize,
+              ),
+            );
           }
 
-          // 4. Send "Set Status" command with status 0x0200 (S2).
-          await nfcA
-              .transceive(Uint8List.fromList([0xa2, 0x06, 0x02, 0x00]));
+          // 2. Handshake
+          await isoDep.transceive(
+            Uint8List.fromList([0xc0, 0xc1, 0x00, 0x00, 0x00]),
+          );
+
+          // 3. Send image data
+          for (var i = 0; i < chunkedData.length; i++) {
+            final chunk = chunkedData[i];
+            final isLastChunk = i == chunkedData.length - 1;
+            final command = [
+              0xd0,
+              0xd1,
+              if (isLastChunk) 0x02 else 0x01,
+              0x00,
+              chunk.length,
+              ...chunk,
+            ];
+            await isoDep.transceive(Uint8List.fromList(command));
+          }
+
+          // 4. Terminate connection
+          await isoDep.transceive(
+            Uint8List.fromList([0xd0, 0xd1, 0x03, 0x00, 0x00]),
+          );
 
           completer.complete();
         } catch (e, stackTrace) {

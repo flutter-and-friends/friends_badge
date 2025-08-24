@@ -50,6 +50,8 @@ The command structure is detailed in `BLE_FORMAT.md` and validated in `CmdCenter
 -   **BLE and NFC Permissions:** The Flutter app will need to request the appropriate permissions for BLE and NFC on both Android and iOS.
 -   **Platform-specific code:** While Flutter is cross-platform, there might be a need for some platform-specific code, especially for the NFC implementation.
 -   **Font rendering:** The example app's template editor will need to handle font rendering correctly to match the original app's behavior.
+-   **Two NFC Protocols:** The app uses two different NFC protocols. The active badge protocol is used for badges with a battery and Bluetooth, while the passive badge protocol is used for badges that are powered by the NFC field. It is crucial to use the correct protocol for the target badge.
+-   **Image Conversion for Different Badge Sizes:** The image conversion logic is different for different badge sizes. The `EPaperPicture.java` file contains the specific logic for each badge size. It is important to use the correct image conversion logic for the target badge.
 
 ## Code Snippets
 
