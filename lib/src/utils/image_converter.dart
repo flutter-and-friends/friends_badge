@@ -15,11 +15,12 @@ enum ColorPalette {
       (r: 255, g: 0, b: 0),
     ],
   ),
-  blackWhiteYellow(
+  blackWhiteYellowRed(
     [
       (r: 0, g: 0, b: 0),
       (r: 255, g: 255, b: 255),
       (r: 255, g: 255, b: 0),
+      (r: 255, g: 0, b: 0),
     ],
   );
 
@@ -52,40 +53,15 @@ class ImageConverter {
       size,
     );
     final ditheredImage = noDither(resizedImage, palette);
-    return gray2BinaryBWR(image);
-    // return _imageToBytes(ditheredImage, palette);
+    return switch (palette) {
+      ColorPalette.blackWhite => gray2BinaryBW(ditheredImage),
+      ColorPalette.blackWhiteRed => gray2BinaryBWR(ditheredImage),
+      ColorPalette.blackWhiteYellowRed => gray2BinaryBWYR(image),
+    };
   }
 
   img.Image resizeImage(img.Image image, BadgeSize size) {
     return img.copyResize(image, width: size.width, height: size.height);
-  }
-
-  List<Uint8List> _imageToBytes(img.Image image, ColorPalette palette) {
-    final width = image.width;
-    final height = image.height;
-    final blackAndWhite = Uint8List(width * height ~/ 8);
-    final redOrYellow = Uint8List(width * height ~/ 8);
-
-    for (var y = 0; y < height; y++) {
-      for (var x = 0; x < width; x++) {
-        final pixel = image.getPixel(x, y);
-        final isBlack = pixel == palette.colors[0];
-        final isRedOrYellow = pixel == palette.colors.last;
-
-        final bwBit = isBlack ? 0 : 1;
-        final redOrYellowBit = isRedOrYellow ? 1 : 0;
-
-        final byteIndex = (x ~/ 8) * height + (height - 1 - y);
-
-        blackAndWhite[byteIndex] = (blackAndWhite[byteIndex] << 1) | bwBit;
-        redOrYellow[byteIndex] = redOrYellowBit | (redOrYellow[byteIndex] << 1);
-      }
-    }
-
-    if (palette == ColorPalette.blackWhite) {
-      return [blackAndWhite];
-    }
-    return [blackAndWhite, redOrYellow];
   }
 
   /// Converts an image to two separate 1-bit-per-pixel byte arrays.
@@ -131,7 +107,8 @@ class ImageConverter {
         final index = (x ~/ 8) * height + (height - 1 - y);
 
         // Pack the 1-bit values into their respective byte arrays.
-        // The bit is added from the right, shifting the existing bits to the left.
+        // The bit is added from the right, shifting the existing bits to the
+        // left.
         outputBytes1[index] = (outputBytes1[index] << 1) | value1;
         outputBytes2[index] = (outputBytes2[index] << 1) | value2;
       }
@@ -234,7 +211,8 @@ class ImageConverter {
         }
 
         // 3. Calculate the index in the output array.
-        // The data is stored in column-major order to match the display controller.
+        // The data is stored in column-major order to match the display
+        // controller.
         final index = ((x ~/ 4) * height) + y;
 
         // 4. Pack the 2-bit color value into the correct byte.

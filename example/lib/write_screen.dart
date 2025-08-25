@@ -63,7 +63,7 @@ class _WriteScreenState extends State<WriteScreen> {
               final image = img.Image(width: 240, height: 416);
               for (var y = 0; y < image.height; y++) {
                 for (var x = 0; x < image.width; x++) {
-                  if ((x ~/ 8 + y ~/ 8) % 2 == 0) {
+                  if ((x ~/ 8 + y ~/ 8).isEven) {
                     image.setPixel(x, y, img.ColorRgb8(0, 0, 0));
                   } else {
                     image.setPixel(x, y, img.ColorRgb8(255, 0, 0));

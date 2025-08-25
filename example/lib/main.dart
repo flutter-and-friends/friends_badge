@@ -58,24 +58,7 @@ class _HomePageState extends State<HomePage> {
       }
     }
 
-    _image2 = ImageConverter().noDither(image, ColorPalette.blackWhiteRed);
-    // for (var y = 0; y < image.height; y++) {
-    //   for (var x = 0; x < image.width; x++) {
-    //     final oldPixel = image.getPixel(x, y);
-    //     _image2.setPixel(x, y, oldPixel);
-    //   }
-    // }
-
-    // final image = _image = img.Image(width: 256, height: 256);
-    // Iterate over its pixels
-    // for (final pixel in image) {
-    // Set the pixels red value to its x position value,
-    // creating a gradient.
-    // pixel
-    //   ..r = pixel.x
-    // Set the pixels green value to its y position value.
-    // ..g = pixel.y;
-    // }
+    _image2 = ImageConverter().noDither(image, ColorPalette.blackWhiteYellowRed);
     super.initState();
   }
 
@@ -104,9 +87,7 @@ class _HomePageState extends State<HomePage> {
             onPressed: () async {
               await WaitingForNfcTap.showLoading(
                 context: context,
-                job: NfcBadgeRepository().writeOverNfc(
-                  _image,
-                ),
+                job: NfcBadgeRepository().writeOverNfc(_image),
               );
             },
             child: const Text('Write over NFC'),
@@ -130,25 +111,19 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
           ),
-          // Expanded(
-          //   child: ListView.builder(
-          //     itemCount: _devices.length,
-          //     itemBuilder: (context, index) {
-          //       return ListTile(
-          //         title: Text(_devices[index]),
-          //         onTap: () {
-          //           Navigator.push(
-          //             context,
-          //             MaterialPageRoute(
-          //               builder: (context) =>
-          //                   WriteScreen(deviceAddress: _devices[index]),
-          //             ),
-          //           );
-          //         },
-          //       );
-          //     },
-          //   ),
-          // ),
+          for (final device in _devices)
+            ListTile(
+              title: Text(device),
+              onTap: () {
+                // Navigator.push(
+                //   context,
+                //   MaterialPageRoute(
+                //     builder: (context) =>
+                //         WriteScreen(deviceAddress: _devices[index]),
+                //   ),
+                // );
+              },
+            ),
         ],
       ),
     );
