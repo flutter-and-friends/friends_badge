@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 
+import 'package:example/template_editor_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:friends_badge/friends_badge.dart';
 import 'package:image/image.dart' as img;
@@ -29,24 +30,25 @@ class _WriteScreenState extends State<WriteScreen> {
       ),
       body: Column(
         children: [
-          if (_convertedImage != null) Image.memory(_convertedImage!),
-          // else
-          // ElevatedButton(
-          //   onPressed: () async {
-          //     final result = await Navigator.push(
-          //       context,
-          //       MaterialPageRoute(
-          //         builder: (context) => const TemplateEditorScreen(),
-          //       ),
-          //     );
-          //     if (result is Uint8List) {
-          //       setState(() {
-          //         _convertedImage = result;
-          //       });
-          //     }
-          //   },
-          //   child: const Text('Create Template'),
-          // ),
+          if (_convertedImage != null)
+            Image.memory(_convertedImage!)
+          else
+            ElevatedButton(
+              onPressed: () async {
+                final result = await Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const TemplateEditorScreen(),
+                  ),
+                );
+                if (result is Uint8List) {
+                  setState(() {
+                    _convertedImage = result;
+                  });
+                }
+              },
+              child: const Text('Create Template'),
+            ),
           ElevatedButton(
             onPressed: () {
               if (_convertedImage != null) {

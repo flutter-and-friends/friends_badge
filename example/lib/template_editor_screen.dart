@@ -1,8 +1,6 @@
 import 'dart:io';
-import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
-import 'package:friends_badge/friends_badge.dart';
 import 'package:image/image.dart' as img;
 import 'package:image_picker/image_picker.dart';
 
@@ -15,7 +13,6 @@ class TemplateEditorScreen extends StatefulWidget {
 
 class _TemplateEditorScreenState extends State<TemplateEditorScreen> {
   File? _image;
-  List<Uint8List>? _convertedImage;
 
   Future<void> _pickImage() async {
     final picker = ImagePicker();
@@ -24,27 +21,8 @@ class _TemplateEditorScreenState extends State<TemplateEditorScreen> {
     if (pickedFile != null) {
       setState(() {
         _image = File(pickedFile.path);
-        _convertedImage = null;
       });
     }
-  }
-
-  Future<void> _convertImage() async {
-    if (_image == null) {
-      return;
-    }
-
-    final image = img.decodeImage(await _image!.readAsBytes());
-    if (image == null) {
-      return;
-    }
-
-    final converter = ImageConverter();
-    final convertedData = converter.convertImage(image);
-
-    setState(() {
-      _convertedImage = convertedData;
-    });
   }
 
   @override
@@ -55,40 +33,45 @@ class _TemplateEditorScreenState extends State<TemplateEditorScreen> {
       ),
       body: Column(
         children: [
-          if (_convertedImage != null)
-            Image.memory(_convertedImage!)
-          else if (_image != null)
+          if (_image != null)
             Image.file(_image!)
           else
             const Text('No image selected'),
-          DropdownButton<ColorPalette>(
-            value: _selectedPalette,
-            onChanged: (ColorPalette? newValue) {
-              if (newValue != null) {
-                setState(() {
-                  _selectedPalette = newValue;
-                });
-              }
-            },
-            items: ColorPalette.values.map((ColorPalette palette) {
-              return DropdownMenuItem<ColorPalette>(
-                value: palette,
-                child: Text(palette.toString().split('.').last),
-              );
-            }).toList(),
-          ),
+          // DropdownButton<ColorPalette>(
+          //   value: _selectedPalette,
+          //   onChanged: (ColorPalette? newValue) {
+          //     if (newValue != null) {
+          //       setState(() {
+          //         _selectedPalette = newValue;
+          //       });
+          //     }
+          //   },
+          //   items: ColorPalette.values.map((ColorPalette palette) {
+          //     return DropdownMenuItem<ColorPalette>(
+          //       value: palette,
+          //       child: Text(palette.toString().split('.').last),
+          //     );
+          //   }).toList(),
+          // ),
           ElevatedButton(
             onPressed: _pickImage,
             child: const Text('Pick Image'),
           ),
           ElevatedButton(
-            onPressed: _convertImage,
-            child: const Text('Convert Image'),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              if (_convertedImage != null) {
-                Navigator.pop(context, _convertedImage);
+            onPressed: () async {
+              if (_image case final image?) {
+                final decodedImage = img.decodeImage(await image.readAsBytes());
+                if (decodedImage == null) {
+                  return;
+                }
+
+                Navigator.pop(
+                  context,
+                  img.resize(
+                    decodedImage,
+                    height: 416 * 2,
+                  ),
+                );
               }
             },
             child: const Text('Done'),

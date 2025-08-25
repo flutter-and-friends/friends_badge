@@ -1,48 +1,14 @@
-import 'dart:typed_data';
-
+import 'package:flutter/foundation.dart';
+import 'package:friends_badge/src/utils/badge_size.dart';
+import 'package:friends_badge/src/utils/color_palette.dart';
 import 'package:image/image.dart' as img;
 
-typedef ColorPaletteColor = ({int r, int g, int b});
-
-enum ColorPalette {
-  blackWhite(
-    [(r: 0, g: 0, b: 0), (r: 255, g: 255, b: 255)],
-  ),
-  blackWhiteRed(
-    [
-      (r: 0, g: 0, b: 0),
-      (r: 255, g: 255, b: 255),
-      (r: 255, g: 0, b: 0),
-    ],
-  ),
-  blackWhiteYellowRed(
-    [
-      (r: 0, g: 0, b: 0),
-      (r: 255, g: 255, b: 255),
-      (r: 255, g: 255, b: 0),
-      (r: 255, g: 0, b: 0),
-    ],
-  );
-
-  final List<ColorPaletteColor> paletteValues;
-
-  List<img.Color> get colors => paletteValues
-      .map((e) => img.ColorRgb8(e.r, e.g, e.b))
-      .toList(growable: false);
-
-  const ColorPalette(this.paletteValues);
-}
-
-enum BadgeSize {
-  size3_7inch(width: 240, height: 416);
-
-  final int height;
-  final int width;
-
-  const BadgeSize({required this.width, required this.height});
-}
-
+@internal
 class ImageConverter {
+  @internal
+  const ImageConverter();
+
+  @internal
   List<Uint8List> convertImage(
     img.Image image,
     ColorPalette palette, [
@@ -56,7 +22,7 @@ class ImageConverter {
     return switch (palette) {
       ColorPalette.blackWhite => gray2BinaryBW(ditheredImage),
       ColorPalette.blackWhiteRed => gray2BinaryBWR(ditheredImage),
-      ColorPalette.blackWhiteYellowRed => gray2BinaryBWYR(image),
+      ColorPalette.blackWhiteYellowRed => gray2BinaryBWYR(ditheredImage),
     };
   }
 
@@ -161,7 +127,8 @@ class ImageConverter {
         final index = (x ~/ 8) * height + (height - 1 - y);
 
         // Pack the 1-bit values into their respective byte arrays.
-        // The bit is added from the right, shifting the existing bits to the left.
+        // The bit is added from the right, shifting the existing bits to the
+        // left.
         outputBytes1[index] = (outputBytes1[index] << 1) | value1;
         outputBytes2[index] = (outputBytes2[index] << 1) | value2;
       }
@@ -224,6 +191,15 @@ class ImageConverter {
     // The original Java function returned a byte[][], so we wrap the result
     // in a list to match that structure.
     return [outputBytes];
+  }
+
+  /// Dithers the image with the specified palette using the default dithering
+  /// algorithm (currently no dithering).
+  img.Image dither(
+    img.Image src, [
+    ColorPalette palette = ColorPalette.blackWhiteYellowRed,
+  ]) {
+    return noDither(src, palette);
   }
 
   img.Image noDither(img.Image src, ColorPalette palette) {

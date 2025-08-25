@@ -25,7 +25,6 @@
 - [x] Build the UI screens for the template editor, home screen, and write screen.
 - [x] Implement BLE device selection in the example app.
 
-## Phase 4: Testing and Debugging
-
-- [ ] Write unit tests for the package's logic.
-- [ ] Perform integration testing with a physical badge using the example app.
+## Phase 4: Reading config from badge
+- [ ] Implement reading the badge configuration over NFC.
+  * Find native implementation in [WriteActivity.java:927](android_app2/Highlight%20WorkBadge2.1.6/sources/cn/highlight/work_card_write/activity/WriteActivity.java)

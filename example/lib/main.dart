@@ -1,8 +1,12 @@
 import 'dart:typed_data';
 
+import 'package:example/nullability_extensions.dart';
+import 'package:example/template_editor_screen.dart';
 import 'package:example/waiting_for_nfc_tap.dart';
 import 'package:flutter/material.dart';
 import 'package:friends_badge/friends_badge.dart';
+// ignore: implementation_imports
+import 'package:friends_badge/src/utils/image_converter.dart';
 import 'package:image/image.dart' as img;
 
 void main() {
@@ -32,16 +36,23 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  late img.Image _image;
-  late img.Image _image2;
+  img.Image? image;
 
-  Uint8List get bytes => Uint8List.fromList(img.encodePng(_image));
+  img.Image? get ditheredImage => image?.let(
+    // ignore: invalid_use_of_internal_member
+    (e) => const ImageConverter().dither(e),
+  );
 
-  Uint8List get bytes2 => Uint8List.fromList(img.encodePng(_image2));
+  Uint8List? get imageBytes => image?.let(
+    (image) => Uint8List.fromList(img.encodePng(image)),
+  );
+
+  Uint8List? get ditheredImageBytes =>
+      ditheredImage?.let((image) => Uint8List.fromList(img.encodePng(image)));
 
   @override
   void initState() {
-    final image = _image = img.Image(width: 240, height: 416);
+    final image = this.image = img.Image(width: 240, height: 416);
     for (var y = 0; y < image.height; y++) {
       for (var x = 0; x < image.width; x++) {
         // Draw circles with radius 8 in a grid pattern
@@ -58,7 +69,6 @@ class _HomePageState extends State<HomePage> {
       }
     }
 
-    _image2 = ImageConverter().noDither(image, ColorPalette.blackWhiteYellowRed);
     super.initState();
   }
 
@@ -83,14 +93,31 @@ class _HomePageState extends State<HomePage> {
             },
             child: const Text('Scan for BLE Devices'),
           ),
+          if (image case final image?)
+            ElevatedButton(
+              onPressed: () async {
+                await WaitingForNfcTap.showLoading(
+                  context: context,
+                  job: NfcBadgeRepository().writeOverNfc(image),
+                );
+              },
+              child: const Text('Write over NFC'),
+            ),
           ElevatedButton(
             onPressed: () async {
-              await WaitingForNfcTap.showLoading(
-                context: context,
-                job: NfcBadgeRepository().writeOverNfc(_image),
+              final result = await Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const TemplateEditorScreen(),
+                ),
               );
+              if (result is img.Image) {
+                setState(() {
+                  image = result;
+                });
+              }
             },
-            child: const Text('Write over NFC'),
+            child: const Text('Create Template'),
           ),
           SingleChildScrollView(
             scrollDirection: Axis.horizontal,
@@ -99,14 +126,16 @@ class _HomePageState extends State<HomePage> {
               child: Row(
                 spacing: 24,
                 children: [
-                  Image.memory(
-                    bytes,
-                    height: 300,
-                  ),
-                  Image.memory(
-                    bytes2,
-                    height: 300,
-                  ),
+                  if (imageBytes case final imageBytes?)
+                    Image.memory(
+                      imageBytes,
+                      height: 300,
+                    ),
+                  if (ditheredImageBytes case final ditheredImageBytes?)
+                    Image.memory(
+                      ditheredImageBytes,
+                      height: 300,
+                    ),
                 ],
               ),
             ),

@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 import 'package:friends_badge/friends_badge.dart';
+import 'package:friends_badge/src/utils/image_converter.dart';
 import 'package:image/image.dart' as img;
 import 'package:nfc_manager/nfc_manager.dart';
 import 'package:nfc_manager/nfc_manager_android.dart';
@@ -24,7 +25,7 @@ class NfcBadgeRepository implements BadgeRepository {
     img.Image image, [
     ColorPalette colorPalette = ColorPalette.blackWhiteYellowRed,
   ]) async {
-    final data = ImageConverter().convertImage(image, colorPalette);
+    final data = const ImageConverter().convertImage(image, colorPalette);
     final completer = Completer<void>();
 
     NfcManager.instance.startSession(
