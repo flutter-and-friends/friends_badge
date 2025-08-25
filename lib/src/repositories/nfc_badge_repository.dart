@@ -10,11 +10,20 @@ import 'package:nfc_manager/nfc_manager_android.dart';
 class NfcBadgeRepository {
   const NfcBadgeRepository();
 
-  Future<void> writeOverNfc(
+  /// Writes the given [image] to an NFC badge.
+  /// If [shouldCrop] is true, the image will be cropped to fit the badge's
+  /// aspect ratio.
+  /// Returns a [Stream] that completes when the write operation is done or
+  /// fails.
+  /// The stream emits progress updates as double values between 0.0 and 1.0.
+  ///
+  /// Make sure to call this method in a context where NFC is available and
+  /// permissions are granted.
+  Stream<double> writeOverNfc(
     img.Image image, {
     bool shouldCrop = true,
-  }) async {
-    final completer = Completer<void>();
+  }) {
+    final controller = StreamController<double>();
 
     NfcManager.instance.startSession(
       pollingOptions: {
@@ -24,7 +33,7 @@ class NfcBadgeRepository {
         try {
           final isoDep = IsoDepAndroid.from(tag);
           if (isoDep == null) {
-            completer.completeError(
+            controller.addError(
               Exception('Tag is not IsoDep compatible'),
               StackTrace.current,
             );
@@ -52,7 +61,7 @@ class NfcBadgeRepository {
           if (listEquals(handshakeResponse, Uint8List.fromList([0x90, 0x00]))) {
             debugPrint('Handshake successful');
           } else {
-            completer.completeError(
+            controller.addError(
               Exception('Handshake failed'),
               StackTrace.current,
             );
@@ -61,6 +70,8 @@ class NfcBadgeRepository {
 
           final blackAndWhite = data[0];
           final redOrYellow = data.elementAtOrNull(1) ?? Uint8List(0);
+
+          final totalChunks = blackAndWhite.length + redOrYellow.length;
 
           // 3. Send black/white data
           const chunkSize = 248;
@@ -87,6 +98,7 @@ class NfcBadgeRepository {
               'Sending chunk ${i + 1}/${blackAndWhite.length} '
               '(${chunk.length} bytes)',
             );
+            controller.add((i + chunk.length) / totalChunks);
           }
 
           // 4. Send red/yellow data
@@ -112,6 +124,9 @@ class NfcBadgeRepository {
               'Sending chunk ${i + 1}/${redOrYellow.length} '
               '(${chunk.length} bytes)',
             );
+            controller.add(
+              (blackAndWhite.length + i + chunk.length) / totalChunks,
+            );
           }
 
           // 5. Terminate connection
@@ -121,16 +136,17 @@ class NfcBadgeRepository {
           );
           debugPrint('Total bytes sent: $totalBytesSent');
 
-          completer.complete();
+          // ignore: avoid_catches_without_on_clauses
         } catch (e, stackTrace) {
-          completer.completeError(e, stackTrace);
+          controller.addError(e, stackTrace);
         } finally {
           NfcManager.instance.stopSession();
+          controller.close();
         }
       },
     );
 
-    return completer.future;
+    return controller.stream;
   }
 
   img.Image? createPreviewImage(img.Image e) {

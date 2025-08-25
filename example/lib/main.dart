@@ -37,7 +37,6 @@ class _HomePageState extends State<HomePage> {
   img.Image? image;
 
   img.Image? get ditheredImage => image?.let(
-    // ignore: invalid_use_of_internal_member
     (e) => const NfcBadgeRepository().createPreviewImage(e),
   );
 
