@@ -59,7 +59,3 @@ The following commands have been identified from the `cn.highlight.tx.app.CmdCen
 | `CMD_openMoreCabinet` | `0x10` |
 | `CMD_getCabinetLockStatus` | `0x11` |
 | `CMD_setCabinetSensor` | `0x12` |
-
-## Data Payload
-
-The data payload for the write characteristic is described in the [DATA_FORMAT.md](DATA_FORMAT.md) document.

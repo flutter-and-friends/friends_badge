@@ -27,7 +27,7 @@
 
 ## Phase 4: Reading config from badge
 - [ ] Implement reading the badge configuration over NFC.
-  * Find native implementation in [WriteActivity.java:927](android_app2/Highlight%20WorkBadge2.1.6/sources/cn/highlight/work_card_write/activity/WriteActivity.java)
+  * Find native implementation in [WriteActivity.java:927](android_app/decompiled_apk/decompiled_java/cn/highlight/work_card_write/activity/WriteActivity.java)
 
 ## Phase 5: iOS support
 - [ ] Implement NFC support for iOS... if possible
