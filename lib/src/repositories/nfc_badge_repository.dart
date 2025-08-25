@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:friends_badge/src/utils/badge_specification.dart';
@@ -6,6 +7,7 @@ import 'package:friends_badge/src/utils/image_converter.dart';
 import 'package:image/image.dart' as img;
 import 'package:nfc_manager/nfc_manager.dart';
 import 'package:nfc_manager/nfc_manager_android.dart';
+import 'package:nfc_manager/nfc_manager_ios.dart';
 
 /// Repository for writing images to NFC badges.
 ///
@@ -48,126 +50,50 @@ class NfcBadgeRepository {
   }) {
     final controller = StreamController<double>();
 
-    NfcManager.instance.startSession(
-      pollingOptions: {
-        NfcPollingOption.iso14443,
-      },
-      onDiscovered: (NfcTag tag) async {
-        try {
-          final isoDep = IsoDepAndroid.from(tag);
-          if (isoDep == null) {
-            controller.addError(
-              Exception('Tag is not IsoDep compatible'),
-              StackTrace.current,
-            );
-            return;
-          }
+    NfcManager.instance
+        .startSession(
+          alertMessageIos: 'Hold your device near the NFC badge',
+          pollingOptions: {
+            NfcPollingOption.iso14443,
+          },
+          onDiscovered: (tag) async {
+            try {
+              if (Platform.isAndroid) {
+                await _writeOverNfcAndroid(
+                  tag,
+                  image,
+                  shouldCrop,
+                  controller,
+                );
+              } else if (Platform.isIOS) {
+                await _writeOverNfcIos(
+                  tag,
+                  image,
+                  shouldCrop,
+                  controller,
+                );
+              } else {
+                throw UnsupportedError('Unsupported platform');
+              }
 
-          // Get badge specification from the device
-          final badge = await isoDep
-              .transceive(
-                Uint8List.fromList([-48, -47, 3, 0, 1]),
-              )
-              .then(BadgeSpecification.fromSpecification);
-
-          final data = const ImageConverter().convertImage(
-            image,
-            badge: badge,
-            shouldCrop: shouldCrop,
+              // ignore: avoid_catches_without_on_clauses
+            } catch (e, stackTrace) {
+              controller.addError(e, stackTrace);
+            } finally {
+              NfcManager.instance.stopSession();
+              controller.close();
+            }
+          },
+        )
+        .onError((error, stackTrace) {
+          debugPrint('NFC session error: $error');
+          debugPrintStack(stackTrace: stackTrace);
+          controller.addError(
+            error ?? 'Something went wrong when setting up the NfcManager',
+            stackTrace,
           );
-
-          // 1. Handshake with passive screen
-          final handshakeResponse = await isoDep.transceive(
-            Uint8List.fromList([0xd0, 0xd1, 0x00, 0x00, 0x00]),
-          );
-
-          if (listEquals(handshakeResponse, Uint8List.fromList([0x90, 0x00]))) {
-            debugPrint('Handshake successful');
-          } else {
-            controller.addError(
-              Exception('Handshake failed'),
-              StackTrace.current,
-            );
-            return;
-          }
-
-          final blackAndWhite = data[0];
-          final redOrYellow = data.elementAtOrNull(1) ?? Uint8List(0);
-
-          final totalChunks = blackAndWhite.length + redOrYellow.length;
-
-          // 3. Send black/white data
-          const chunkSize = 248;
-          var totalBytesSent = 0;
-          for (var i = 0; i < blackAndWhite.length; i += chunkSize) {
-            final chunk = blackAndWhite.sublist(
-              i,
-              i + chunkSize > blackAndWhite.length
-                  ? blackAndWhite.length
-                  : i + chunkSize,
-            );
-            final isLastChunk = i + chunkSize >= blackAndWhite.length;
-            final command = [
-              0xd0,
-              0xd1,
-              if (isLastChunk) 0x02 else 0x01,
-              0x00,
-              chunk.length,
-              ...chunk,
-            ];
-            await isoDep.transceive(Uint8List.fromList(command));
-            totalBytesSent += command.length;
-            debugPrint(
-              'Sending chunk ${i + 1}/${blackAndWhite.length} '
-              '(${chunk.length} bytes)',
-            );
-            controller.add((i + chunk.length) / totalChunks);
-          }
-
-          // 4. Send red/yellow data
-          for (var i = 0; i < redOrYellow.length; i += chunkSize) {
-            final chunk = redOrYellow.sublist(
-              i,
-              i + chunkSize > redOrYellow.length
-                  ? redOrYellow.length
-                  : i + chunkSize,
-            );
-            final isLastChunk = i + chunkSize >= redOrYellow.length;
-            final command = [
-              0xd0,
-              0xd1,
-              if (isLastChunk) 0x05 else 0x04,
-              0x00,
-              chunk.length,
-              ...chunk,
-            ];
-            await isoDep.transceive(Uint8List.fromList(command));
-            totalBytesSent += command.length;
-            debugPrint(
-              'Sending chunk ${i + 1}/${redOrYellow.length} '
-              '(${chunk.length} bytes)',
-            );
-            controller.add(
-              (blackAndWhite.length + i + chunk.length) / totalChunks,
-            );
-          }
-
-          // 5. Terminate connection
-          await Future.delayed(const Duration(milliseconds: 50));
-          await isoDep.transceive(
-            Uint8List.fromList([0xd0, 0xd1, 0x03, 0x00, 0x00]),
-          );
-          debugPrint('Total bytes sent: $totalBytesSent');
-
-          // ignore: avoid_catches_without_on_clauses
-        } catch (e, stackTrace) {
-          controller.addError(e, stackTrace);
-        } finally {
-          NfcManager.instance.stopSession();
           controller.close();
-        }
-      },
-    );
+        });
 
     return controller.stream;
   }
@@ -181,5 +107,137 @@ class NfcBadgeRepository {
       e,
       badge: BadgeSpecification.size3_7inchPassiveBWRY,
     );
+  }
+
+  Future<void> _writeOverNfcAndroid(
+    NfcTag tag,
+    img.Image image,
+    bool shouldCrop,
+    StreamController<double> controller,
+  ) async {
+    final isoDep = IsoDepAndroid.from(tag);
+    if (isoDep == null) {
+      controller.addError(
+        Exception('Tag is not IsoDep compatible'),
+        StackTrace.current,
+      );
+      return;
+    }
+
+    // Get badge specification from the device
+    final badge = await isoDep
+        .transceive(
+          Uint8List.fromList([-48, -47, 3, 0, 1]),
+        )
+        .then(BadgeSpecification.fromSpecification);
+
+    final data = const ImageConverter().convertImage(
+      image,
+      badge: badge,
+      shouldCrop: shouldCrop,
+    );
+
+    // 1. Handshake with passive screen
+    final handshakeResponse = await isoDep.transceive(
+      Uint8List.fromList([0xd0, 0xd1, 0x00, 0x00, 0x00]),
+    );
+
+    if (listEquals(handshakeResponse, Uint8List.fromList([0x90, 0x00]))) {
+      debugPrint('Handshake successful');
+    } else {
+      controller.addError(
+        Exception('Handshake failed'),
+        StackTrace.current,
+      );
+      return;
+    }
+
+    final blackAndWhite = data[0];
+    final redOrYellow = data.elementAtOrNull(1) ?? Uint8List(0);
+
+    final totalChunks = blackAndWhite.length + redOrYellow.length;
+
+    // 3. Send black/white data
+    const chunkSize = 248;
+    var totalBytesSent = 0;
+    for (var i = 0; i < blackAndWhite.length; i += chunkSize) {
+      final chunk = blackAndWhite.sublist(
+        i,
+        i + chunkSize > blackAndWhite.length
+            ? blackAndWhite.length
+            : i + chunkSize,
+      );
+      final isLastChunk = i + chunkSize >= blackAndWhite.length;
+      final command = [
+        0xd0,
+        0xd1,
+        if (isLastChunk) 0x02 else 0x01,
+        0x00,
+        chunk.length,
+        ...chunk,
+      ];
+      await isoDep.transceive(Uint8List.fromList(command));
+      totalBytesSent += command.length;
+      debugPrint(
+        'Sending chunk ${i + 1}/${blackAndWhite.length} '
+        '(${chunk.length} bytes)',
+      );
+      controller.add((i + chunk.length) / totalChunks);
+    }
+
+    // 4. Send red/yellow data
+    for (var i = 0; i < redOrYellow.length; i += chunkSize) {
+      final chunk = redOrYellow.sublist(
+        i,
+        i + chunkSize > redOrYellow.length ? redOrYellow.length : i + chunkSize,
+      );
+      final isLastChunk = i + chunkSize >= redOrYellow.length;
+      final command = [
+        0xd0,
+        0xd1,
+        if (isLastChunk) 0x05 else 0x04,
+        0x00,
+        chunk.length,
+        ...chunk,
+      ];
+      await isoDep.transceive(Uint8List.fromList(command));
+      totalBytesSent += command.length;
+      debugPrint(
+        'Sending chunk ${i + 1}/${redOrYellow.length} '
+        '(${chunk.length} bytes)',
+      );
+      controller.add(
+        (blackAndWhite.length + i + chunk.length) / totalChunks,
+      );
+    }
+
+    // 5. Terminate connection
+    await Future.delayed(const Duration(milliseconds: 50));
+    await isoDep.transceive(
+      Uint8List.fromList([0xd0, 0xd1, 0x03, 0x00, 0x00]),
+    );
+    debugPrint('Total bytes sent: $totalBytesSent');
+  }
+
+  Future<void> _writeOverNfcIos(
+    NfcTag tag,
+    img.Image image,
+    bool shouldCrop,
+    StreamController<double> controller,
+  ) async {
+    final nfc = MiFareIos.from(tag);
+    if (nfc == null) {
+      controller.addError(
+        Exception('Tag is not Mifare compatible'),
+        StackTrace.current,
+      );
+      return;
+    }
+    // nfc.sendCommand(instructionClass: instructionClass,
+    //     instructionCode: instructionCode,
+    //     p1Parameter: p1Parameter,
+    //     p2Parameter: p2Parameter,
+    //     data: data,
+    //     expectedResponseLength: expectedResponseLength)
   }
 }
