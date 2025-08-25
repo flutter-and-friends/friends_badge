@@ -1,5 +1,5 @@
 import 'package:flutter/foundation.dart';
-import 'package:friends_badge/friends_badge.dart';
+import 'package:friends_badge/src/utils/color_palette.dart';
 
 @internal
 enum BadgeSpecification {
@@ -31,7 +31,7 @@ enum BadgeSpecification {
 }
 
 /// From the decompiled code of the official app (BadgeSpecificationUtils.java)
-/// 
+///
 /// public static String getSpecificationByHardware(String hardware) {
 ///     switch (hardware) {
 ///         case "00"://Passive - BlackWhiteRed

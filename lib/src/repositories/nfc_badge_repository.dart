@@ -7,6 +7,29 @@ import 'package:image/image.dart' as img;
 import 'package:nfc_manager/nfc_manager.dart';
 import 'package:nfc_manager/nfc_manager_android.dart';
 
+/// Repository for writing images to NFC badges.
+///
+/// Usage:
+/// ```dart
+/// final repository = NfcBadgeRepository();
+///
+/// final image = img.decodeImage(yourImageBytes);
+/// if (image != null) {
+///   repository
+///       .writeOverNfc(image)
+///       .listen(
+///         (progress) {
+///           // Update progress UI
+///         },
+///         onError: (error) {
+///           // Handle error
+///         },
+///         onDone: () {
+///           // Write operation completed
+///         },
+///       );
+/// }
+/// ```
 class NfcBadgeRepository {
   const NfcBadgeRepository();
 
@@ -149,6 +172,10 @@ class NfcBadgeRepository {
     return controller.stream;
   }
 
+  /// Creates a preview image suitable for display on the badge.
+  /// The image is processed to match the badge's color capabilities and
+  /// aspect ratio using the specifications from
+  /// `BadgeSpecification.size3_7inchPassiveBWRY`.
   img.Image? createPreviewImage(img.Image e) {
     return const ImageConverter().prepareImage(
       e,
