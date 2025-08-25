@@ -40,7 +40,15 @@ class _HomePageState extends State<HomePage> {
 
   img.Image? get ditheredImage => image?.let(
     // ignore: invalid_use_of_internal_member
-    (e) => const ImageConverter().dither(e),
+    (e) => const ImageConverter().floydSteinbergDither(
+      e,
+      ColorPalette.blackWhiteYellowRed,
+    ),
+  );
+
+  img.Image? get noDitheredImage => image?.let(
+    // ignore: invalid_use_of_internal_member
+    (e) => const ImageConverter().noDither(e, ColorPalette.blackWhiteYellowRed),
   );
 
   Uint8List? get imageBytes => image?.let(
@@ -49,6 +57,9 @@ class _HomePageState extends State<HomePage> {
 
   Uint8List? get ditheredImageBytes =>
       ditheredImage?.let((image) => Uint8List.fromList(img.encodePng(image)));
+
+  Uint8List? get noDitheredImageBytes =>
+      noDitheredImage?.let((image) => Uint8List.fromList(img.encodePng(image)));
 
   @override
   void initState() {
@@ -132,6 +143,11 @@ class _HomePageState extends State<HomePage> {
                       height: 300,
                     ),
                   if (ditheredImageBytes case final ditheredImageBytes?)
+                    Image.memory(
+                      ditheredImageBytes,
+                      height: 300,
+                    ),
+                  if (noDitheredImageBytes case final ditheredImageBytes?)
                     Image.memory(
                       ditheredImageBytes,
                       height: 300,

@@ -199,7 +199,7 @@ class ImageConverter {
     img.Image src, [
     ColorPalette palette = ColorPalette.blackWhiteYellowRed,
   ]) {
-    return noDither(src, palette);
+    return floydSteinbergDither(src, palette);
   }
 
   img.Image noDither(img.Image src, ColorPalette palette) {
@@ -213,6 +213,63 @@ class ImageConverter {
       }
     }
     return image;
+  }
+
+  img.Image floydSteinbergDither(img.Image src, ColorPalette palette) {
+    final image = img.Image.from(src);
+
+    for (var y = 0; y < image.height; y++) {
+      for (var x = 0; x < image.width; x++) {
+        final oldPixel = image.getPixel(x, y);
+        final newPixel = _findNearestColor(oldPixel, palette);
+        image.setPixel(x, y, newPixel);
+
+        final error = (
+          (oldPixel.r - newPixel.r).toInt(),
+          (oldPixel.g - newPixel.g).toInt(),
+          (oldPixel.b - newPixel.b).toInt(),
+        );
+
+        _distributeError(image, x + 1, y, error, 7 / 16.0);
+        _distributeError(
+          image,
+          x - 1,
+          y + 1,
+          error,
+          3 / 16,
+        );
+        _distributeError(image, x, y + 1, error, 5 / 16.0);
+        _distributeError(
+          image,
+          x + 1,
+          y + 1,
+          error,
+          1 / 16,
+        );
+      }
+    }
+
+    return image;
+  }
+
+  void _distributeError(
+    img.Image image,
+    int x,
+    int y,
+    (num, num, num) error,
+    double factor,
+  ) {
+    final pixel = image.getPixel(x, y);
+    pixel.r = (pixel.r + error.$1 * factor).clamp(0, 255);
+    pixel.g = (pixel.g + error.$2 * factor).clamp(0, 255);
+    pixel.b = (pixel.b + error.$3 * factor).clamp(0, 255);
+
+    if (x >= 0 && x < image.width && y >= 0 && y < image.height) {
+      final pixel = image.getPixel(x, y);
+      pixel.r = (pixel.r.toInt() + (error.$1 * factor).round()).clamp(0, 255);
+      pixel.g = (pixel.g.toInt() + (error.$2 * factor).round()).clamp(0, 255);
+      pixel.b = (pixel.b.toInt() + (error.$3 * factor).round()).clamp(0, 255);
+    }
   }
 
   img.Color _findNearestColor(img.Color color, ColorPalette palette) {

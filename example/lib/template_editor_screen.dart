@@ -37,22 +37,6 @@ class _TemplateEditorScreenState extends State<TemplateEditorScreen> {
             Image.file(_image!)
           else
             const Text('No image selected'),
-          // DropdownButton<ColorPalette>(
-          //   value: _selectedPalette,
-          //   onChanged: (ColorPalette? newValue) {
-          //     if (newValue != null) {
-          //       setState(() {
-          //         _selectedPalette = newValue;
-          //       });
-          //     }
-          //   },
-          //   items: ColorPalette.values.map((ColorPalette palette) {
-          //     return DropdownMenuItem<ColorPalette>(
-          //       value: palette,
-          //       child: Text(palette.toString().split('.').last),
-          //     );
-          //   }).toList(),
-          // ),
           ElevatedButton(
             onPressed: _pickImage,
             child: const Text('Pick Image'),
