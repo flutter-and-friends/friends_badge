@@ -72,7 +72,7 @@ class _HomePageState extends State<HomePage> {
     super.initState();
   }
 
-  final BadgeRepository _badgeRepository = BleBadgeRepository();
+  final _badgeRepository = BleBadgeRepository();
   List<String> _devices = [];
 
   @override

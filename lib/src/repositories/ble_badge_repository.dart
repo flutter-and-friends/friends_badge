@@ -1,10 +1,8 @@
 import 'dart:async';
 
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
-import 'package:friends_badge/friends_badge.dart';
-import 'package:image/image.dart' as img;
 
-class BleBadgeRepository implements BadgeRepository {
+class BleBadgeRepository {
   static final Guid serviceUuid = Guid('6e400001-b5a3-f393-e0a9-e50e24dcca9e');
   static final Guid writeCharacteristicUuid = Guid(
     '6e400002-b5a3-f393-e0a9-e50e24dcca9e',
@@ -13,7 +11,6 @@ class BleBadgeRepository implements BadgeRepository {
     '6e400003-b5a3-f393-e0a9-e50e24dcca9e',
   );
 
-  @override
   Stream<List<String>> scanForBleDevices() {
     final completer = StreamController<List<String>>();
 
@@ -43,7 +40,6 @@ class BleBadgeRepository implements BadgeRepository {
     return completer.stream;
   }
 
-  @override
   Future<void> writeOverBle(String address, List<int> data) async {
     final device = BluetoothDevice.fromId(address);
     await device.connect();
@@ -104,14 +100,5 @@ class BleBadgeRepository implements BadgeRepository {
 
     packet.add(0x7E);
     return packet;
-  }
-
-  @override
-  Future<void> writeOverNfc(
-    img.Image image, [
-    ColorPalette colorPalette = ColorPalette.blackWhiteRed,
-  ]) {
-    // This repository does not handle NFC
-    throw UnimplementedError('This repository does not handle NFC');
   }
 }

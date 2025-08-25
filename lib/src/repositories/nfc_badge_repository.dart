@@ -7,25 +7,19 @@ import 'package:image/image.dart' as img;
 import 'package:nfc_manager/nfc_manager.dart';
 import 'package:nfc_manager/nfc_manager_android.dart';
 
-class NfcBadgeRepository implements BadgeRepository {
-  @override
-  Stream<List<String>> scanForBleDevices() {
-    // This repository does not handle BLE
-    throw UnimplementedError('This repository does not handle BLE');
-  }
-
-  @override
-  Future<void> writeOverBle(String address, List<int> data) {
-    // This repository does not handle BLE
-    throw UnimplementedError('This repository does not handle BLE');
-  }
-
-  @override
+class NfcBadgeRepository {
   Future<void> writeOverNfc(
-    img.Image image, [
-    ColorPalette colorPalette = ColorPalette.blackWhiteYellowRed,
-  ]) async {
-    final data = const ImageConverter().convertImage(image, colorPalette);
+    img.Image image, {
+    bool shouldCrop = true,
+  }) async {
+    // TODO(lohnn): Read config from device before selecting the size
+    //  and palette
+    final data = const ImageConverter().convertImage(
+      image,
+      ColorPalette.blackWhiteYellowRed,
+      size: BadgeSize.size3_7inch,
+      shouldCrop: shouldCrop,
+    );
     final completer = Completer<void>();
 
     NfcManager.instance.startSession(

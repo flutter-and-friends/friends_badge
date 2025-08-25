@@ -12,8 +12,8 @@ class ImageConverter {
   List<Uint8List> convertImage(
     img.Image image,
     ColorPalette palette, {
-    BadgeSize size = BadgeSize.size3_7inch,
-    bool shouldCrop = true,
+    required BadgeSize size,
+    required bool shouldCrop,
   }) {
     final preparedImage = prepareImage(
       image,
@@ -28,6 +28,7 @@ class ImageConverter {
     };
   }
 
+  @internal
   img.Image prepareImage(
     img.Image image, {
     ColorPalette palette = ColorPalette.blackWhiteYellowRed,
