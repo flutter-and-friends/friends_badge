@@ -52,6 +52,8 @@ The command structure is detailed in `BLE_FORMAT.md` and validated in `CmdCenter
 -   **Font rendering:** The example app's template editor will need to handle font rendering correctly to match the original app's behavior.
 -   **Two NFC Protocols:** The app uses two different NFC protocols. The active badge protocol is used for badges with a battery and Bluetooth, while the passive badge protocol is used for badges that are powered by the NFC field. It is crucial to use the correct protocol for the target badge.
 -   **Image Conversion for Different Badge Sizes:** The image conversion logic is different for different badge sizes. The `EPaperPicture.java` file contains the specific logic for each badge size. It is important to use the correct image conversion logic for the target badge.
+-   **Inverted Colors:** The image is currently being displayed with inverted colors (e.g., black circles on a red background instead of bright circles on a dark background). This suggests that the color mapping in the `ImageConverter` class is not correct.
+-   **Half-Screen Issue:** The image is only being displayed on the left half of the screen. This is likely due to an issue with the image dimensions or the amount of data being sent.
 
 ## Code Snippets
 

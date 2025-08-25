@@ -42,20 +42,6 @@ enum BadgeSize {
 }
 
 class ImageConverter {
-  final List<List<img.Color>> _palettes = [
-    [img.ColorRgb8(0, 0, 0), img.ColorRgb8(255, 255, 255)],
-    [
-      img.ColorRgb8(0, 0, 0),
-      img.ColorRgb8(255, 255, 255),
-      img.ColorRgb8(255, 0, 0),
-    ],
-    [
-      img.ColorRgb8(0, 0, 0),
-      img.ColorRgb8(255, 255, 255),
-      img.ColorRgb8(255, 255, 0),
-    ],
-  ];
-
   List<Uint8List> convertImage(
     img.Image image,
     ColorPalette palette, [
@@ -63,31 +49,28 @@ class ImageConverter {
   ]) {
     final resizedImage = resizeImage(
       image,
-      size.width,
-      size.height,
+      size,
     );
-    final paletteIndex = palette.index;
     final ditheredImage = noDither(resizedImage, palette);
-    return gray2BinaryBW(image);
-    // return _imageToBytes(ditheredImage, paletteIndex);
+    return gray2BinaryBWR(image);
+    // return _imageToBytes(ditheredImage, palette);
   }
 
-  img.Image resizeImage(img.Image image, int width, int height) {
-    return img.copyResize(image, width: width, height: height);
+  img.Image resizeImage(img.Image image, BadgeSize size) {
+    return img.copyResize(image, width: size.width, height: size.height);
   }
 
-  Uint8List _imageToBytes(img.Image image, int paletteIndex) {
+  List<Uint8List> _imageToBytes(img.Image image, ColorPalette palette) {
     final width = image.width;
     final height = image.height;
     final blackAndWhite = Uint8List(width * height ~/ 8);
     final redOrYellow = Uint8List(width * height ~/ 8);
-    final palette = _palettes[paletteIndex];
 
     for (var y = 0; y < height; y++) {
       for (var x = 0; x < width; x++) {
         final pixel = image.getPixel(x, y);
-        final isBlack = pixel == palette[0];
-        final isRedOrYellow = pixel == palette.last;
+        final isBlack = pixel == palette.colors[0];
+        final isRedOrYellow = pixel == palette.colors.last;
 
         final bwBit = isBlack ? 0 : 1;
         final redOrYellowBit = isRedOrYellow ? 1 : 0;
@@ -99,10 +82,10 @@ class ImageConverter {
       }
     }
 
-    if (paletteIndex == 0) {
-      return blackAndWhite;
+    if (palette == ColorPalette.blackWhite) {
+      return [blackAndWhite];
     }
-    return Uint8List.fromList(blackAndWhite + redOrYellow);
+    return [blackAndWhite, redOrYellow];
   }
 
   /// Converts an image to two separate 1-bit-per-pixel byte arrays.
@@ -140,7 +123,7 @@ class ImageConverter {
         final value1 = (luminance <= 95) ? 1 : 0;
 
         // Calculate the second bit: Red overlay (if applicable)
-        final isRed = (r > 95 && g < 95 && b < 95);
+        final isRed = r > 95 && g < 95 && b < 95;
         final value2 = isRed ? 1 : 0;
 
         // Calculate the index in the output array.
@@ -193,7 +176,7 @@ class ImageConverter {
         final value1 = (luminance <= 95) ? 1 : 0;
 
         // Calculate the second bit: Red overlay (if applicable)
-        final isRed = (r > 95 && g < 95 && b < 95);
+        final isRed = r > 95 && g < 95 && b < 95;
         final value2 = isRed ? 1 : 0;
 
         // Calculate the index in the output array.
