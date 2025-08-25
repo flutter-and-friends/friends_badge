@@ -18,7 +18,6 @@ class WriteScreen extends StatefulWidget {
 }
 
 class _WriteScreenState extends State<WriteScreen> {
-  final _bleBadgeRepository = BleBadgeRepository();
   static const _nfcBadgeRepository = NfcBadgeRepository();
   Uint8List? _convertedImage;
 
@@ -49,17 +48,6 @@ class _WriteScreenState extends State<WriteScreen> {
               },
               child: const Text('Create Template'),
             ),
-          ElevatedButton(
-            onPressed: () {
-              if (_convertedImage != null) {
-                _bleBadgeRepository.writeOverBle(
-                  widget.deviceAddress,
-                  _convertedImage!,
-                );
-              }
-            },
-            child: const Text('Write over BLE'),
-          ),
           ElevatedButton(
             onPressed: () {
               final image = img.Image(width: 240, height: 416);

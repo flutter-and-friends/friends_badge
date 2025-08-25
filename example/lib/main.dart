@@ -69,9 +69,6 @@ class _HomePageState extends State<HomePage> {
     super.initState();
   }
 
-  final _badgeRepository = BleBadgeRepository();
-  List<String> _devices = [];
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -80,16 +77,6 @@ class _HomePageState extends State<HomePage> {
       ),
       body: ListView(
         children: [
-          ElevatedButton(
-            onPressed: () {
-              _badgeRepository.scanForBleDevices().listen((devices) {
-                setState(() {
-                  _devices = devices;
-                });
-              });
-            },
-            child: const Text('Scan for BLE Devices'),
-          ),
           if (image case final image?)
             ElevatedButton(
               onPressed: () async {
@@ -137,19 +124,6 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
           ),
-          for (final device in _devices)
-            ListTile(
-              title: Text(device),
-              onTap: () {
-                // Navigator.push(
-                //   context,
-                //   MaterialPageRoute(
-                //     builder: (context) =>
-                //         WriteScreen(deviceAddress: _devices[index]),
-                //   ),
-                // );
-              },
-            ),
         ],
       ),
     );

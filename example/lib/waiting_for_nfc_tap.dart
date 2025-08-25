@@ -104,7 +104,8 @@ class RadialRevealClipper extends CustomClipper<Path> {
     // Define the bounding rectangle for our arc.
     final rect = Rect.fromCircle(center: center, radius: maxRadius);
 
-    // Calculate the sweep angle based on the reveal percentage. 2*pi is a full circle.
+    // Calculate the sweep angle based on the reveal percentage. 2*pi is a full
+    // circle.
     final sweepAngle = 2 * pi * revealPercent;
 
     // The starting angle of -pi/2 corresponds to 12 o'clock.
