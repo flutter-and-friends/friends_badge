@@ -91,6 +91,10 @@ class RadialRevealClipper extends CustomClipper<Path> {
 
   @override
   Path getClip(Size size) {
+    if (revealPercent >= 1.0) {
+      return Path()..addRect(Rect.fromLTWH(0, 0, size.width, size.height));
+    }
+
     // Determine the center of the widget.
     final center = Offset(size.width / 2, size.height / 2);
 
