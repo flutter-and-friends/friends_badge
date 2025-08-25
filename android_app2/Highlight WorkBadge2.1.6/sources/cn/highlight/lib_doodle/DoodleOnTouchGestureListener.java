@@ -3,6 +3,7 @@ package cn.highlight.lib_doodle;
 import android.animation.ValueAnimator;
 import android.graphics.Path;
 import android.graphics.PointF;
+import android.graphics.RectF;
 import android.view.MotionEvent;
 import androidx.core.view.ViewCompat;
 import cn.forward.androids.ScaleGestureDetectorApi27;
@@ -425,14 +426,82 @@ public class DoodleOnTouchGestureListener extends TouchGestureDetector.OnTouchGe
       0x017b: PHI (r6v13 float) = (r6v12 float), (r6v4 float) binds: [B:85:0x01ba, B:69:0x0177] A[DONT_GENERATE, DONT_INLINE]] */
     /*
         Code decompiled incorrectly, please refer to instructions dump.
-        To view partially-correct add '--show-bad-code' argument
     */
-    public void limitBound(boolean r15) {
-        /*
-            Method dump skipped, instructions count: 505
-            To view this dump add '--comments-level debug' option
-        */
-        throw new UnsupportedOperationException("Method not decompiled: cn.highlight.lib_doodle.DoodleOnTouchGestureListener.limitBound(boolean):void");
+    public void limitBound(boolean z) {
+        if (this.mDoodle.getDoodleRotation() % 90 != 0) {
+            return;
+        }
+        float doodleTranslationX = this.mDoodle.getDoodleTranslationX();
+        float doodleTranslationY = this.mDoodle.getDoodleTranslationY();
+        RectF doodleBound = this.mDoodle.getDoodleBound();
+        float doodleTranslationX2 = this.mDoodle.getDoodleTranslationX();
+        float doodleTranslationY2 = this.mDoodle.getDoodleTranslationY();
+        float centerWidth = this.mDoodle.getCenterWidth() * this.mDoodle.getRotateScale();
+        float centerHeight = this.mDoodle.getCenterHeight() * this.mDoodle.getRotateScale();
+        if (doodleBound.height() <= this.mDoodle.getHeight()) {
+            if (this.mDoodle.getDoodleRotation() == 0 || this.mDoodle.getDoodleRotation() == 180) {
+                doodleTranslationY2 = (centerHeight - (this.mDoodle.getDoodleScale() * centerHeight)) / 2.0f;
+            } else {
+                doodleTranslationX2 = (centerWidth - (this.mDoodle.getDoodleScale() * centerWidth)) / 2.0f;
+            }
+        } else {
+            float height = doodleBound.top;
+            if (doodleBound.top <= 0.0f || doodleBound.bottom < this.mDoodle.getHeight()) {
+                if (doodleBound.bottom < this.mDoodle.getHeight() && doodleBound.top <= 0.0f) {
+                    height = this.mDoodle.getHeight() - doodleBound.bottom;
+                    if (this.mDoodle.getDoodleRotation() == 0 || this.mDoodle.getDoodleRotation() == 180) {
+                        doodleTranslationY2 = this.mDoodle.getDoodleRotation() == 0 ? doodleTranslationY2 + height : doodleTranslationY2 - height;
+                    } else {
+                        doodleTranslationX2 = this.mDoodle.getDoodleRotation() == 90 ? doodleTranslationX2 + height : doodleTranslationX2 - height;
+                    }
+                }
+            } else if (this.mDoodle.getDoodleRotation() == 0 || this.mDoodle.getDoodleRotation() == 180) {
+                if (this.mDoodle.getDoodleRotation() == 0) {
+                }
+            } else if (this.mDoodle.getDoodleRotation() == 90) {
+            }
+        }
+        if (doodleBound.width() <= this.mDoodle.getWidth()) {
+            if (this.mDoodle.getDoodleRotation() == 0 || this.mDoodle.getDoodleRotation() == 180) {
+                doodleTranslationX2 = (centerWidth - (this.mDoodle.getDoodleScale() * centerWidth)) / 2.0f;
+            } else {
+                doodleTranslationY2 = (centerHeight - (this.mDoodle.getDoodleScale() * centerHeight)) / 2.0f;
+            }
+        } else {
+            float width = doodleBound.left;
+            if (doodleBound.left <= 0.0f || doodleBound.right < this.mDoodle.getWidth()) {
+                if (doodleBound.right < this.mDoodle.getWidth() && doodleBound.left <= 0.0f) {
+                    width = this.mDoodle.getWidth() - doodleBound.right;
+                    if (this.mDoodle.getDoodleRotation() == 0 || this.mDoodle.getDoodleRotation() == 180) {
+                        doodleTranslationX2 = this.mDoodle.getDoodleRotation() == 0 ? doodleTranslationX2 + width : doodleTranslationX2 - width;
+                    } else {
+                        doodleTranslationY2 = this.mDoodle.getDoodleRotation() == 90 ? doodleTranslationY2 - width : doodleTranslationY2 + width;
+                    }
+                }
+            } else if (this.mDoodle.getDoodleRotation() == 0 || this.mDoodle.getDoodleRotation() == 180) {
+                if (this.mDoodle.getDoodleRotation() == 0) {
+                }
+            } else if (this.mDoodle.getDoodleRotation() == 90) {
+            }
+        }
+        if (z) {
+            if (this.mTranslateAnimator == null) {
+                this.mTranslateAnimator = new ValueAnimator();
+                this.mTranslateAnimator.setDuration(100L);
+                this.mTranslateAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() { // from class: cn.highlight.lib_doodle.DoodleOnTouchGestureListener.2
+                    @Override // android.animation.ValueAnimator.AnimatorUpdateListener
+                    public void onAnimationUpdate(ValueAnimator valueAnimator) {
+                        DoodleOnTouchGestureListener.this.mDoodle.setDoodleTranslation(((Float) valueAnimator.getAnimatedValue()).floatValue(), DoodleOnTouchGestureListener.this.mTransAnimOldY + ((DoodleOnTouchGestureListener.this.mTransAnimY - DoodleOnTouchGestureListener.this.mTransAnimOldY) * valueAnimator.getAnimatedFraction()));
+                    }
+                });
+            }
+            this.mTranslateAnimator.setFloatValues(doodleTranslationX, doodleTranslationX2);
+            this.mTransAnimOldY = doodleTranslationY;
+            this.mTransAnimY = doodleTranslationY2;
+            this.mTranslateAnimator.start();
+            return;
+        }
+        this.mDoodle.setDoodleTranslation(doodleTranslationX2, doodleTranslationY2);
     }
 
     public void setSelectionListener(ISelectionListener iSelectionListener) {

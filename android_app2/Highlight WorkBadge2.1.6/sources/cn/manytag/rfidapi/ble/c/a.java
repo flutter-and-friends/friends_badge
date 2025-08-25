@@ -6,6 +6,7 @@ import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Looper;
 import android.os.Message;
+import android.text.TextUtils;
 import cn.manytag.rfidapi.ble.callback.BleScanPresenterImp;
 import cn.manytag.rfidapi.ble.data.BleDevice;
 import java.util.ArrayList;
@@ -36,70 +37,35 @@ public abstract class a implements BluetoothAdapter.LeScanCallback {
     /* JADX WARN: Removed duplicated region for block: B:31:0x0056  */
     /*
         Code decompiled incorrectly, please refer to instructions dump.
-        To view partially-correct add '--show-bad-code' argument
     */
-    private void d(cn.manytag.rfidapi.ble.data.BleDevice r9) {
-        /*
-            r8 = this;
-            java.lang.String r0 = r8.b
-            boolean r0 = android.text.TextUtils.isEmpty(r0)
-            r1 = 1
-            if (r0 == 0) goto L14
-            java.lang.String[] r0 = r8.a
-            if (r0 == 0) goto L10
-            int r0 = r0.length
-            if (r0 >= r1) goto L14
-        L10:
-            r8.e(r9)
-            return
-        L14:
-            java.lang.String r0 = r8.b
-            boolean r0 = android.text.TextUtils.isEmpty(r0)
-            if (r0 != 0) goto L29
-            java.lang.String r0 = r8.b
-            java.lang.String r2 = r9.getMac()
-            boolean r0 = r0.equalsIgnoreCase(r2)
-            if (r0 != 0) goto L29
-            return
-        L29:
-            java.lang.String[] r0 = r8.a
-            if (r0 == 0) goto L63
-            int r0 = r0.length
-            if (r0 <= 0) goto L63
-            java.util.concurrent.atomic.AtomicBoolean r0 = new java.util.concurrent.atomic.AtomicBoolean
-            r2 = 0
-            r0.<init>(r2)
-            java.lang.String[] r3 = r8.a
-            int r4 = r3.length
-        L39:
-            if (r2 >= r4) goto L5c
-            r5 = r3[r2]
-            java.lang.String r6 = r9.getName()
-            if (r6 != 0) goto L45
-            java.lang.String r6 = ""
-        L45:
-            boolean r7 = r8.c
-            if (r7 == 0) goto L50
-            boolean r5 = r6.contains(r5)
-            if (r5 == 0) goto L59
-            goto L56
-        L50:
-            boolean r5 = r6.equals(r5)
-            if (r5 == 0) goto L59
-        L56:
-            r0.set(r1)
-        L59:
-            int r2 = r2 + 1
-            goto L39
-        L5c:
-            boolean r0 = r0.get()
-            if (r0 != 0) goto L63
-            return
-        L63:
-            r8.e(r9)
-            return
-        */
-        throw new UnsupportedOperationException("Method not decompiled: cn.manytag.rfidapi.ble.c.a.d(cn.manytag.rfidapi.ble.data.BleDevice):void");
+    private void d(BleDevice bleDevice) {
+        String[] strArr;
+        if (TextUtils.isEmpty(this.b) && ((strArr = this.a) == null || strArr.length < 1)) {
+            e(bleDevice);
+            return;
+        }
+        if (TextUtils.isEmpty(this.b) || this.b.equalsIgnoreCase(bleDevice.getMac())) {
+            String[] strArr2 = this.a;
+            if (strArr2 != null && strArr2.length > 0) {
+                AtomicBoolean atomicBoolean = new AtomicBoolean(false);
+                for (String str : this.a) {
+                    String name = bleDevice.getName();
+                    if (name == null) {
+                        name = "";
+                    }
+                    if (this.c) {
+                        if (name.contains(str)) {
+                            atomicBoolean.set(true);
+                        }
+                    } else if (name.equals(str)) {
+                    }
+                }
+                if (!atomicBoolean.get()) {
+                    return;
+                }
+            }
+            e(bleDevice);
+        }
     }
 
     private void e(BleDevice bleDevice) {

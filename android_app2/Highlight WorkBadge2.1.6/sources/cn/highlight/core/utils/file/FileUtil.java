@@ -261,85 +261,61 @@ public class FileUtil {
     /* JADX WARN: Removed duplicated region for block: B:6:0x0021 A[Catch: all -> 0x008e, Exception -> 0x0090, TryCatch #6 {Exception -> 0x0090, all -> 0x008e, blocks: (B:4:0x0017, B:7:0x0042, B:9:0x004d, B:10:0x0050, B:6:0x0021), top: B:32:0x0017 }] */
     /*
         Code decompiled incorrectly, please refer to instructions dump.
-        To view partially-correct add '--show-bad-code' argument
     */
-    public static java.lang.String saveFile(android.content.Context r5, java.lang.String r6, java.lang.String r7, byte[] r8) throws java.lang.Throwable {
-        /*
-            java.lang.String r5 = ""
-            java.text.SimpleDateFormat r0 = new java.text.SimpleDateFormat
-            java.util.Locale r1 = java.util.Locale.CHINA
-            java.lang.String r2 = "yyyyMMdd"
-            r0.<init>(r2, r1)
-            java.util.Date r1 = new java.util.Date
-            r1.<init>()
-            java.lang.String r0 = r0.format(r1)
-            r1 = 0
-            if (r6 == 0) goto L21
-            java.lang.String r2 = r6.trim()     // Catch: java.lang.Throwable -> L8e java.lang.Exception -> L90
-            int r2 = r2.length()     // Catch: java.lang.Throwable -> L8e java.lang.Exception -> L90
-            if (r2 != 0) goto L42
-        L21:
-            java.lang.StringBuilder r6 = new java.lang.StringBuilder     // Catch: java.lang.Throwable -> L8e java.lang.Exception -> L90
-            r6.<init>()     // Catch: java.lang.Throwable -> L8e java.lang.Exception -> L90
-            java.io.File r2 = android.os.Environment.getExternalStorageDirectory()     // Catch: java.lang.Throwable -> L8e java.lang.Exception -> L90
-            java.lang.String r2 = r2.getPath()     // Catch: java.lang.Throwable -> L8e java.lang.Exception -> L90
-            r6.append(r2)     // Catch: java.lang.Throwable -> L8e java.lang.Exception -> L90
-            java.lang.String r2 = "/head/"
-            r6.append(r2)     // Catch: java.lang.Throwable -> L8e java.lang.Exception -> L90
-            r6.append(r0)     // Catch: java.lang.Throwable -> L8e java.lang.Exception -> L90
-            java.lang.String r0 = "/"
-            r6.append(r0)     // Catch: java.lang.Throwable -> L8e java.lang.Exception -> L90
-            java.lang.String r6 = r6.toString()     // Catch: java.lang.Throwable -> L8e java.lang.Exception -> L90
-        L42:
-            java.io.File r0 = new java.io.File     // Catch: java.lang.Throwable -> L8e java.lang.Exception -> L90
-            r0.<init>(r6)     // Catch: java.lang.Throwable -> L8e java.lang.Exception -> L90
-            boolean r2 = r0.exists()     // Catch: java.lang.Throwable -> L8e java.lang.Exception -> L90
-            if (r2 != 0) goto L50
-            r0.mkdirs()     // Catch: java.lang.Throwable -> L8e java.lang.Exception -> L90
-        L50:
-            java.io.File r0 = new java.io.File     // Catch: java.lang.Throwable -> L8e java.lang.Exception -> L90
-            java.lang.StringBuilder r2 = new java.lang.StringBuilder     // Catch: java.lang.Throwable -> L8e java.lang.Exception -> L90
-            r2.<init>()     // Catch: java.lang.Throwable -> L8e java.lang.Exception -> L90
-            r2.append(r7)     // Catch: java.lang.Throwable -> L8e java.lang.Exception -> L90
-            r2.append(r5)     // Catch: java.lang.Throwable -> L8e java.lang.Exception -> L90
-            java.lang.String r2 = r2.toString()     // Catch: java.lang.Throwable -> L8e java.lang.Exception -> L90
-            r0.<init>(r6, r2)     // Catch: java.lang.Throwable -> L8e java.lang.Exception -> L90
-            java.lang.String r0 = r0.getAbsolutePath()     // Catch: java.lang.Throwable -> L8e java.lang.Exception -> L90
-            java.io.FileOutputStream r2 = new java.io.FileOutputStream     // Catch: java.lang.Throwable -> L8e java.lang.Exception -> L90
-            java.io.File r3 = new java.io.File     // Catch: java.lang.Throwable -> L8e java.lang.Exception -> L90
-            java.lang.StringBuilder r4 = new java.lang.StringBuilder     // Catch: java.lang.Throwable -> L8e java.lang.Exception -> L90
-            r4.<init>()     // Catch: java.lang.Throwable -> L8e java.lang.Exception -> L90
-            r4.append(r7)     // Catch: java.lang.Throwable -> L8e java.lang.Exception -> L90
-            r4.append(r5)     // Catch: java.lang.Throwable -> L8e java.lang.Exception -> L90
-            java.lang.String r7 = r4.toString()     // Catch: java.lang.Throwable -> L8e java.lang.Exception -> L90
-            r3.<init>(r6, r7)     // Catch: java.lang.Throwable -> L8e java.lang.Exception -> L90
-            r2.<init>(r3)     // Catch: java.lang.Throwable -> L8e java.lang.Exception -> L90
-            r2.write(r8)     // Catch: java.lang.Throwable -> L89 java.lang.Exception -> L8c
-            r2.close()     // Catch: java.io.IOException -> L95
-            r5 = r0
-            goto L95
-        L89:
-            r5 = move-exception
-            r1 = r2
-            goto L96
-        L8c:
-            r1 = r2
-            goto L90
-        L8e:
-            r5 = move-exception
-            goto L96
-        L90:
-            if (r1 == 0) goto L95
-            r1.close()     // Catch: java.io.IOException -> L95
-        L95:
-            return r5
-        L96:
-            if (r1 == 0) goto L9b
-            r1.close()     // Catch: java.io.IOException -> L9b
-        L9b:
-            throw r5
-        */
-        throw new UnsupportedOperationException("Method not decompiled: cn.highlight.core.utils.file.FileUtil.saveFile(android.content.Context, java.lang.String, java.lang.String, byte[]):java.lang.String");
+    public static String saveFile(Context context, String str, String str2, byte[] bArr) throws Throwable {
+        Throwable th;
+        String absolutePath;
+        FileOutputStream fileOutputStream;
+        String str3 = "";
+        String str4 = new SimpleDateFormat("yyyyMMdd", Locale.CHINA).format(new Date());
+        FileOutputStream fileOutputStream2 = null;
+        try {
+            if (str != null) {
+                try {
+                    if (str.trim().length() == 0) {
+                        str = Environment.getExternalStorageDirectory().getPath() + "/head/" + str4 + "/";
+                    }
+                    File file = new File(str);
+                    if (!file.exists()) {
+                        file.mkdirs();
+                    }
+                    absolutePath = new File(str, str2 + "").getAbsolutePath();
+                    fileOutputStream = new FileOutputStream(new File(str, str2 + ""));
+                } catch (Exception unused) {
+                    if (fileOutputStream2 != null) {
+                        fileOutputStream2.close();
+                    }
+                    return str3;
+                } catch (Throwable th2) {
+                    th = th2;
+                    if (fileOutputStream2 != null) {
+                        try {
+                            fileOutputStream2.close();
+                        } catch (IOException unused2) {
+                        }
+                    }
+                    throw th;
+                }
+                try {
+                    fileOutputStream.write(bArr);
+                    fileOutputStream.close();
+                    str3 = absolutePath;
+                } catch (Exception unused3) {
+                    fileOutputStream2 = fileOutputStream;
+                    if (fileOutputStream2 != null) {
+                    }
+                    return str3;
+                } catch (Throwable th3) {
+                    th = th3;
+                    fileOutputStream2 = fileOutputStream;
+                    if (fileOutputStream2 != null) {
+                    }
+                    throw th;
+                }
+            }
+        } catch (IOException unused4) {
+        }
+        return str3;
     }
 
     private static String getTimeFormatName(String str) {

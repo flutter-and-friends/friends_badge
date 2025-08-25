@@ -1,6 +1,8 @@
 package cn.forward.androids.Image;
 
 import android.content.Context;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Build;
@@ -53,64 +55,36 @@ public class ImageCache {
     /* JADX WARN: Removed duplicated region for block: B:23:0x0042 A[Catch: Exception -> 0x004e, all -> 0x0054, TRY_LEAVE, TryCatch #0 {Exception -> 0x004e, blocks: (B:17:0x002b, B:19:0x0033, B:22:0x003c, B:23:0x0042), top: B:32:0x002b, outer: #2 }] */
     /*
         Code decompiled incorrectly, please refer to instructions dump.
-        To view partially-correct add '--show-bad-code' argument
     */
     private void initDiskCache() {
-        /*
-            r6 = this;
-            java.lang.Object r0 = r6.mDiskCacheLock
-            monitor-enter(r0)
-            cn.forward.androids.utils.cache.DiskLruCache r1 = r6.diskLruCache     // Catch: java.lang.Throwable -> L54
-            if (r1 == 0) goto L11
-            cn.forward.androids.utils.cache.DiskLruCache r1 = r6.diskLruCache     // Catch: java.lang.Throwable -> L54
-            boolean r1 = r1.isClosed()     // Catch: java.lang.Throwable -> L54
-            if (r1 != 0) goto L11
-            monitor-exit(r0)     // Catch: java.lang.Throwable -> L54
-            return
-        L11:
-            r1 = 0
-            android.content.Context r2 = r6.mContext     // Catch: android.content.pm.PackageManager.NameNotFoundException -> L27 java.lang.Throwable -> L54
-            android.content.pm.PackageManager r2 = r2.getPackageManager()     // Catch: android.content.pm.PackageManager.NameNotFoundException -> L27 java.lang.Throwable -> L54
-            android.content.Context r3 = r6.mContext     // Catch: android.content.pm.PackageManager.NameNotFoundException -> L27 java.lang.Throwable -> L54
-            java.lang.String r3 = r3.getPackageName()     // Catch: android.content.pm.PackageManager.NameNotFoundException -> L27 java.lang.Throwable -> L54
-            android.content.pm.PackageInfo r2 = r2.getPackageInfo(r3, r1)     // Catch: android.content.pm.PackageManager.NameNotFoundException -> L27 java.lang.Throwable -> L54
-            if (r2 == 0) goto L2b
-            int r1 = r2.versionCode     // Catch: android.content.pm.PackageManager.NameNotFoundException -> L27 java.lang.Throwable -> L54
-            goto L2b
-        L27:
-            r2 = move-exception
-            r2.printStackTrace()     // Catch: java.lang.Throwable -> L54
-        L2b:
-            java.io.File r2 = r6.mDiskCacheDir     // Catch: java.lang.Exception -> L4e java.lang.Throwable -> L54
-            boolean r2 = r2.exists()     // Catch: java.lang.Exception -> L4e java.lang.Throwable -> L54
-            if (r2 != 0) goto L42
-            java.io.File r2 = r6.mDiskCacheDir     // Catch: java.lang.Exception -> L4e java.lang.Throwable -> L54
-            boolean r2 = r2.mkdirs()     // Catch: java.lang.Exception -> L4e java.lang.Throwable -> L54
-            if (r2 == 0) goto L3c
-            goto L42
-        L3c:
-            java.lang.String r1 = "disk cache dir init failed"
-            cn.forward.androids.utils.LogUtil.e(r1)     // Catch: java.lang.Exception -> L4e java.lang.Throwable -> L54
-            goto L52
-        L42:
-            java.io.File r2 = r6.mDiskCacheDir     // Catch: java.lang.Exception -> L4e java.lang.Throwable -> L54
-            r3 = 1
-            long r4 = r6.mDiskCacheMaxSize     // Catch: java.lang.Exception -> L4e java.lang.Throwable -> L54
-            cn.forward.androids.utils.cache.DiskLruCache r1 = cn.forward.androids.utils.cache.DiskLruCache.open(r2, r1, r3, r4)     // Catch: java.lang.Exception -> L4e java.lang.Throwable -> L54
-            r6.diskLruCache = r1     // Catch: java.lang.Exception -> L4e java.lang.Throwable -> L54
-            goto L52
-        L4e:
-            r1 = move-exception
-            r1.printStackTrace()     // Catch: java.lang.Throwable -> L54
-        L52:
-            monitor-exit(r0)     // Catch: java.lang.Throwable -> L54
-            return
-        L54:
-            r1 = move-exception
-            monitor-exit(r0)     // Catch: java.lang.Throwable -> L54
-            throw r1
-        */
-        throw new UnsupportedOperationException("Method not decompiled: cn.forward.androids.Image.ImageCache.initDiskCache():void");
+        PackageInfo packageInfo;
+        synchronized (this.mDiskCacheLock) {
+            if (this.diskLruCache == null || this.diskLruCache.isClosed()) {
+                int i = 0;
+                try {
+                    packageInfo = this.mContext.getPackageManager().getPackageInfo(this.mContext.getPackageName(), 0);
+                } catch (PackageManager.NameNotFoundException e) {
+                    e.printStackTrace();
+                }
+                if (packageInfo != null) {
+                    i = packageInfo.versionCode;
+                    try {
+                        if (!this.mDiskCacheDir.exists() || this.mDiskCacheDir.mkdirs()) {
+                            this.diskLruCache = DiskLruCache.open(this.mDiskCacheDir, i, 1, this.mDiskCacheMaxSize);
+                        } else {
+                            LogUtil.e("disk cache dir init failed");
+                        }
+                    } catch (Exception e2) {
+                        e2.printStackTrace();
+                    }
+                    return;
+                }
+                if (!this.mDiskCacheDir.exists()) {
+                    this.diskLruCache = DiskLruCache.open(this.mDiskCacheDir, i, 1, this.mDiskCacheMaxSize);
+                }
+                return;
+            }
+        }
     }
 
     public void clearAllCache() {

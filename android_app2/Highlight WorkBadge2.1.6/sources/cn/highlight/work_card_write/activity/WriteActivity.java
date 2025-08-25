@@ -848,60 +848,30 @@ public class WriteActivity extends BaseActivity {
     /* JADX WARN: Removed duplicated region for block: B:18:0x0038  */
     /*
         Code decompiled incorrectly, please refer to instructions dump.
-        To view partially-correct add '--show-bad-code' argument
     */
-    public /* synthetic */ void lambda$null$14$WriteActivity() throws java.lang.InterruptedException {
-        /*
-            r6 = this;
-            r0 = 0
-            r6.isExit = r0
-            java.lang.String r1 = r6.badgeColor
-            int r2 = r1.hashCode()
-            r3 = 1290700(0x13b1cc, float:1.808656E-39)
-            r4 = 2
-            r5 = 1
-            if (r2 == r3) goto L2f
-            r0 = 40044118(0x2630656, float:1.6679144E-37)
-            if (r2 == r0) goto L25
-            r0 = 1241408302(0x49fe632e, float:2083941.8)
-            if (r2 == r0) goto L1b
-            goto L38
-        L1b:
-            java.lang.String r0 = "黑白红黄"
-            boolean r0 = r1.equals(r0)
-            if (r0 == 0) goto L38
-            r0 = 2
-            goto L39
-        L25:
-            java.lang.String r0 = "黑白红"
-            boolean r0 = r1.equals(r0)
-            if (r0 == 0) goto L38
-            r0 = 1
-            goto L39
-        L2f:
-            java.lang.String r2 = "黑白"
-            boolean r1 = r1.equals(r2)
-            if (r1 == 0) goto L38
-            goto L39
-        L38:
-            r0 = -1
-        L39:
-            if (r0 == 0) goto L48
-            if (r0 == r5) goto L44
-            if (r0 == r4) goto L40
-            goto L4b
-        L40:
-            r6.sendImageDataBWYR()
-            goto L4b
-        L44:
-            r6.sendImageDataBWR()
-            goto L4b
-        L48:
-            r6.sendImageDataBW()
-        L4b:
-            return
-        */
-        throw new UnsupportedOperationException("Method not decompiled: cn.highlight.work_card_write.activity.WriteActivity.lambda$null$14$WriteActivity():void");
+    public /* synthetic */ void lambda$null$14$WriteActivity() throws InterruptedException {
+        char c = 0;
+        this.isExit = false;
+        String str = this.badgeColor;
+        int iHashCode = str.hashCode();
+        if (iHashCode != 1290700) {
+            if (iHashCode != 40044118) {
+                c = (iHashCode == 1241408302 && str.equals("黑白红黄")) ? (char) 2 : (char) 65535;
+            } else if (str.equals("黑白红")) {
+                c = 1;
+            }
+        } else if (!str.equals("黑白")) {
+        }
+        if (c == 0) {
+            sendImageDataBW();
+        } else if (c == 1) {
+            sendImageDataBWR();
+        } else {
+            if (c != 2) {
+                return;
+            }
+            sendImageDataBWYR();
+        }
     }
 
     private void readNFC() {

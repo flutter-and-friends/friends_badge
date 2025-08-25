@@ -178,100 +178,64 @@ public class Reader {
     /* JADX WARN: Removed duplicated region for block: B:23:0x004a  */
     /*
         Code decompiled incorrectly, please refer to instructions dump.
-        To view partially-correct add '--show-bad-code' argument
     */
-    public void setWorkingFrequency(java.lang.String r8) throws java.lang.InterruptedException, java.lang.NumberFormatException {
-        /*
-            r7 = this;
-            int r0 = r8.hashCode()
-            r1 = 5
-            r2 = 3
-            r3 = 0
-            r4 = 4
-            r5 = 2
-            r6 = 1
-            switch(r0) {
-                case -1574598577: goto L40;
-                case -1173639986: goto L36;
-                case -940799867: goto L2c;
-                case 144669269: goto L22;
-                case 281410309: goto L18;
-                case 586923135: goto Le;
-                default: goto Ld;
-            }
-        Ld:
-            goto L4a
-        Le:
-            java.lang.String r0 = "Japan(952MHz-953MHz)"
-            boolean r8 = r8.equals(r0)
-            if (r8 == 0) goto L4a
-            r8 = 5
-            goto L4b
-        L18:
-            java.lang.String r0 = "Europe(865MHz-868MHz)"
-            boolean r8 = r8.equals(r0)
-            if (r8 == 0) goto L4a
-            r8 = 2
-            goto L4b
-        L22:
-            java.lang.String r0 = "Korea(917MHz-923MHz)"
-            boolean r8 = r8.equals(r0)
-            if (r8 == 0) goto L4a
-            r8 = 4
-            goto L4b
-        L2c:
-            java.lang.String r0 = "USA(902MHz-928MHz)"
-            boolean r8 = r8.equals(r0)
-            if (r8 == 0) goto L4a
-            r8 = 3
-            goto L4b
-        L36:
-            java.lang.String r0 = "China2(920MHz-925MHz)"
-            boolean r8 = r8.equals(r0)
-            if (r8 == 0) goto L4a
-            r8 = 1
-            goto L4b
-        L40:
-            java.lang.String r0 = "China1(840MHz-845MHz)"
-            boolean r8 = r8.equals(r0)
-            if (r8 == 0) goto L4a
-            r8 = 0
-            goto L4b
-        L4a:
-            r8 = -1
-        L4b:
-            if (r8 == 0) goto L65
-            if (r8 == r6) goto L63
-            if (r8 == r5) goto L61
-            if (r8 == r2) goto L5e
-            if (r8 == r4) goto L5b
-            if (r8 == r1) goto L58
-            goto L66
-        L58:
-            r3 = 50
-            goto L66
-        L5b:
-            r3 = 22
-            goto L66
-        L5e:
-            r3 = 8
-            goto L66
-        L61:
-            r3 = 4
-            goto L66
-        L63:
-            r3 = 2
-            goto L66
-        L65:
-            r3 = 1
-        L66:
-            cn.manytag.rfidapi.uhf.a r8 = r7.bluetoothOperation
-            cn.manytag.rfidapi.ble.data.BleDevice r0 = r7.ble
-            byte[] r1 = cn.manytag.rfidapi.uhf.m.a(r3)
-            r8.a(r0, r1)
-            return
-        */
-        throw new UnsupportedOperationException("Method not decompiled: cn.manytag.rfidapi.Reader.setWorkingFrequency(java.lang.String):void");
+    public void setWorkingFrequency(String str) throws InterruptedException, NumberFormatException {
+        char c;
+        byte b = 0;
+        switch (str.hashCode()) {
+            case -1574598577:
+                if (!str.equals(MST1126.CHINA1)) {
+                    c = 65535;
+                    break;
+                } else {
+                    c = 0;
+                    break;
+                }
+            case -1173639986:
+                if (str.equals(MST1126.CHINA2)) {
+                    c = 1;
+                    break;
+                }
+                break;
+            case -940799867:
+                if (str.equals(MST1126.USA)) {
+                    c = 3;
+                    break;
+                }
+                break;
+            case 144669269:
+                if (str.equals(MST1126.KOREA)) {
+                    c = 4;
+                    break;
+                }
+                break;
+            case 281410309:
+                if (str.equals(MST1126.EUROPE)) {
+                    c = 2;
+                    break;
+                }
+                break;
+            case 586923135:
+                if (str.equals(MST1126.JAPAN)) {
+                    c = 5;
+                    break;
+                }
+                break;
+        }
+        if (c == 0) {
+            b = 1;
+        } else if (c == 1) {
+            b = 2;
+        } else if (c == 2) {
+            b = 4;
+        } else if (c == 3) {
+            b = 8;
+        } else if (c == 4) {
+            b = 22;
+        } else if (c == 5) {
+            b = 50;
+        }
+        this.bluetoothOperation.a(this.ble, m.a(b));
     }
 
     public void setWorkingMode(WorkingModeType workingModeType) throws InterruptedException, NumberFormatException {

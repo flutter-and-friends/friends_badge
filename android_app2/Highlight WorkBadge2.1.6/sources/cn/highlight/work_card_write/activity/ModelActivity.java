@@ -11,6 +11,7 @@ import android.graphics.Paint;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.Editable;
+import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -740,123 +741,50 @@ public class ModelActivity extends BaseActivity {
     /* JADX WARN: Removed duplicated region for block: B:18:0x0052  */
     /*
         Code decompiled incorrectly, please refer to instructions dump.
-        To view partially-correct add '--show-bad-code' argument
     */
-    public /* synthetic */ void lambda$initText$9$ModelActivity(cn.highlight.lib_doodle.DoodleText r9, float r10, float r11, java.util.concurrent.atomic.AtomicReference r12, android.view.View r13) throws java.lang.NumberFormatException {
-        /*
-            r8 = this;
-            android.widget.EditText r13 = r8.textEdit
-            android.text.Editable r13 = r13.getText()
-            java.lang.String r2 = r13.toString()
-            android.widget.TextView r13 = r8.textStyleSeekBarProgress
-            java.lang.CharSequence r13 = r13.getText()
-            java.lang.String r13 = r13.toString()
-            int r13 = java.lang.Integer.parseInt(r13)
-            cn.highlight.work_card_write.adapter.ModelTextStyleColorAdapter r0 = r8.styleAdapter
-            java.lang.String r0 = r0.type
-            int r1 = r0.hashCode()
-            r3 = 1038352(0xfd810, float:1.455041E-39)
-            r7 = 0
-            r4 = 2
-            r5 = 1
-            r6 = -1
-            if (r1 == r3) goto L48
-            r3 = 1293358(0x13bc2e, float:1.81238E-39)
-            if (r1 == r3) goto L3e
-            r3 = 1293761(0x13bdc1, float:1.812945E-39)
-            if (r1 == r3) goto L34
-            goto L52
-        L34:
-            java.lang.String r1 = "黑色"
-            boolean r0 = r0.equals(r1)
-            if (r0 == 0) goto L52
-            r0 = 0
-            goto L53
-        L3e:
-            java.lang.String r1 = "黄色"
-            boolean r0 = r0.equals(r1)
-            if (r0 == 0) goto L52
-            r0 = 2
-            goto L53
-        L48:
-            java.lang.String r1 = "红色"
-            boolean r0 = r0.equals(r1)
-            if (r0 == 0) goto L52
-            r0 = 1
-            goto L53
-        L52:
-            r0 = -1
-        L53:
-            if (r0 == 0) goto L64
-            if (r0 == r5) goto L61
-            if (r0 == r4) goto L5a
-            goto L66
-        L5a:
-            java.lang.String r0 = "#FFC000"
-            int r6 = android.graphics.Color.parseColor(r0)
-            goto L66
-        L61:
-            r6 = -65536(0xffffffffffff0000, float:NaN)
-            goto L66
-        L64:
-            r6 = -16777216(0xffffffffff000000, float:-1.7014118E38)
-        L66:
-            boolean r0 = android.text.TextUtils.isEmpty(r2)
-            if (r0 == 0) goto L6d
-            return
-        L6d:
-            if (r9 != 0) goto L9a
-            cn.highlight.lib_doodle.IDoodle r9 = r8.mDoodle
-            cn.highlight.lib_doodle.DoodleColor r0 = new cn.highlight.lib_doodle.DoodleColor
-            r0.<init>(r6)
-            r9.setColor(r0)
-            cn.highlight.lib_doodle.DoodleText r9 = new cn.highlight.lib_doodle.DoodleText
-            cn.highlight.lib_doodle.IDoodle r1 = r8.mDoodle
-            int r0 = r8.MIN_TEXT_SIZE
-            int r0 = r0 + r13
-            float r3 = (float) r0
-            cn.highlight.lib_doodle.IDoodleColor r0 = r1.getColor()
-            cn.highlight.lib_doodle.IDoodleColor r4 = r0.copy()
-            r0 = r9
-            r5 = r10
-            r6 = r11
-            r0.<init>(r1, r2, r3, r4, r5, r6)
-            cn.highlight.lib_doodle.IDoodle r10 = r8.mDoodle
-            r10.addItem(r9)
-            cn.highlight.lib_doodle.DoodleOnTouchGestureListener r10 = r8.mTouchGestureListener
-            r10.setSelectedItem(r9)
-            goto La5
-        L9a:
-            r9.setText1(r2)
-            cn.highlight.lib_doodle.DoodleColor r10 = new cn.highlight.lib_doodle.DoodleColor
-            r10.<init>(r6)
-            r9.setColor(r10)
-        La5:
-            cn.highlight.lib_doodle.DoodleOnTouchGestureListener r9 = r8.mTouchGestureListener
-            cn.highlight.lib_doodle.IDoodleSelectableItem r9 = r9.getSelectedItem()
-            boolean r9 = r9 instanceof cn.highlight.lib_doodle.DoodleText
-            if (r9 == 0) goto Lcd
-            cn.highlight.lib_doodle.DoodleOnTouchGestureListener r9 = r8.mTouchGestureListener
-            cn.highlight.lib_doodle.IDoodleSelectableItem r9 = r9.getSelectedItem()
-            cn.highlight.lib_doodle.DoodleText r9 = (cn.highlight.lib_doodle.DoodleText) r9
-            java.lang.Object r10 = r12.get()
-            java.lang.String r10 = (java.lang.String) r10
-            r9.setTypeface(r8, r10)
-            cn.highlight.lib_doodle.DoodleOnTouchGestureListener r9 = r8.mTouchGestureListener
-            cn.highlight.lib_doodle.IDoodleSelectableItem r9 = r9.getSelectedItem()
-            int r10 = r8.MIN_TEXT_SIZE
-            int r13 = r13 + r10
-            float r10 = (float) r13
-            r9.setSize(r10)
-        Lcd:
-            cn.highlight.lib_doodle.IDoodle r9 = r8.mDoodle
-            r9.refresh()
-            r8.showSet(r7)
-            android.widget.EditText r9 = r8.textEdit
-            r8.hideSoftKeyBoard(r9)
-            return
-        */
-        throw new UnsupportedOperationException("Method not decompiled: cn.highlight.work_card_write.activity.ModelActivity.lambda$initText$9$ModelActivity(cn.highlight.lib_doodle.DoodleText, float, float, java.util.concurrent.atomic.AtomicReference, android.view.View):void");
+    public /* synthetic */ void lambda$initText$9$ModelActivity(DoodleText doodleText, float f, float f2, AtomicReference atomicReference, View view) throws NumberFormatException {
+        char c;
+        String string = this.textEdit.getText().toString();
+        int i = Integer.parseInt(this.textStyleSeekBarProgress.getText().toString());
+        String str = this.styleAdapter.type;
+        int iHashCode = str.hashCode();
+        int color = -1;
+        if (iHashCode != 1038352) {
+            if (iHashCode != 1293358) {
+                c = (iHashCode == 1293761 && str.equals("黑色")) ? (char) 0 : (char) 65535;
+            } else if (str.equals("黄色")) {
+                c = 2;
+            }
+        } else if (str.equals("红色")) {
+            c = 1;
+        }
+        if (c == 0) {
+            color = ViewCompat.MEASURED_STATE_MASK;
+        } else if (c == 1) {
+            color = SupportMenu.CATEGORY_MASK;
+        } else if (c == 2) {
+            color = Color.parseColor("#FFC000");
+        }
+        if (TextUtils.isEmpty(string)) {
+            return;
+        }
+        if (doodleText == null) {
+            this.mDoodle.setColor(new DoodleColor(color));
+            IDoodle iDoodle = this.mDoodle;
+            DoodleText doodleText2 = new DoodleText(iDoodle, string, this.MIN_TEXT_SIZE + i, iDoodle.getColor().copy(), f, f2);
+            this.mDoodle.addItem(doodleText2);
+            this.mTouchGestureListener.setSelectedItem(doodleText2);
+        } else {
+            doodleText.setText1(string);
+            doodleText.setColor(new DoodleColor(color));
+        }
+        if (this.mTouchGestureListener.getSelectedItem() instanceof DoodleText) {
+            ((DoodleText) this.mTouchGestureListener.getSelectedItem()).setTypeface(this, (String) atomicReference.get());
+            this.mTouchGestureListener.getSelectedItem().setSize(i + this.MIN_TEXT_SIZE);
+        }
+        this.mDoodle.refresh();
+        showSet(0);
+        hideSoftKeyBoard(this.textEdit);
     }
 
     /* JADX INFO: Access modifiers changed from: private */

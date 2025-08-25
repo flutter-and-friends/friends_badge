@@ -123,57 +123,25 @@ public class WriteAdapter extends RecyclerView.Adapter<ViewHolder> {
     /* JADX WARN: Removed duplicated region for block: B:18:0x0036  */
     /*
         Code decompiled incorrectly, please refer to instructions dump.
-        To view partially-correct add '--show-bad-code' argument
     */
-    private int getIdByName(java.lang.String r7) {
-        /*
-            r6 = this;
-            int r0 = r7.hashCode()
-            r1 = 1290700(0x13b1cc, float:1.808656E-39)
-            r2 = 0
-            r3 = -1
-            r4 = 2
-            r5 = 1
-            if (r0 == r1) goto L2c
-            r1 = 40044118(0x2630656, float:1.6679144E-37)
-            if (r0 == r1) goto L22
-            r1 = 1241408302(0x49fe632e, float:2083941.8)
-            if (r0 == r1) goto L18
-            goto L36
-        L18:
-            java.lang.String r0 = "黑白红黄"
-            boolean r7 = r7.equals(r0)
-            if (r7 == 0) goto L36
-            r7 = 2
-            goto L37
-        L22:
-            java.lang.String r0 = "黑白红"
-            boolean r7 = r7.equals(r0)
-            if (r7 == 0) goto L36
-            r7 = 1
-            goto L37
-        L2c:
-            java.lang.String r0 = "黑白"
-            boolean r7 = r7.equals(r0)
-            if (r7 == 0) goto L36
-            r7 = 0
-            goto L37
-        L36:
-            r7 = -1
-        L37:
-            if (r7 == 0) goto L42
-            if (r7 == r5) goto L41
-            if (r7 == r4) goto L3f
-            r2 = -1
-            goto L42
-        L3f:
-            r2 = 2
-            goto L42
-        L41:
-            r2 = 1
-        L42:
-            return r2
-        */
-        throw new UnsupportedOperationException("Method not decompiled: cn.highlight.work_card_write.adapter.WriteAdapter.getIdByName(java.lang.String):int");
+    private int getIdByName(String str) {
+        char c;
+        int iHashCode = str.hashCode();
+        if (iHashCode != 1290700) {
+            if (iHashCode != 40044118) {
+                c = (iHashCode == 1241408302 && str.equals("黑白红黄")) ? (char) 2 : (char) 65535;
+            } else if (str.equals("黑白红")) {
+                c = 1;
+            }
+        } else if (str.equals("黑白")) {
+            c = 0;
+        }
+        if (c == 0) {
+            return 0;
+        }
+        if (c != 1) {
+            return c != 2 ? -1 : 2;
+        }
+        return 1;
     }
 }

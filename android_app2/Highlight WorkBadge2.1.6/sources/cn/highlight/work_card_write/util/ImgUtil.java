@@ -40,59 +40,27 @@ public class ImgUtil {
     /* JADX WARN: Removed duplicated region for block: B:18:0x0037  */
     /*
         Code decompiled incorrectly, please refer to instructions dump.
-        To view partially-correct add '--show-bad-code' argument
     */
-    public static byte[][] gray2Binary(android.graphics.Bitmap r5, java.lang.String r6) {
-        /*
-            r0 = 0
-            byte[][] r0 = (byte[][]) r0
-            int r1 = r6.hashCode()
-            r2 = 1290700(0x13b1cc, float:1.808656E-39)
-            r3 = 2
-            r4 = 1
-            if (r1 == r2) goto L2d
-            r2 = 40044118(0x2630656, float:1.6679144E-37)
-            if (r1 == r2) goto L23
-            r2 = 1241408302(0x49fe632e, float:2083941.8)
-            if (r1 == r2) goto L19
-            goto L37
-        L19:
-            java.lang.String r1 = "黑白红黄"
-            boolean r6 = r6.equals(r1)
-            if (r6 == 0) goto L37
-            r6 = 2
-            goto L38
-        L23:
-            java.lang.String r1 = "黑白红"
-            boolean r6 = r6.equals(r1)
-            if (r6 == 0) goto L37
-            r6 = 1
-            goto L38
-        L2d:
-            java.lang.String r1 = "黑白"
-            boolean r6 = r6.equals(r1)
-            if (r6 == 0) goto L37
-            r6 = 0
-            goto L38
-        L37:
-            r6 = -1
-        L38:
-            if (r6 == 0) goto L49
-            if (r6 == r4) goto L44
-            if (r6 == r3) goto L3f
-            goto L4d
-        L3f:
-            byte[][] r0 = gray2Binary_BWYR(r5)
-            goto L4d
-        L44:
-            byte[][] r0 = gray2Binary_BWR(r5)
-            goto L4d
-        L49:
-            byte[][] r0 = gray2Binary_BW(r5)
-        L4d:
-            return r0
-        */
-        throw new UnsupportedOperationException("Method not decompiled: cn.highlight.work_card_write.util.ImgUtil.gray2Binary(android.graphics.Bitmap, java.lang.String):byte[][]");
+    public static byte[][] gray2Binary(Bitmap bitmap, String str) {
+        char c;
+        byte[][] bArr = (byte[][]) null;
+        int iHashCode = str.hashCode();
+        if (iHashCode != 1290700) {
+            if (iHashCode != 40044118) {
+                c = (iHashCode == 1241408302 && str.equals("黑白红黄")) ? (char) 2 : (char) 65535;
+            } else if (str.equals("黑白红")) {
+                c = 1;
+            }
+        } else if (str.equals("黑白")) {
+            c = 0;
+        }
+        if (c == 0) {
+            return gray2Binary_BW(bitmap);
+        }
+        if (c != 1) {
+            return c != 2 ? bArr : gray2Binary_BWYR(bitmap);
+        }
+        return gray2Binary_BWR(bitmap);
     }
 
     public static byte[][] gray2Binary_BW(Bitmap bitmap) {

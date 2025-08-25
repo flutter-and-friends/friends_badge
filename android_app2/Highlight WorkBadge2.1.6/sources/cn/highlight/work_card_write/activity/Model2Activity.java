@@ -13,8 +13,10 @@ import android.graphics.Point;
 import android.nfc.NfcAdapter;
 import android.os.Bundle;
 import android.os.Handler;
+import android.text.Editable;
 import android.text.InputFilter;
 import android.text.Spanned;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -72,6 +74,7 @@ import cn.highlight.work_card_write.adapter.ModelimageLibraryIconAdapter;
 import cn.highlight.work_card_write.base.BaseActivity;
 import cn.highlight.work_card_write.greendao.dao.DoodleBeanDaoUse;
 import cn.highlight.work_card_write.greendao.table.DoodleBean;
+import cn.highlight.work_card_write.sp.ConfigSp;
 import cn.highlight.work_card_write.util.BadgeSpecificationUtils;
 import cn.highlight.work_card_write.util.ScaleBitmapUtils;
 import cn.highlight.work_card_write.util.ShapeUtil;
@@ -455,74 +458,47 @@ public class Model2Activity extends BaseActivity {
     /* JADX WARN: Removed duplicated region for block: B:17:0x0035  */
     /*
         Code decompiled incorrectly, please refer to instructions dump.
-        To view partially-correct add '--show-bad-code' argument
     */
-    public int getColorByValue(java.lang.String r7) {
-        /*
-            r6 = this;
-            int r0 = r7.hashCode()
-            r1 = 0
-            r2 = 3
-            r3 = 2
-            r4 = 1
-            r5 = -1
-            switch(r0) {
-                case 973717: goto L2b;
-                case 1038352: goto L21;
-                case 1293358: goto L17;
-                case 1293761: goto Ld;
-                default: goto Lc;
-            }
-        Lc:
-            goto L35
-        Ld:
-            java.lang.String r0 = "黑色"
-            boolean r7 = r7.equals(r0)
-            if (r7 == 0) goto L35
-            r7 = 0
-            goto L36
-        L17:
-            java.lang.String r0 = "黄色"
-            boolean r7 = r7.equals(r0)
-            if (r7 == 0) goto L35
-            r7 = 2
-            goto L36
-        L21:
-            java.lang.String r0 = "红色"
-            boolean r7 = r7.equals(r0)
-            if (r7 == 0) goto L35
-            r7 = 1
-            goto L36
-        L2b:
-            java.lang.String r0 = "白色"
-            boolean r7 = r7.equals(r0)
-            if (r7 == 0) goto L35
-            r7 = 3
-            goto L36
-        L35:
-            r7 = -1
-        L36:
-            if (r7 == 0) goto L4b
-            if (r7 == r4) goto L48
-            if (r7 == r3) goto L41
-            if (r7 == r2) goto L3f
-            goto L4d
-        L3f:
-            r1 = -1
-            goto L4d
-        L41:
-            java.lang.String r7 = "#FFC000"
-            int r1 = android.graphics.Color.parseColor(r7)
-            goto L4d
-        L48:
-            r1 = -65536(0xffffffffffff0000, float:NaN)
-            goto L4d
-        L4b:
-            r1 = -16777216(0xffffffffff000000, float:-1.7014118E38)
-        L4d:
-            return r1
-        */
-        throw new UnsupportedOperationException("Method not decompiled: cn.highlight.work_card_write.activity.Model2Activity.getColorByValue(java.lang.String):int");
+    public int getColorByValue(String str) {
+        char c;
+        switch (str.hashCode()) {
+            case 973717:
+                if (!str.equals("白色")) {
+                    c = 65535;
+                    break;
+                } else {
+                    c = 3;
+                    break;
+                }
+            case 1038352:
+                if (str.equals("红色")) {
+                    c = 1;
+                    break;
+                }
+                break;
+            case 1293358:
+                if (str.equals("黄色")) {
+                    c = 2;
+                    break;
+                }
+                break;
+            case 1293761:
+                if (str.equals("黑色")) {
+                    c = 0;
+                    break;
+                }
+                break;
+        }
+        if (c == 0) {
+            return ViewCompat.MEASURED_STATE_MASK;
+        }
+        if (c == 1) {
+            return SupportMenu.CATEGORY_MASK;
+        }
+        if (c != 2) {
+            return c != 3 ? 0 : -1;
+        }
+        return Color.parseColor("#FFC000");
     }
 
     private String getValueByColor(int i) {
@@ -958,14 +934,549 @@ public class Model2Activity extends BaseActivity {
     /* JADX WARN: Removed duplicated region for block: B:97:0x04c9  */
     /*
         Code decompiled incorrectly, please refer to instructions dump.
-        To view partially-correct add '--show-bad-code' argument
     */
     private void showMainSetText() {
-        /*
-            Method dump skipped, instructions count: 1377
-            To view this dump add '--comments-level debug' option
-        */
-        throw new UnsupportedOperationException("Method not decompiled: cn.highlight.work_card_write.activity.Model2Activity.showMainSetText():void");
+        AtomicReference atomicReference;
+        int i;
+        boolean z;
+        String[] strArr;
+        char c;
+        String str;
+        final ImageView imageView;
+        char c2;
+        final boolean[] zArr;
+        final ImageView imageView2;
+        char c3;
+        final boolean[] zArr2;
+        final ImageView imageView3;
+        View viewInflate = LayoutInflater.from(this).inflate(R.layout.dialog_model_main_set_text_item, (ViewGroup) null);
+        ImageView imageView4 = (ImageView) viewInflate.findViewById(R.id.textCancel);
+        ImageView imageView5 = (ImageView) viewInflate.findViewById(R.id.textSure);
+        TabLayout tabLayout = (TabLayout) viewInflate.findViewById(R.id.textTabLayout);
+        final LinearLayout linearLayout = (LinearLayout) viewInflate.findViewById(R.id.textSetEdit);
+        this.textEdit = (EditText) viewInflate.findViewById(R.id.textEdit);
+        final LinearLayout linearLayout2 = (LinearLayout) viewInflate.findViewById(R.id.textSetFont);
+        RecyclerView recyclerView = (RecyclerView) viewInflate.findViewById(R.id.textFontRecyclerView);
+        final LinearLayout linearLayout3 = (LinearLayout) viewInflate.findViewById(R.id.textSetStyle);
+        RecyclerView recyclerView2 = (RecyclerView) viewInflate.findViewById(R.id.textStyleBgRecyclerView);
+        RecyclerView recyclerView3 = (RecyclerView) viewInflate.findViewById(R.id.textStyleColorRecyclerView);
+        SeekBar seekBar = (SeekBar) viewInflate.findViewById(R.id.textStyleSeekBar);
+        final TextView textView = (TextView) viewInflate.findViewById(R.id.textStyleSeekBarProgress);
+        LinearLayout linearLayout4 = (LinearLayout) viewInflate.findViewById(R.id.linearBold);
+        ImageView imageView6 = (ImageView) viewInflate.findViewById(R.id.imageBold);
+        LinearLayout linearLayout5 = (LinearLayout) viewInflate.findViewById(R.id.linearItalic);
+        ImageView imageView7 = (ImageView) viewInflate.findViewById(R.id.imageItalic);
+        LinearLayout linearLayout6 = (LinearLayout) viewInflate.findViewById(R.id.linearUnderline);
+        ImageView imageView8 = (ImageView) viewInflate.findViewById(R.id.imageUnderline);
+        final BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(this, R.style.CustomBottomSheetStyle1);
+        bottomSheetDialog.setContentView(viewInflate);
+        bottomSheetDialog.setCanceledOnTouchOutside(false);
+        bottomSheetDialog.setCancelable(false);
+        ((Window) Objects.requireNonNull(bottomSheetDialog.getWindow())).setDimAmount(0.0f);
+        bottomSheetDialog.show();
+        String[] strArr2 = {""};
+        final AtomicReference atomicReference2 = new AtomicReference("默认");
+        final AtomicReference atomicReference3 = new AtomicReference("透明");
+        AtomicReference atomicReference4 = new AtomicReference("黑色");
+        final float[] fArr = {1.0f};
+        final int[] iArr = {0};
+        final int[] iArr2 = {0};
+        final int[] iArr3 = {0};
+        if (this.mTouchGestureListener.getSelectedItem() == null || !(this.mTouchGestureListener.getSelectedItem() instanceof DoodleText)) {
+            atomicReference = atomicReference4;
+            i = 0;
+            z = false;
+        } else {
+            strArr2[0] = ((DoodleText) this.mTouchGestureListener.getSelectedItem()).getText1();
+            atomicReference2.set(((DoodleText) this.mTouchGestureListener.getSelectedItem()).getTypeface());
+            atomicReference3.set(getValueByColor(((DoodleText) this.mTouchGestureListener.getSelectedItem()).getBgColor()));
+            atomicReference4.set(getValueByColor(((DoodleColor) this.mTouchGestureListener.getSelectedItem().getColor()).getColor()));
+            atomicReference = atomicReference4;
+            i = 0;
+            fArr[0] = this.mTouchGestureListener.getSelectedItem().getScale();
+            iArr[0] = ((DoodleText) this.mTouchGestureListener.getSelectedItem()).getBold();
+            iArr2[0] = ((DoodleText) this.mTouchGestureListener.getSelectedItem()).getItalic();
+            iArr3[0] = ((DoodleText) this.mTouchGestureListener.getSelectedItem()).getUnderline();
+            z = true;
+        }
+        ((TabLayout.Tab) Objects.requireNonNull(tabLayout.getTabAt(i))).select();
+        linearLayout.setVisibility(i);
+        if (Tools.isNull(strArr2[i])) {
+            strArr = strArr2;
+        } else {
+            strArr = strArr2;
+            this.textEdit.setText(((DoodleText) this.mTouchGestureListener.getSelectedItem()).getText0());
+        }
+        final String[] strArr3 = {this.textEdit.getText().toString()};
+        EditText editText = this.textEdit;
+        final boolean z2 = z;
+        editText.setSelection(editText.length());
+        this.textEdit.addTextChangedListener(new TextWatcher() { // from class: cn.highlight.work_card_write.activity.Model2Activity.5
+            @Override // android.text.TextWatcher
+            public void beforeTextChanged(CharSequence charSequence, int i2, int i3, int i4) {
+                IDoodleSelectableItem doodleText;
+                if (Model2Activity.this.mTouchGestureListener.getSelectedItem() == null || !(Model2Activity.this.mTouchGestureListener.getSelectedItem() instanceof DoodleText)) {
+                    doodleText = new DoodleText(Model2Activity.this.mDoodle, Tools.getText(Model2Activity.this.textEdit), Model2Activity.this.MIN_TEXT_SIZE, new DoodleColor(Model2Activity.this.getColorByValue("黑色")), 3.0f, 3.0f);
+                } else {
+                    doodleText = Model2Activity.this.mTouchGestureListener.getSelectedItem();
+                }
+                Model2Activity.this.cy = doodleText.getPivotY();
+            }
+
+            @Override // android.text.TextWatcher
+            public void onTextChanged(CharSequence charSequence, int i2, int i3, int i4) {
+                StringBuilder sb = new StringBuilder();
+                StringBuilder sb2 = new StringBuilder();
+                String string = Model2Activity.this.textEdit.getText().toString();
+                if (!Tools.isNull(string)) {
+                    int i5 = 0;
+                    for (int i6 = 0; i6 < string.length(); i6++) {
+                        char cCharAt = string.charAt(i6);
+                        if (cCharAt == '\n') {
+                            sb2.append("\n");
+                            sb.setLength(0);
+                            i5 = 0;
+                        } else {
+                            sb.append(cCharAt);
+                            i5++;
+                            DoodleText doodleText = new DoodleText(Model2Activity.this.mDoodle, sb.toString(), 120.0f, new DoodleColor(ViewCompat.MEASURED_STATE_MASK), 3.0f, 3.0f);
+                            if (Model2Activity.this.mTouchGestureListener.getSelectedItem() != null && (Model2Activity.this.mTouchGestureListener.getSelectedItem() instanceof DoodleText)) {
+                                doodleText.setScale(Model2Activity.this.mTouchGestureListener.getSelectedItem().getScale());
+                            }
+                            if (doodleText.getBounds().width() >= 1024.0f && i5 != 1) {
+                                sb2.append("\n");
+                                sb2.append(cCharAt);
+                                sb.setLength(0);
+                                sb.append(cCharAt);
+                                i5 = 1;
+                            } else {
+                                sb2.append(cCharAt);
+                            }
+                        }
+                    }
+                    strArr3[0] = sb2.toString();
+                    return;
+                }
+                strArr3[0] = "";
+            }
+
+            @Override // android.text.TextWatcher
+            public void afterTextChanged(Editable editable) {
+                float f = Model2Activity.this.getResources().getDisplayMetrics().density * 30.0f;
+                int width = Model2Activity.this.mFrameLayout.getWidth() - Math.round(f);
+                int height = Model2Activity.this.mFrameLayout.getHeight() - Math.round(f);
+                float x = Model2Activity.this.mDoodleView.toX(width / 2);
+                float y = Model2Activity.this.mDoodleView.toY(height / 2);
+                if (Model2Activity.this.mTouchGestureListener.getSelectedItem() == null || !(Model2Activity.this.mTouchGestureListener.getSelectedItem() instanceof DoodleText)) {
+                    DoodleText doodleText = new DoodleText(Model2Activity.this.mDoodle, strArr3[0], Model2Activity.this.MIN_TEXT_SIZE, new DoodleColor(Model2Activity.this.getColorByValue("黑色")), x, y);
+                    DoodleText doodleText2 = doodleText;
+                    doodleText.setLocation(x - (doodleText2.getMaxWidth(strArr3[0]) / 2), y - (doodleText2.getMaxHeight(strArr3[0]) / 2));
+                    Model2Activity.this.mDoodle.addItem(doodleText);
+                    Model2Activity.this.mTouchGestureListener.setSelectedItem(doodleText);
+                    ((DoodleText) Model2Activity.this.mTouchGestureListener.getSelectedItem()).setTypeface(Model2Activity.this, "默认");
+                    Model2Activity.this.mDoodle.refresh();
+                    return;
+                }
+                ((DoodleText) Model2Activity.this.mTouchGestureListener.getSelectedItem()).setText1(strArr3[0]);
+                DoodleText doodleText3 = (DoodleText) Model2Activity.this.mTouchGestureListener.getSelectedItem();
+                float f2 = Model2Activity.this.cy;
+                if (f2 <= 1003.0f || f2 >= 1100.0f) {
+                    return;
+                }
+                doodleText3.setLocation(x - (doodleText3.getMaxWidth(doodleText3.getText1()) / 2), y - (doodleText3.getMaxHeight(doodleText3.getText1()) / 2));
+            }
+        });
+        linearLayout2.setVisibility(8);
+        recyclerView.setLayoutManager(new GridLayoutManager(this, 4));
+        final ModelTextFontAdapter modelTextFontAdapter = new ModelTextFontAdapter(this);
+        recyclerView.setAdapter(modelTextFontAdapter);
+        ArrayList arrayList = new ArrayList();
+        String lang = ConfigSp.getLang();
+        int iHashCode = lang.hashCode();
+        if (iHashCode != 3201) {
+            if (iHashCode != 3241) {
+                c = (iHashCode == 3886 && lang.equals("zh")) ? (char) 1 : (char) 65535;
+            } else if (lang.equals("en")) {
+                c = 0;
+            }
+        } else if (lang.equals("de")) {
+            c = 2;
+        }
+        if (c == 0) {
+            arrayList.add(getResources().getString(R.string.model_text_font_default));
+            arrayList.add("SourceHanSansCN-Regular");
+            arrayList.add("SourceHanSansCN-Light");
+            arrayList.add("SourceHanSerifCN-Medium");
+            arrayList.add("HarmonyOS_Sans_Bold");
+        } else if (c == 1) {
+            arrayList.add(getResources().getString(R.string.model_text_font_default));
+            arrayList.add("思源黑体");
+            arrayList.add("思源黑体细");
+            arrayList.add("思源宋体中");
+            arrayList.add("鸿蒙黑体粗");
+        } else if (c == 2) {
+            arrayList.add(getResources().getString(R.string.model_text_font_default));
+            arrayList.add("HanSansCN-Regular");
+            arrayList.add("HanSansCN-Light");
+            arrayList.add("HanSerifCN-Medium");
+            arrayList.add("HarmonyOS_Sans_Bold");
+        }
+        modelTextFontAdapter.type = (String) atomicReference2.get();
+        modelTextFontAdapter.setDataList(arrayList);
+        modelTextFontAdapter.setOnClickSelectViewTextFont(new ModelTextFontAdapter.OnClickSelectViewTextFont() { // from class: cn.highlight.work_card_write.activity.-$$Lambda$Model2Activity$E1HHD6ol1Ps3jOC0Anu2qVtKmmQ
+            @Override // cn.highlight.work_card_write.adapter.ModelTextFontAdapter.OnClickSelectViewTextFont
+            public final void onClickSelectFont(String str2) {
+                this.f$0.lambda$showMainSetText$11$Model2Activity(modelTextFontAdapter, str2);
+            }
+        });
+        linearLayout3.setVisibility(8);
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
+        linearLayoutManager.setOrientation(0);
+        recyclerView2.setLayoutManager(linearLayoutManager);
+        final ModelTextStyleBgAdapter modelTextStyleBgAdapter = new ModelTextStyleBgAdapter(this);
+        recyclerView2.setAdapter(modelTextStyleBgAdapter);
+        ArrayList arrayList2 = new ArrayList();
+        arrayList2.add("透明");
+        if (this.modelColor.contains("黑白")) {
+            str = "黑色";
+            arrayList2.add(str);
+            arrayList2.add("白色");
+        } else {
+            str = "黑色";
+        }
+        if (this.modelColor.contains("红")) {
+            arrayList2.add("红色");
+        }
+        if (this.modelColor.contains("黄")) {
+            arrayList2.add("黄色");
+        }
+        modelTextStyleBgAdapter.type = (String) atomicReference3.get();
+        modelTextStyleBgAdapter.setDataList(arrayList2);
+        modelTextStyleBgAdapter.setOnClickSelectViewBG(new ModelTextStyleBgAdapter.OnClickSelectViewBg() { // from class: cn.highlight.work_card_write.activity.-$$Lambda$Model2Activity$17Piy9N5qVpi313yJ_YG5F9a5gc
+            @Override // cn.highlight.work_card_write.adapter.ModelTextStyleBgAdapter.OnClickSelectViewBg
+            public final void onClickSelectBg(String str2) {
+                this.f$0.lambda$showMainSetText$12$Model2Activity(modelTextStyleBgAdapter, str2);
+            }
+        });
+        LinearLayoutManager linearLayoutManager2 = new LinearLayoutManager(this);
+        linearLayoutManager2.setOrientation(0);
+        recyclerView3.setLayoutManager(linearLayoutManager2);
+        final ModelTextStyleColorAdapter modelTextStyleColorAdapter = new ModelTextStyleColorAdapter(this);
+        recyclerView3.setAdapter(modelTextStyleColorAdapter);
+        ArrayList arrayList3 = new ArrayList();
+        if (this.modelColor.contains("黑白")) {
+            arrayList3.add(str);
+            arrayList3.add("白色");
+        }
+        if (this.modelColor.contains("红")) {
+            arrayList3.add("红色");
+        }
+        if (this.modelColor.contains("黄")) {
+            arrayList3.add("黄色");
+        }
+        modelTextStyleColorAdapter.type = (String) atomicReference.get();
+        modelTextStyleColorAdapter.setDataList(arrayList3);
+        modelTextStyleColorAdapter.setOnClickSelectViewBG(new ModelTextStyleColorAdapter.OnClickSelectViewBg() { // from class: cn.highlight.work_card_write.activity.-$$Lambda$Model2Activity$7aINLdWmYBmX3OArZALc27Jp9A4
+            @Override // cn.highlight.work_card_write.adapter.ModelTextStyleColorAdapter.OnClickSelectViewBg
+            public final void onClickSelectBg(String str2) {
+                this.f$0.lambda$showMainSetText$13$Model2Activity(modelTextStyleColorAdapter, str2);
+            }
+        });
+        int iRound = Math.round((fArr[0] - 0.5f) / 0.08421053f);
+        seekBar.setProgress(iRound);
+        textView.setText(String.valueOf(iRound + 5));
+        seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() { // from class: cn.highlight.work_card_write.activity.Model2Activity.6
+            @Override // android.widget.SeekBar.OnSeekBarChangeListener
+            public void onStartTrackingTouch(SeekBar seekBar2) {
+            }
+
+            @Override // android.widget.SeekBar.OnSeekBarChangeListener
+            public void onStopTrackingTouch(SeekBar seekBar2) {
+            }
+
+            @Override // android.widget.SeekBar.OnSeekBarChangeListener
+            public void onProgressChanged(SeekBar seekBar2, int i2, boolean z3) {
+                textView.setText(String.valueOf(i2 + 5));
+                if (Model2Activity.this.mTouchGestureListener.getSelectedItem() == null || !(Model2Activity.this.mTouchGestureListener.getSelectedItem() instanceof DoodleText)) {
+                    return;
+                }
+                Model2Activity.this.mTouchGestureListener.getSelectedItem().setScale((i2 * 0.08421053f) + 0.5f);
+                float pivotX = Model2Activity.this.mTouchGestureListener.getSelectedItem().getPivotX();
+                float pivotY = Model2Activity.this.mTouchGestureListener.getSelectedItem().getPivotY();
+                StringBuilder sb = new StringBuilder();
+                StringBuilder sb2 = new StringBuilder();
+                String string = Model2Activity.this.textEdit.getText().toString();
+                if (!Tools.isNull(string)) {
+                    int i3 = 0;
+                    int i4 = 0;
+                    for (int i5 = 0; i5 < string.length(); i5++) {
+                        char cCharAt = string.charAt(i5);
+                        if (cCharAt == '\n') {
+                            sb2.append("\n");
+                            sb.setLength(i3);
+                            i4 = 0;
+                        } else {
+                            sb.append(cCharAt);
+                            i4++;
+                            new DoodleText(Model2Activity.this.mDoodle, sb.toString(), 120.0f, new DoodleColor(ViewCompat.MEASURED_STATE_MASK), 3.0f, 3.0f).setScale(Model2Activity.this.mTouchGestureListener.getSelectedItem().getScale());
+                            if (r10.getBounds().width() >= 1024.0f && i4 != 1) {
+                                sb2.append("\n");
+                                sb2.append(cCharAt);
+                                i3 = 0;
+                                sb.setLength(0);
+                                sb.append(cCharAt);
+                                i4 = 1;
+                            } else {
+                                i3 = 0;
+                                sb2.append(cCharAt);
+                            }
+                        }
+                    }
+                    ((DoodleText) Model2Activity.this.mTouchGestureListener.getSelectedItem()).setText1(sb2.toString());
+                    Model2Activity.this.mTouchGestureListener.getSelectedItem().setLocation(Model2Activity.this.mTouchGestureListener.getSelectedItem().getLocation().x + (pivotX - Model2Activity.this.mTouchGestureListener.getSelectedItem().getPivotX()), Model2Activity.this.mTouchGestureListener.getSelectedItem().getLocation().y + (pivotY - Model2Activity.this.mTouchGestureListener.getSelectedItem().getPivotY()));
+                }
+                ((DoodleText) Model2Activity.this.mTouchGestureListener.getSelectedItem()).setBgColor(Model2Activity.this.getColorByValue(modelTextStyleBgAdapter.type));
+            }
+        });
+        final boolean[] zArr3 = new boolean[1];
+        zArr3[0] = iArr[0] != 0;
+        if (zArr3[0]) {
+            imageView = imageView6;
+            imageView.setImageResource(R.mipmap.cuti1);
+            imageView.setBackgroundResource(R.drawable.shape_so_bai_st_hong_co_5);
+            if (this.mTouchGestureListener.getSelectedItem() != null && (this.mTouchGestureListener.getSelectedItem() instanceof DoodleText)) {
+                ((DoodleText) this.mTouchGestureListener.getSelectedItem()).setBold(1);
+            }
+        } else {
+            imageView = imageView6;
+            imageView.setImageResource(R.mipmap.cuti);
+            imageView.setBackgroundResource(R.drawable.shape_so_bai2_st_0_co_5);
+            if (this.mTouchGestureListener.getSelectedItem() != null && (this.mTouchGestureListener.getSelectedItem() instanceof DoodleText)) {
+                c2 = 0;
+                ((DoodleText) this.mTouchGestureListener.getSelectedItem()).setBold(0);
+            }
+            linearLayout4.setOnClickListener(new View.OnClickListener() { // from class: cn.highlight.work_card_write.activity.-$$Lambda$Model2Activity$ce8sTFRd68zDqNRSPrCLWkgPlOo
+                @Override // android.view.View.OnClickListener
+                public final void onClick(View view) {
+                    this.f$0.lambda$showMainSetText$14$Model2Activity(zArr3, imageView, view);
+                }
+            });
+            zArr = new boolean[1];
+            zArr[c2] = iArr2[c2] == 0;
+            if (!zArr[c2]) {
+                imageView2 = imageView7;
+                imageView2.setImageResource(R.mipmap.xieti1);
+                imageView2.setBackgroundResource(R.drawable.shape_so_bai_st_hong_co_5);
+                if (this.mTouchGestureListener.getSelectedItem() != null && (this.mTouchGestureListener.getSelectedItem() instanceof DoodleText)) {
+                    ((DoodleText) this.mTouchGestureListener.getSelectedItem()).setItalic(1);
+                }
+            } else {
+                imageView2 = imageView7;
+                imageView2.setImageResource(R.mipmap.xieti);
+                imageView2.setBackgroundResource(R.drawable.shape_so_bai2_st_0_co_5);
+                if (this.mTouchGestureListener.getSelectedItem() != null && (this.mTouchGestureListener.getSelectedItem() instanceof DoodleText)) {
+                    c3 = 0;
+                    ((DoodleText) this.mTouchGestureListener.getSelectedItem()).setItalic(0);
+                }
+                linearLayout5.setOnClickListener(new View.OnClickListener() { // from class: cn.highlight.work_card_write.activity.-$$Lambda$Model2Activity$Bx61TelGrEPizXW43VciCueo8Ys
+                    @Override // android.view.View.OnClickListener
+                    public final void onClick(View view) {
+                        this.f$0.lambda$showMainSetText$15$Model2Activity(zArr, imageView2, view);
+                    }
+                });
+                zArr2 = new boolean[1];
+                zArr2[c3] = iArr3[c3] != 0;
+                if (zArr2[c3]) {
+                    imageView3 = imageView8;
+                    imageView3.setImageResource(R.mipmap.xiahuaxian1);
+                    imageView3.setBackgroundResource(R.drawable.shape_so_bai_st_hong_co_5);
+                    if (this.mTouchGestureListener.getSelectedItem() != null && (this.mTouchGestureListener.getSelectedItem() instanceof DoodleText)) {
+                        ((DoodleText) this.mTouchGestureListener.getSelectedItem()).setUnderline(1);
+                    }
+                } else {
+                    imageView3 = imageView8;
+                    imageView3.setImageResource(R.mipmap.xiahuaxian);
+                    imageView3.setBackgroundResource(R.drawable.shape_so_bai2_st_0_co_5);
+                    if (this.mTouchGestureListener.getSelectedItem() != null && (this.mTouchGestureListener.getSelectedItem() instanceof DoodleText)) {
+                        ((DoodleText) this.mTouchGestureListener.getSelectedItem()).setUnderline(0);
+                    }
+                }
+                linearLayout6.setOnClickListener(new View.OnClickListener() { // from class: cn.highlight.work_card_write.activity.-$$Lambda$Model2Activity$7AUgd3JP4kElL1lxEm4iEQTw-aU
+                    @Override // android.view.View.OnClickListener
+                    public final void onClick(View view) {
+                        this.f$0.lambda$showMainSetText$16$Model2Activity(zArr2, imageView3, view);
+                    }
+                });
+                tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() { // from class: cn.highlight.work_card_write.activity.Model2Activity.7
+                    @Override // com.google.android.material.tabs.TabLayout.BaseOnTabSelectedListener
+                    public void onTabReselected(TabLayout.Tab tab) {
+                    }
+
+                    @Override // com.google.android.material.tabs.TabLayout.BaseOnTabSelectedListener
+                    public void onTabUnselected(TabLayout.Tab tab) {
+                    }
+
+                    @Override // com.google.android.material.tabs.TabLayout.BaseOnTabSelectedListener
+                    public void onTabSelected(TabLayout.Tab tab) {
+                        int position = tab.getPosition();
+                        linearLayout.setVisibility(8);
+                        linearLayout2.setVisibility(8);
+                        linearLayout3.setVisibility(8);
+                        if (position == 0) {
+                            linearLayout.setVisibility(0);
+                        } else if (position == 1) {
+                            linearLayout2.setVisibility(0);
+                        } else {
+                            if (position != 2) {
+                                return;
+                            }
+                            linearLayout3.setVisibility(0);
+                        }
+                    }
+                });
+                final String[] strArr4 = strArr;
+                final AtomicReference atomicReference5 = atomicReference;
+                imageView4.setOnClickListener(new View.OnClickListener() { // from class: cn.highlight.work_card_write.activity.-$$Lambda$Model2Activity$WKGl4tZgu5k5XJgwhaSwYgOBtKA
+                    @Override // android.view.View.OnClickListener
+                    public final void onClick(View view) {
+                        this.f$0.lambda$showMainSetText$17$Model2Activity(z2, strArr4, atomicReference2, atomicReference3, atomicReference5, fArr, iArr, iArr2, iArr3, bottomSheetDialog, view);
+                    }
+                });
+                imageView5.setOnClickListener(new View.OnClickListener() { // from class: cn.highlight.work_card_write.activity.-$$Lambda$Model2Activity$ufhfsqiQP1fI7dMR4-fI_21zvVM
+                    @Override // android.view.View.OnClickListener
+                    public final void onClick(View view) {
+                        this.f$0.lambda$showMainSetText$18$Model2Activity(z2, bottomSheetDialog, view);
+                    }
+                });
+            }
+            c3 = 0;
+            linearLayout5.setOnClickListener(new View.OnClickListener() { // from class: cn.highlight.work_card_write.activity.-$$Lambda$Model2Activity$Bx61TelGrEPizXW43VciCueo8Ys
+                @Override // android.view.View.OnClickListener
+                public final void onClick(View view) {
+                    this.f$0.lambda$showMainSetText$15$Model2Activity(zArr, imageView2, view);
+                }
+            });
+            zArr2 = new boolean[1];
+            zArr2[c3] = iArr3[c3] != 0;
+            if (zArr2[c3]) {
+            }
+            linearLayout6.setOnClickListener(new View.OnClickListener() { // from class: cn.highlight.work_card_write.activity.-$$Lambda$Model2Activity$7AUgd3JP4kElL1lxEm4iEQTw-aU
+                @Override // android.view.View.OnClickListener
+                public final void onClick(View view) {
+                    this.f$0.lambda$showMainSetText$16$Model2Activity(zArr2, imageView3, view);
+                }
+            });
+            tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() { // from class: cn.highlight.work_card_write.activity.Model2Activity.7
+                @Override // com.google.android.material.tabs.TabLayout.BaseOnTabSelectedListener
+                public void onTabReselected(TabLayout.Tab tab) {
+                }
+
+                @Override // com.google.android.material.tabs.TabLayout.BaseOnTabSelectedListener
+                public void onTabUnselected(TabLayout.Tab tab) {
+                }
+
+                @Override // com.google.android.material.tabs.TabLayout.BaseOnTabSelectedListener
+                public void onTabSelected(TabLayout.Tab tab) {
+                    int position = tab.getPosition();
+                    linearLayout.setVisibility(8);
+                    linearLayout2.setVisibility(8);
+                    linearLayout3.setVisibility(8);
+                    if (position == 0) {
+                        linearLayout.setVisibility(0);
+                    } else if (position == 1) {
+                        linearLayout2.setVisibility(0);
+                    } else {
+                        if (position != 2) {
+                            return;
+                        }
+                        linearLayout3.setVisibility(0);
+                    }
+                }
+            });
+            final String[] strArr42 = strArr;
+            final AtomicReference atomicReference52 = atomicReference;
+            imageView4.setOnClickListener(new View.OnClickListener() { // from class: cn.highlight.work_card_write.activity.-$$Lambda$Model2Activity$WKGl4tZgu5k5XJgwhaSwYgOBtKA
+                @Override // android.view.View.OnClickListener
+                public final void onClick(View view) {
+                    this.f$0.lambda$showMainSetText$17$Model2Activity(z2, strArr42, atomicReference2, atomicReference3, atomicReference52, fArr, iArr, iArr2, iArr3, bottomSheetDialog, view);
+                }
+            });
+            imageView5.setOnClickListener(new View.OnClickListener() { // from class: cn.highlight.work_card_write.activity.-$$Lambda$Model2Activity$ufhfsqiQP1fI7dMR4-fI_21zvVM
+                @Override // android.view.View.OnClickListener
+                public final void onClick(View view) {
+                    this.f$0.lambda$showMainSetText$18$Model2Activity(z2, bottomSheetDialog, view);
+                }
+            });
+        }
+        c2 = 0;
+        linearLayout4.setOnClickListener(new View.OnClickListener() { // from class: cn.highlight.work_card_write.activity.-$$Lambda$Model2Activity$ce8sTFRd68zDqNRSPrCLWkgPlOo
+            @Override // android.view.View.OnClickListener
+            public final void onClick(View view) {
+                this.f$0.lambda$showMainSetText$14$Model2Activity(zArr3, imageView, view);
+            }
+        });
+        zArr = new boolean[1];
+        zArr[c2] = iArr2[c2] == 0;
+        if (!zArr[c2]) {
+        }
+        c3 = 0;
+        linearLayout5.setOnClickListener(new View.OnClickListener() { // from class: cn.highlight.work_card_write.activity.-$$Lambda$Model2Activity$Bx61TelGrEPizXW43VciCueo8Ys
+            @Override // android.view.View.OnClickListener
+            public final void onClick(View view) {
+                this.f$0.lambda$showMainSetText$15$Model2Activity(zArr, imageView2, view);
+            }
+        });
+        zArr2 = new boolean[1];
+        zArr2[c3] = iArr3[c3] != 0;
+        if (zArr2[c3]) {
+        }
+        linearLayout6.setOnClickListener(new View.OnClickListener() { // from class: cn.highlight.work_card_write.activity.-$$Lambda$Model2Activity$7AUgd3JP4kElL1lxEm4iEQTw-aU
+            @Override // android.view.View.OnClickListener
+            public final void onClick(View view) {
+                this.f$0.lambda$showMainSetText$16$Model2Activity(zArr2, imageView3, view);
+            }
+        });
+        tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() { // from class: cn.highlight.work_card_write.activity.Model2Activity.7
+            @Override // com.google.android.material.tabs.TabLayout.BaseOnTabSelectedListener
+            public void onTabReselected(TabLayout.Tab tab) {
+            }
+
+            @Override // com.google.android.material.tabs.TabLayout.BaseOnTabSelectedListener
+            public void onTabUnselected(TabLayout.Tab tab) {
+            }
+
+            @Override // com.google.android.material.tabs.TabLayout.BaseOnTabSelectedListener
+            public void onTabSelected(TabLayout.Tab tab) {
+                int position = tab.getPosition();
+                linearLayout.setVisibility(8);
+                linearLayout2.setVisibility(8);
+                linearLayout3.setVisibility(8);
+                if (position == 0) {
+                    linearLayout.setVisibility(0);
+                } else if (position == 1) {
+                    linearLayout2.setVisibility(0);
+                } else {
+                    if (position != 2) {
+                        return;
+                    }
+                    linearLayout3.setVisibility(0);
+                }
+            }
+        });
+        final String[] strArr422 = strArr;
+        final AtomicReference atomicReference522 = atomicReference;
+        imageView4.setOnClickListener(new View.OnClickListener() { // from class: cn.highlight.work_card_write.activity.-$$Lambda$Model2Activity$WKGl4tZgu5k5XJgwhaSwYgOBtKA
+            @Override // android.view.View.OnClickListener
+            public final void onClick(View view) {
+                this.f$0.lambda$showMainSetText$17$Model2Activity(z2, strArr422, atomicReference2, atomicReference3, atomicReference522, fArr, iArr, iArr2, iArr3, bottomSheetDialog, view);
+            }
+        });
+        imageView5.setOnClickListener(new View.OnClickListener() { // from class: cn.highlight.work_card_write.activity.-$$Lambda$Model2Activity$ufhfsqiQP1fI7dMR4-fI_21zvVM
+            @Override // android.view.View.OnClickListener
+            public final void onClick(View view) {
+                this.f$0.lambda$showMainSetText$18$Model2Activity(z2, bottomSheetDialog, view);
+            }
+        });
     }
 
     public /* synthetic */ void lambda$showMainSetText$11$Model2Activity(ModelTextFontAdapter modelTextFontAdapter, String str) {

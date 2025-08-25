@@ -1,5 +1,6 @@
 package cn.highlight.tx.ble.bluetooth;
 
+import android.bluetooth.BluetoothDevice;
 import android.os.Build;
 import cn.highlight.tx.ble.BleManager;
 import cn.highlight.tx.ble.data.BleDevice;
@@ -56,65 +57,29 @@ public class MultipleBluetoothController {
     /* JADX WARN: Removed duplicated region for block: B:10:0x0014  */
     /*
         Code decompiled incorrectly, please refer to instructions dump.
-        To view partially-correct add '--show-bad-code' argument
     */
-    public synchronized boolean isContainDevice(cn.highlight.tx.ble.data.BleDevice r2) {
-        /*
-            r1 = this;
-            monitor-enter(r1)
-            if (r2 == 0) goto L14
-            cn.highlight.tx.ble.utils.BleLruHashMap<java.lang.String, cn.highlight.tx.ble.bluetooth.BleBluetooth> r0 = r1.bleLruHashMap     // Catch: java.lang.Throwable -> L11
-            java.lang.String r2 = r2.getKey()     // Catch: java.lang.Throwable -> L11
-            boolean r2 = r0.containsKey(r2)     // Catch: java.lang.Throwable -> L11
-            if (r2 == 0) goto L14
-            r2 = 1
-            goto L15
-        L11:
-            r2 = move-exception
-            monitor-exit(r1)
-            throw r2
-        L14:
-            r2 = 0
-        L15:
-            monitor-exit(r1)
-            return r2
-        */
-        throw new UnsupportedOperationException("Method not decompiled: cn.highlight.tx.ble.bluetooth.MultipleBluetoothController.isContainDevice(cn.highlight.tx.ble.data.BleDevice):boolean");
+    public synchronized boolean isContainDevice(BleDevice bleDevice) {
+        boolean z;
+        if (bleDevice != null) {
+            z = this.bleLruHashMap.containsKey(bleDevice.getKey());
+        }
+        return z;
     }
 
     /* JADX WARN: Removed duplicated region for block: B:10:0x0027  */
     /*
         Code decompiled incorrectly, please refer to instructions dump.
-        To view partially-correct add '--show-bad-code' argument
     */
-    public synchronized boolean isContainDevice(android.bluetooth.BluetoothDevice r4) {
-        /*
-            r3 = this;
-            monitor-enter(r3)
-            if (r4 == 0) goto L27
-            cn.highlight.tx.ble.utils.BleLruHashMap<java.lang.String, cn.highlight.tx.ble.bluetooth.BleBluetooth> r0 = r3.bleLruHashMap     // Catch: java.lang.Throwable -> L24
-            java.lang.StringBuilder r1 = new java.lang.StringBuilder     // Catch: java.lang.Throwable -> L24
-            r1.<init>()     // Catch: java.lang.Throwable -> L24
-            java.lang.String r2 = r4.getName()     // Catch: java.lang.Throwable -> L24
-            r1.append(r2)     // Catch: java.lang.Throwable -> L24
-            java.lang.String r4 = r4.getAddress()     // Catch: java.lang.Throwable -> L24
-            r1.append(r4)     // Catch: java.lang.Throwable -> L24
-            java.lang.String r4 = r1.toString()     // Catch: java.lang.Throwable -> L24
-            boolean r4 = r0.containsKey(r4)     // Catch: java.lang.Throwable -> L24
-            if (r4 == 0) goto L27
-            r4 = 1
-            goto L28
-        L24:
-            r4 = move-exception
-            monitor-exit(r3)
-            throw r4
-        L27:
-            r4 = 0
-        L28:
-            monitor-exit(r3)
-            return r4
-        */
-        throw new UnsupportedOperationException("Method not decompiled: cn.highlight.tx.ble.bluetooth.MultipleBluetoothController.isContainDevice(android.bluetooth.BluetoothDevice):boolean");
+    public synchronized boolean isContainDevice(BluetoothDevice bluetoothDevice) {
+        boolean z;
+        if (bluetoothDevice != null) {
+            BleLruHashMap<String, BleBluetooth> bleLruHashMap = this.bleLruHashMap;
+            StringBuilder sb = new StringBuilder();
+            sb.append(bluetoothDevice.getName());
+            sb.append(bluetoothDevice.getAddress());
+            z = bleLruHashMap.containsKey(sb.toString());
+        }
+        return z;
     }
 
     public synchronized BleBluetooth getBleBluetooth(BleDevice bleDevice) {

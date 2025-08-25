@@ -11,6 +11,8 @@ import cn.highlight.core.utils.file.FileUtil;
 import com.gg.reader.api.protocol.gx.EnumG;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.List;
 import top.zibin.luban.CompressionPredicate;
@@ -157,56 +159,60 @@ public class FileCompressUtil {
     /* JADX WARN: Unsupported multi-entry loop pattern (BACK_EDGE: B:8:0x001f -> B:29:0x0031). Please report as a decompilation issue!!! */
     /*
         Code decompiled incorrectly, please refer to instructions dump.
-        To view partially-correct add '--show-bad-code' argument
     */
-    public java.lang.String saveBitmapToPath(android.content.Context r4, android.graphics.Bitmap r5, java.lang.String r6) throws java.lang.Throwable {
-        /*
-            r3 = this;
-            r0 = 0
-            java.io.File r1 = new java.io.File     // Catch: java.lang.Throwable -> L25 java.lang.Exception -> L27
-            java.io.File r4 = r4.getFilesDir()     // Catch: java.lang.Throwable -> L25 java.lang.Exception -> L27
-            r1.<init>(r4, r6)     // Catch: java.lang.Throwable -> L25 java.lang.Exception -> L27
-            java.io.FileOutputStream r4 = new java.io.FileOutputStream     // Catch: java.lang.Throwable -> L25 java.lang.Exception -> L27
-            r4.<init>(r1)     // Catch: java.lang.Throwable -> L25 java.lang.Exception -> L27
-            android.graphics.Bitmap$CompressFormat r6 = android.graphics.Bitmap.CompressFormat.WEBP     // Catch: java.lang.Exception -> L23 java.lang.Throwable -> L32
-            r2 = 100
-            r5.compress(r6, r2, r4)     // Catch: java.lang.Exception -> L23 java.lang.Throwable -> L32
-            java.lang.String r0 = r1.getAbsolutePath()     // Catch: java.lang.Exception -> L23 java.lang.Throwable -> L32
-            r4.close()     // Catch: java.io.IOException -> L1e
-            goto L31
-        L1e:
-            r4 = move-exception
-            r4.printStackTrace()
-            goto L31
-        L23:
-            r5 = move-exception
-            goto L29
-        L25:
-            r5 = move-exception
-            goto L34
-        L27:
-            r5 = move-exception
-            r4 = r0
-        L29:
-            r5.printStackTrace()     // Catch: java.lang.Throwable -> L32
-            if (r4 == 0) goto L31
-            r4.close()     // Catch: java.io.IOException -> L1e
-        L31:
-            return r0
-        L32:
-            r5 = move-exception
-            r0 = r4
-        L34:
-            if (r0 == 0) goto L3e
-            r0.close()     // Catch: java.io.IOException -> L3a
-            goto L3e
-        L3a:
-            r4 = move-exception
-            r4.printStackTrace()
-        L3e:
-            throw r5
-        */
-        throw new UnsupportedOperationException("Method not decompiled: cn.highlight.work_card_write.util.FileCompressUtil.saveBitmapToPath(android.content.Context, android.graphics.Bitmap, java.lang.String):java.lang.String");
+    public String saveBitmapToPath(Context context, Bitmap bitmap, String str) throws Throwable {
+        Throwable th;
+        ?? fileOutputStream;
+        String absolutePath = null;
+        absolutePath = null;
+        absolutePath = null;
+        ?? r0 = null;
+        try {
+            try {
+                try {
+                    File file = new File(context.getFilesDir(), str);
+                    fileOutputStream = new FileOutputStream(file);
+                    try {
+                        bitmap.compress(Bitmap.CompressFormat.WEBP, 100, fileOutputStream);
+                        absolutePath = file.getAbsolutePath();
+                        fileOutputStream.close();
+                        context = fileOutputStream;
+                    } catch (Exception e) {
+                        e = e;
+                        e.printStackTrace();
+                        context = fileOutputStream;
+                        if (fileOutputStream != 0) {
+                            fileOutputStream.close();
+                            context = fileOutputStream;
+                        }
+                        return absolutePath;
+                    }
+                } catch (Throwable th2) {
+                    th = th2;
+                    r0 = context;
+                    if (r0 != null) {
+                        try {
+                            r0.close();
+                        } catch (IOException e2) {
+                            e2.printStackTrace();
+                        }
+                    }
+                    throw th;
+                }
+            } catch (Exception e3) {
+                e = e3;
+                fileOutputStream = 0;
+            } catch (Throwable th3) {
+                th = th3;
+                if (r0 != null) {
+                }
+                throw th;
+            }
+        } catch (IOException e4) {
+            e4.printStackTrace();
+            context = e4;
+        }
+        return absolutePath;
     }
 
     public Bitmap getBitmapFromPath(String str) {

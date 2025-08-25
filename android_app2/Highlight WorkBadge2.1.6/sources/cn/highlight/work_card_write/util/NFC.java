@@ -40,19 +40,19 @@ public class NFC {
                     while (i < bArr.length) {
                         i2++;
                         StringBuilder sb = new StringBuilder();
-                        sb.append("No. ");
+                        sb.append("第 ");
                         int i3 = i + 1;
                         sb.append(i3);
-                        sb.append(" time(s), length of data array is ");
+                        sb.append(" 次, 数组data的长度为 ");
                         sb.append(bArr[i].length);
-                        Log.e("Loop", sb.toString());
+                        Log.e("l循环", sb.toString());
                         int iSendCmd = sendCmd(nfcA, bArr[i], i3);
                         if (iSendCmd == 0) {
-                            Log.e("LoopResult", "No. " + i3 + " operation succeeded");
+                            Log.e("l循环结果", "第 " + i3 + " 次操作成功");
                             i = i3;
                             i2 = 0;
                         } else if (i2 == 5) {
-                            Log.e("LoopResult", "No. " + i3 + " operation failed " + i2);
+                            Log.e("l循环结果", "第 " + i3 + " 次操作失败" + i2);
                             nfcA.close();
                             return false;
                         }
@@ -60,7 +60,7 @@ public class NFC {
                             Thread.sleep(1000L);
                         }
                     }
-                    Log.e("NFC", "Total connection time: " + (System.currentTimeMillis() - jCurrentTimeMillis));
+                    Log.e("NFC", "连接耗总耗时：" + (System.currentTimeMillis() - jCurrentTimeMillis));
                     nfcA.close();
                     return true;
                 }

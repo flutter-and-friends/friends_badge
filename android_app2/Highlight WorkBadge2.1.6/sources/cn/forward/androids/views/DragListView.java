@@ -6,8 +6,10 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.os.Build;
 import android.util.AttributeSet;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewConfiguration;
+import android.view.ViewGroup;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.TranslateAnimation;
 import android.widget.ListView;
@@ -83,14 +85,68 @@ public class DragListView extends ListView {
     @Override // android.view.ViewGroup, android.view.View
     /*
         Code decompiled incorrectly, please refer to instructions dump.
-        To view partially-correct add '--show-bad-code' argument
     */
-    public boolean dispatchTouchEvent(android.view.MotionEvent r7) {
-        /*
-            Method dump skipped, instructions count: 236
-            To view this dump add '--comments-level debug' option
-        */
-        throw new UnsupportedOperationException("Method not decompiled: cn.forward.androids.views.DragListView.dispatchTouchEvent(android.view.MotionEvent):boolean");
+    public boolean dispatchTouchEvent(MotionEvent motionEvent) {
+        DragItemListener dragItemListener;
+        int action = motionEvent.getAction();
+        int height = 0;
+        if (action == 0) {
+            stopDrag();
+            this.mDownX = (int) motionEvent.getX();
+            this.mDownY = (int) motionEvent.getY();
+            int iPointToPosition = pointToPosition(this.mDownX, this.mDownY);
+            if (iPointToPosition == -1) {
+                return super.dispatchTouchEvent(motionEvent);
+            }
+            this.mCurrentPosition = iPointToPosition;
+            this.mLastPosition = iPointToPosition;
+            ViewGroup viewGroup = (ViewGroup) getChildAt(this.mCurrentPosition - getFirstVisiblePosition());
+            if (viewGroup != null && (dragItemListener = this.mDragItemListener) != null && dragItemListener.canDrag(viewGroup, this.mDownX, this.mDownY)) {
+                this.mDragViewOffset = this.mDownY - viewGroup.getTop();
+                this.mDragItemListener.beforeDrawingCache(viewGroup);
+                viewGroup.setDrawingCacheEnabled(true);
+                this.mBitmap = Bitmap.createBitmap(viewGroup.getDrawingCache());
+                viewGroup.setDrawingCacheEnabled(false);
+                Bitmap bitmapAfterDrawingCache = this.mDragItemListener.afterDrawingCache(viewGroup, this.mBitmap);
+                if (bitmapAfterDrawingCache == null) {
+                    bitmapAfterDrawingCache = this.mBitmap;
+                }
+                this.mBitmap = bitmapAfterDrawingCache;
+                this.mHasStart = false;
+                this.mLastY = this.mDownY;
+                this.mLastX = this.mDownX;
+                this.mItemView = viewGroup;
+                invalidate();
+                return true;
+            }
+        } else if (action == 1) {
+            if (this.mBitmap != null) {
+                this.mLastX = (int) motionEvent.getX();
+                this.mLastY = (int) motionEvent.getY();
+                stopDrag();
+                invalidate();
+                return true;
+            }
+        } else if (action != 2) {
+            if (action == 3 || action == 4) {
+            }
+        } else if (this.mBitmap != null) {
+            if (!this.mHasStart) {
+                this.mDragItemListener.startDrag(this.mCurrentPosition, this.mItemView);
+                this.mHasStart = true;
+            }
+            int y = (int) motionEvent.getY();
+            if (y >= 0) {
+                height = y > getHeight() ? getHeight() : y;
+            }
+            this.mMoveY = height;
+            onMove(height);
+            this.mLastY = height;
+            this.mLastX = (int) motionEvent.getX();
+            invalidate();
+            return true;
+        }
+        return super.dispatchTouchEvent(motionEvent);
     }
 
     @Override // android.widget.ListView, android.widget.AbsListView, android.view.ViewGroup, android.view.View
@@ -155,65 +211,25 @@ public class DragListView extends ListView {
     /* JADX WARN: Removed duplicated region for block: B:12:0x002b  */
     /*
         Code decompiled incorrectly, please refer to instructions dump.
-        To view partially-correct add '--show-bad-code' argument
     */
-    public void checkScroller(int r6) {
-        /*
-            r5 = this;
-            int r0 = r5.mAutoScrollUpY
-            r1 = 1086324736(0x40c00000, float:6.0)
-            if (r6 >= r0) goto L16
-            int r0 = r5.mDownY
-            int r2 = r5.mTouchSlop
-            int r0 = r0 - r2
-            if (r6 > r0) goto L2b
-            android.content.Context r6 = r5.getContext()
-            int r6 = r5.dp2px(r6, r1)
-            goto L2c
-        L16:
-            int r0 = r5.mAutoScrollDownY
-            if (r6 <= r0) goto L2b
-            int r0 = r5.mDownY
-            int r2 = r5.mTouchSlop
-            int r0 = r0 + r2
-            if (r6 < r0) goto L2b
-            android.content.Context r6 = r5.getContext()
-            int r6 = r5.dp2px(r6, r1)
-            int r6 = -r6
-            goto L2c
-        L2b:
-            r6 = 0
-        L2c:
-            if (r6 == 0) goto L60
-            int r0 = r5.mCurrentPosition
-            int r1 = r5.getFirstVisiblePosition()
-            int r0 = r0 - r1
-            android.view.View r0 = r5.getChildAt(r0)
-            if (r0 == 0) goto L60
-            int r1 = r5.mCurrentPosition
-            int r0 = r0.getTop()
-            int r0 = r0 + r6
-            r5.setSelectionFromTop(r1, r0)
-            boolean r6 = r5.mScrolling
-            if (r6 != 0) goto L60
-            r6 = 1
-            r5.mScrolling = r6
-            long r0 = java.lang.System.currentTimeMillis()
-            long r2 = r5.mLastScrollTime
-            long r0 = r0 - r2
-            java.lang.Runnable r6 = r5.mScrollRunnable
-            r2 = 15
-            int r4 = (r0 > r2 ? 1 : (r0 == r2 ? 0 : -1))
-            if (r4 <= 0) goto L5c
-            goto L5d
-        L5c:
-            long r2 = r2 - r0
-        L5d:
-            r5.postDelayed(r6, r2)
-        L60:
-            return
-        */
-        throw new UnsupportedOperationException("Method not decompiled: cn.forward.androids.views.DragListView.checkScroller(int):void");
+    public void checkScroller(int i) {
+        int iDp2px;
+        View childAt;
+        if (i < this.mAutoScrollUpY) {
+            iDp2px = i <= this.mDownY - this.mTouchSlop ? dp2px(getContext(), 6.0f) : 0;
+        } else if (i > this.mAutoScrollDownY && i >= this.mDownY + this.mTouchSlop) {
+            iDp2px = -dp2px(getContext(), 6.0f);
+        }
+        if (iDp2px == 0 || (childAt = getChildAt(this.mCurrentPosition - getFirstVisiblePosition())) == null) {
+            return;
+        }
+        setSelectionFromTop(this.mCurrentPosition, childAt.getTop() + iDp2px);
+        if (this.mScrolling) {
+            return;
+        }
+        this.mScrolling = true;
+        long jCurrentTimeMillis = System.currentTimeMillis() - this.mLastScrollTime;
+        postDelayed(this.mScrollRunnable, jCurrentTimeMillis <= 15 ? 15 - jCurrentTimeMillis : 15L);
     }
 
     public void stopDrag() {

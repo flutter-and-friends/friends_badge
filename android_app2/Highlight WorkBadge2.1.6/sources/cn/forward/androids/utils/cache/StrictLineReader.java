@@ -1,9 +1,11 @@
 package cn.forward.androids.utils.cache;
 
+import java.io.ByteArrayOutputStream;
 import java.io.Closeable;
 import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 
 /* loaded from: classes.dex */
@@ -48,105 +50,58 @@ class StrictLineReader implements Closeable {
     /* JADX WARN: Removed duplicated region for block: B:19:0x002d  */
     /*
         Code decompiled incorrectly, please refer to instructions dump.
-        To view partially-correct add '--show-bad-code' argument
     */
-    public java.lang.String readLine() throws java.io.IOException {
-        /*
-            r7 = this;
-            java.io.InputStream r0 = r7.in
-            monitor-enter(r0)
-            byte[] r1 = r7.buf     // Catch: java.lang.Throwable -> L97
-            if (r1 == 0) goto L8f
-            int r1 = r7.pos     // Catch: java.lang.Throwable -> L97
-            int r2 = r7.end     // Catch: java.lang.Throwable -> L97
-            if (r1 < r2) goto L10
-            r7.fillBuf()     // Catch: java.lang.Throwable -> L97
-        L10:
-            int r1 = r7.pos     // Catch: java.lang.Throwable -> L97
-        L12:
-            int r2 = r7.end     // Catch: java.lang.Throwable -> L97
-            r3 = 10
-            if (r1 == r2) goto L49
-            byte[] r2 = r7.buf     // Catch: java.lang.Throwable -> L97
-            r2 = r2[r1]     // Catch: java.lang.Throwable -> L97
-            if (r2 != r3) goto L46
-            int r2 = r7.pos     // Catch: java.lang.Throwable -> L97
-            if (r1 == r2) goto L2d
-            byte[] r2 = r7.buf     // Catch: java.lang.Throwable -> L97
-            int r3 = r1 + (-1)
-            r2 = r2[r3]     // Catch: java.lang.Throwable -> L97
-            r4 = 13
-            if (r2 != r4) goto L2d
-            goto L2e
-        L2d:
-            r3 = r1
-        L2e:
-            java.lang.String r2 = new java.lang.String     // Catch: java.lang.Throwable -> L97
-            byte[] r4 = r7.buf     // Catch: java.lang.Throwable -> L97
-            int r5 = r7.pos     // Catch: java.lang.Throwable -> L97
-            int r6 = r7.pos     // Catch: java.lang.Throwable -> L97
-            int r3 = r3 - r6
-            java.nio.charset.Charset r6 = r7.charset     // Catch: java.lang.Throwable -> L97
-            java.lang.String r6 = r6.name()     // Catch: java.lang.Throwable -> L97
-            r2.<init>(r4, r5, r3, r6)     // Catch: java.lang.Throwable -> L97
-            int r1 = r1 + 1
-            r7.pos = r1     // Catch: java.lang.Throwable -> L97
-            monitor-exit(r0)     // Catch: java.lang.Throwable -> L97
-            return r2
-        L46:
-            int r1 = r1 + 1
-            goto L12
-        L49:
-            cn.forward.androids.utils.cache.StrictLineReader$1 r1 = new cn.forward.androids.utils.cache.StrictLineReader$1     // Catch: java.lang.Throwable -> L97
-            int r2 = r7.end     // Catch: java.lang.Throwable -> L97
-            int r4 = r7.pos     // Catch: java.lang.Throwable -> L97
-            int r2 = r2 - r4
-            int r2 = r2 + 80
-            r1.<init>(r2)     // Catch: java.lang.Throwable -> L97
-        L55:
-            byte[] r2 = r7.buf     // Catch: java.lang.Throwable -> L97
-            int r4 = r7.pos     // Catch: java.lang.Throwable -> L97
-            int r5 = r7.end     // Catch: java.lang.Throwable -> L97
-            int r6 = r7.pos     // Catch: java.lang.Throwable -> L97
-            int r5 = r5 - r6
-            r1.write(r2, r4, r5)     // Catch: java.lang.Throwable -> L97
-            r2 = -1
-            r7.end = r2     // Catch: java.lang.Throwable -> L97
-            r7.fillBuf()     // Catch: java.lang.Throwable -> L97
-            int r2 = r7.pos     // Catch: java.lang.Throwable -> L97
-        L69:
-            int r4 = r7.end     // Catch: java.lang.Throwable -> L97
-            if (r2 == r4) goto L55
-            byte[] r4 = r7.buf     // Catch: java.lang.Throwable -> L97
-            r4 = r4[r2]     // Catch: java.lang.Throwable -> L97
-            if (r4 != r3) goto L8c
-            int r3 = r7.pos     // Catch: java.lang.Throwable -> L97
-            if (r2 == r3) goto L82
-            byte[] r3 = r7.buf     // Catch: java.lang.Throwable -> L97
-            int r4 = r7.pos     // Catch: java.lang.Throwable -> L97
-            int r5 = r7.pos     // Catch: java.lang.Throwable -> L97
-            int r5 = r2 - r5
-            r1.write(r3, r4, r5)     // Catch: java.lang.Throwable -> L97
-        L82:
-            int r2 = r2 + 1
-            r7.pos = r2     // Catch: java.lang.Throwable -> L97
-            java.lang.String r1 = r1.toString()     // Catch: java.lang.Throwable -> L97
-            monitor-exit(r0)     // Catch: java.lang.Throwable -> L97
-            return r1
-        L8c:
-            int r2 = r2 + 1
-            goto L69
-        L8f:
-            java.io.IOException r1 = new java.io.IOException     // Catch: java.lang.Throwable -> L97
-            java.lang.String r2 = "LineReader is closed"
-            r1.<init>(r2)     // Catch: java.lang.Throwable -> L97
-            throw r1     // Catch: java.lang.Throwable -> L97
-        L97:
-            r1 = move-exception
-            monitor-exit(r0)     // Catch: java.lang.Throwable -> L97
-            throw r1
-        */
-        throw new UnsupportedOperationException("Method not decompiled: cn.forward.androids.utils.cache.StrictLineReader.readLine():java.lang.String");
+    public String readLine() throws IOException {
+        int i;
+        int i2;
+        synchronized (this.in) {
+            if (this.buf == null) {
+                throw new IOException("LineReader is closed");
+            }
+            if (this.pos >= this.end) {
+                fillBuf();
+            }
+            for (int i3 = this.pos; i3 != this.end; i3++) {
+                if (this.buf[i3] == 10) {
+                    if (i3 != this.pos) {
+                        i2 = i3 - 1;
+                        if (this.buf[i2] != 13) {
+                            i2 = i3;
+                        }
+                    }
+                    String str = new String(this.buf, this.pos, i2 - this.pos, this.charset.name());
+                    this.pos = i3 + 1;
+                    return str;
+                }
+            }
+            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream((this.end - this.pos) + 80) { // from class: cn.forward.androids.utils.cache.StrictLineReader.1
+                @Override // java.io.ByteArrayOutputStream
+                public String toString() {
+                    try {
+                        return new String(this.buf, 0, (this.count <= 0 || this.buf[this.count + (-1)] != 13) ? this.count : this.count - 1, StrictLineReader.this.charset.name());
+                    } catch (UnsupportedEncodingException e) {
+                        throw new AssertionError(e);
+                    }
+                }
+            };
+            loop1: while (true) {
+                byteArrayOutputStream.write(this.buf, this.pos, this.end - this.pos);
+                this.end = -1;
+                fillBuf();
+                i = this.pos;
+                while (i != this.end) {
+                    if (this.buf[i] == 10) {
+                        break loop1;
+                    }
+                    i++;
+                }
+            }
+            if (i != this.pos) {
+                byteArrayOutputStream.write(this.buf, this.pos, i - this.pos);
+            }
+            this.pos = i + 1;
+            return byteArrayOutputStream.toString();
+        }
     }
 
     public boolean hasUnterminatedLine() {

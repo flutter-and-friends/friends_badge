@@ -12,13 +12,16 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import butterknife.BindView;
 import butterknife.OnClick;
+import cn.highlight.core.utils.ToastUtil;
 import cn.highlight.core.utils.Tools;
 import cn.highlight.work_card_write.Constants;
 import cn.highlight.work_card_write.R;
 import cn.highlight.work_card_write.base.BaseActivity;
 import cn.highlight.work_card_write.util.ImageUtils;
+import com.gg.reader.api.protocol.gx.EnumG;
 import com.isseiaoki.simplecropview.CropImageView;
 import com.isseiaoki.simplecropview.callback.CropCallback;
+import com.isseiaoki.simplecropview.callback.LoadCallback;
 import java.io.File;
 import java.io.IOException;
 
@@ -127,78 +130,43 @@ public class CropActivity extends BaseActivity {
     /* JADX WARN: Removed duplicated region for block: B:18:0x0052  */
     /*
         Code decompiled incorrectly, please refer to instructions dump.
-        To view partially-correct add '--show-bad-code' argument
     */
     private void initCrop() {
-        /*
-            r5 = this;
-            com.isseiaoki.simplecropview.CropImageView r0 = r5.cropView
-            android.net.Uri r1 = r5.imageUri
-            com.isseiaoki.simplecropview.LoadRequest r0 = r0.load(r1)
-            cn.highlight.work_card_write.activity.CropActivity$1 r1 = new cn.highlight.work_card_write.activity.CropActivity$1
-            r1.<init>()
-            r0.execute(r1)
-            com.isseiaoki.simplecropview.CropImageView r0 = r5.cropView
-            r1 = 1
-            r0.setAnimationEnabled(r1)
-            com.isseiaoki.simplecropview.CropImageView r0 = r5.cropView
-            r2 = 100
-            r0.setAnimationDuration(r2)
-            java.lang.String r0 = r5.cropSize
-            int r2 = r0.hashCode()
-            r3 = 49530(0xc17a, float:6.9406E-41)
-            r4 = 2
-            if (r2 == r3) goto L48
-            r3 = 49533(0xc17d, float:6.941E-41)
-            if (r2 == r3) goto L3e
-            r3 = 50492(0xc53c, float:7.0754E-41)
-            if (r2 == r3) goto L34
-            goto L52
-        L34:
-            java.lang.String r2 = "3.7"
-            boolean r0 = r0.equals(r2)
-            if (r0 == 0) goto L52
-            r0 = 2
-            goto L53
-        L3e:
-            java.lang.String r2 = "2.9"
-            boolean r0 = r0.equals(r2)
-            if (r0 == 0) goto L52
-            r0 = 1
-            goto L53
-        L48:
-            java.lang.String r2 = "2.6"
-            boolean r0 = r0.equals(r2)
-            if (r0 == 0) goto L52
-            r0 = 0
-            goto L53
-        L52:
-            r0 = -1
-        L53:
-            r2 = 296(0x128, float:4.15E-43)
-            if (r0 == 0) goto L6e
-            if (r0 == r1) goto L66
-            if (r0 == r4) goto L5c
-            goto L75
-        L5c:
-            com.isseiaoki.simplecropview.CropImageView r0 = r5.cropView
-            r1 = 240(0xf0, float:3.36E-43)
-            r2 = 416(0x1a0, float:5.83E-43)
-            r0.setCustomRatio(r1, r2)
-            goto L75
-        L66:
-            com.isseiaoki.simplecropview.CropImageView r0 = r5.cropView
-            r1 = 128(0x80, float:1.8E-43)
-            r0.setCustomRatio(r2, r1)
-            goto L75
-        L6e:
-            com.isseiaoki.simplecropview.CropImageView r0 = r5.cropView
-            r1 = 152(0x98, float:2.13E-43)
-            r0.setCustomRatio(r2, r1)
-        L75:
-            return
-        */
-        throw new UnsupportedOperationException("Method not decompiled: cn.highlight.work_card_write.activity.CropActivity.initCrop():void");
+        char c;
+        this.cropView.load(this.imageUri).execute(new LoadCallback() { // from class: cn.highlight.work_card_write.activity.CropActivity.1
+            @Override // com.isseiaoki.simplecropview.callback.LoadCallback
+            public void onSuccess() {
+            }
+
+            @Override // com.isseiaoki.simplecropview.callback.Callback
+            public void onError(Throwable th) {
+                CropActivity cropActivity = CropActivity.this;
+                ToastUtil.showToast(cropActivity, cropActivity.getResources().getString(R.string.crop_load_error));
+            }
+        });
+        this.cropView.setAnimationEnabled(true);
+        this.cropView.setAnimationDuration(100);
+        String str = this.cropSize;
+        int iHashCode = str.hashCode();
+        if (iHashCode != 49530) {
+            if (iHashCode != 49533) {
+                c = (iHashCode == 50492 && str.equals("3.7")) ? (char) 2 : (char) 65535;
+            } else if (str.equals("2.9")) {
+                c = 1;
+            }
+        } else if (str.equals("2.6")) {
+            c = 0;
+        }
+        if (c == 0) {
+            this.cropView.setCustomRatio(296, 152);
+        } else if (c == 1) {
+            this.cropView.setCustomRatio(296, 128);
+        } else {
+            if (c != 2) {
+                return;
+            }
+            this.cropView.setCustomRatio(EnumG.BaseMid_SafeCertification, 416);
+        }
     }
 
     @OnClick({R.id.img_turn_left, R.id.img_turn_right, R.id.tvCancel, R.id.tvSure})

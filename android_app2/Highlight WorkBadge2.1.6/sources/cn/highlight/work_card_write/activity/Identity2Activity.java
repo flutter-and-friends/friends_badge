@@ -48,49 +48,22 @@ public class Identity2Activity extends BaseActivity {
     @Override // cn.highlight.work_card_write.base.BaseActivity
     /*
         Code decompiled incorrectly, please refer to instructions dump.
-        To view partially-correct add '--show-bad-code' argument
     */
     protected void initData() {
-        /*
-            r6 = this;
-            java.lang.String r0 = "Person"
-            java.lang.String r1 = "Identity"
-            java.lang.String r1 = cn.highlight.core.utils.SpUtil.getString(r6, r1, r0)
-            int r2 = r1.hashCode()
-            r3 = -1907849355(0xffffffff8e488775, float:-2.4717123E-30)
-            r4 = 0
-            r5 = 1
-            if (r2 == r3) goto L23
-            r0 = 1190727553(0x46f90f81, float:31879.752)
-            if (r2 == r0) goto L19
-            goto L2b
-        L19:
-            java.lang.String r0 = "Enterprise"
-            boolean r0 = r1.equals(r0)
-            if (r0 == 0) goto L2b
-            r0 = 0
-            goto L2c
-        L23:
-            boolean r0 = r1.equals(r0)
-            if (r0 == 0) goto L2b
-            r0 = 1
-            goto L2c
-        L2b:
-            r0 = -1
-        L2c:
-            if (r0 == 0) goto L34
-            if (r0 == r5) goto L31
-            goto L36
-        L31:
-            r6.userType = r5
-            goto L36
-        L34:
-            r6.userType = r4
-        L36:
-            r6.selectRadioButton()
-            return
-        */
-        throw new UnsupportedOperationException("Method not decompiled: cn.highlight.work_card_write.activity.Identity2Activity.initData():void");
+        char c;
+        String string = SpUtil.getString(this, Constants.Identity, Constants.Person);
+        int iHashCode = string.hashCode();
+        if (iHashCode != -1907849355) {
+            c = (iHashCode == 1190727553 && string.equals(Constants.Enterprise)) ? (char) 0 : (char) 65535;
+        } else if (string.equals(Constants.Person)) {
+            c = 1;
+        }
+        if (c == 0) {
+            this.userType = 0;
+        } else if (c == 1) {
+            this.userType = 1;
+        }
+        selectRadioButton();
     }
 
     private void selectRadioButton() {

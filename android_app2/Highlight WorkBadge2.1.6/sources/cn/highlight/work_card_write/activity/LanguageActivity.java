@@ -54,61 +54,28 @@ public class LanguageActivity extends BaseActivity {
     @Override // cn.highlight.work_card_write.base.BaseActivity
     /*
         Code decompiled incorrectly, please refer to instructions dump.
-        To view partially-correct add '--show-bad-code' argument
     */
     protected void initData() {
-        /*
-            r6 = this;
-            java.lang.String r0 = cn.highlight.work_card_write.sp.ConfigSp.getLang()
-            int r1 = r0.hashCode()
-            r2 = 3201(0xc81, float:4.486E-42)
-            r3 = 0
-            r4 = 2
-            r5 = 1
-            if (r1 == r2) goto L2c
-            r2 = 3241(0xca9, float:4.542E-42)
-            if (r1 == r2) goto L22
-            r2 = 3886(0xf2e, float:5.445E-42)
-            if (r1 == r2) goto L18
-            goto L36
-        L18:
-            java.lang.String r1 = "zh"
-            boolean r0 = r0.equals(r1)
-            if (r0 == 0) goto L36
-            r0 = 1
-            goto L37
-        L22:
-            java.lang.String r1 = "en"
-            boolean r0 = r0.equals(r1)
-            if (r0 == 0) goto L36
-            r0 = 0
-            goto L37
-        L2c:
-            java.lang.String r1 = "de"
-            boolean r0 = r0.equals(r1)
-            if (r0 == 0) goto L36
-            r0 = 2
-            goto L37
-        L36:
-            r0 = -1
-        L37:
-            if (r0 == 0) goto L44
-            if (r0 == r5) goto L41
-            if (r0 == r4) goto L3e
-            goto L46
-        L3e:
-            r6.currentLanguage = r4
-            goto L46
-        L41:
-            r6.currentLanguage = r5
-            goto L46
-        L44:
-            r6.currentLanguage = r3
-        L46:
-            r6.selectRadioButton()
-            return
-        */
-        throw new UnsupportedOperationException("Method not decompiled: cn.highlight.work_card_write.activity.LanguageActivity.initData():void");
+        char c;
+        String lang = ConfigSp.getLang();
+        int iHashCode = lang.hashCode();
+        if (iHashCode != 3201) {
+            if (iHashCode != 3241) {
+                c = (iHashCode == 3886 && lang.equals("zh")) ? (char) 1 : (char) 65535;
+            } else if (lang.equals("en")) {
+                c = 0;
+            }
+        } else if (lang.equals("de")) {
+            c = 2;
+        }
+        if (c == 0) {
+            this.currentLanguage = 0;
+        } else if (c == 1) {
+            this.currentLanguage = 1;
+        } else if (c == 2) {
+            this.currentLanguage = 2;
+        }
+        selectRadioButton();
     }
 
     @OnClick({R.id.imgBack, R.id.linearEn, R.id.radioEn, R.id.linearZh, R.id.radioZh, R.id.linearDe, R.id.radioDe, R.id.btnSave})
