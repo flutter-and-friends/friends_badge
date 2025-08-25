@@ -89,7 +89,11 @@ class ImageConverter {
     img.Image src, [
     ColorPalette palette = ColorPalette.blackWhiteYellowRed,
   ]) {
-    return img.ditherImage(src, quantizer: palette.quantizer);
+    return img.ditherImage(
+      src,
+      quantizer: palette.quantizer,
+      kernel: img.DitherKernel.atkinson,
+    );
   }
 
   /// Converts an image to two separate 1-bit-per-pixel byte arrays.

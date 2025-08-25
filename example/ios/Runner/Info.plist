@@ -45,11 +45,7 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
-	<key> NFCReaderUsageDescription </key>
+	<key>NFCReaderUsageDescription</key>
 	<string>We use Near Field Communication (NFC) to wirelessly transfer your selected image to the e-ink display. Access is required to update the screen.</string>
-	<key>com.apple.developer.nfc.readersession.iso7816.select-identifiers</key>
-	<array>
-		<string></string>
-	</array>
 </dict>
 </plist>

@@ -50,6 +50,7 @@ class NfcBadgeRepository {
   }) {
     final controller = StreamController<double>();
 
+    // NfcManager.instance.isAvailable();
     NfcManager.instance
         .startSession(
           alertMessageIos: 'Hold your device near the NFC badge',
