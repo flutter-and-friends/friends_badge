@@ -19,7 +19,7 @@ class WriteScreen extends StatefulWidget {
 
 class _WriteScreenState extends State<WriteScreen> {
   final _bleBadgeRepository = BleBadgeRepository();
-  final _nfcBadgeRepository = NfcBadgeRepository();
+  static const _nfcBadgeRepository = NfcBadgeRepository();
   Uint8List? _convertedImage;
 
   @override

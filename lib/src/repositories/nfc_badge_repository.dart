@@ -1,25 +1,19 @@
 import 'dart:async';
 
 import 'package:flutter/foundation.dart';
-import 'package:friends_badge/friends_badge.dart';
+import 'package:friends_badge/src/utils/badge_specification.dart';
 import 'package:friends_badge/src/utils/image_converter.dart';
 import 'package:image/image.dart' as img;
 import 'package:nfc_manager/nfc_manager.dart';
 import 'package:nfc_manager/nfc_manager_android.dart';
 
 class NfcBadgeRepository {
+  const NfcBadgeRepository();
+
   Future<void> writeOverNfc(
     img.Image image, {
     bool shouldCrop = true,
   }) async {
-    // TODO(lohnn): Read config from device before selecting the size
-    //  and palette
-    final data = const ImageConverter().convertImage(
-      image,
-      ColorPalette.blackWhiteYellowRed,
-      size: BadgeSize.size3_7inch,
-      shouldCrop: shouldCrop,
-    );
     final completer = Completer<void>();
 
     NfcManager.instance.startSession(
@@ -37,7 +31,20 @@ class NfcBadgeRepository {
             return;
           }
 
-          // 1. Handshake
+          // Get badge specification from the device
+          final badge = await isoDep
+              .transceive(
+                Uint8List.fromList([-48, -47, 3, 0, 1]),
+              )
+              .then(BadgeSpecification.fromSpecification);
+
+          final data = const ImageConverter().convertImage(
+            image,
+            badge: badge,
+            shouldCrop: shouldCrop,
+          );
+
+          // 1. Handshake with passive screen
           final handshakeResponse = await isoDep.transceive(
             Uint8List.fromList([0xd0, 0xd1, 0x00, 0x00, 0x00]),
           );
@@ -124,5 +131,12 @@ class NfcBadgeRepository {
     );
 
     return completer.future;
+  }
+
+  img.Image? createPreviewImage(img.Image e) {
+    return const ImageConverter().prepareImage(
+      e,
+      badge: BadgeSpecification.size3_7inchPassiveBWRY,
+    );
   }
 }

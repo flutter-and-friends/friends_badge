@@ -5,8 +5,6 @@ import 'package:example/template_editor_screen.dart';
 import 'package:example/waiting_for_nfc_tap.dart';
 import 'package:flutter/material.dart';
 import 'package:friends_badge/friends_badge.dart';
-// ignore: implementation_imports
-import 'package:friends_badge/src/utils/image_converter.dart';
 import 'package:image/image.dart' as img;
 
 void main() {
@@ -40,7 +38,7 @@ class _HomePageState extends State<HomePage> {
 
   img.Image? get ditheredImage => image?.let(
     // ignore: invalid_use_of_internal_member
-    (e) => const ImageConverter().prepareImage(e),
+    (e) => const NfcBadgeRepository().createPreviewImage(e),
   );
 
   Uint8List? get imageBytes => image?.let(
@@ -98,7 +96,7 @@ class _HomePageState extends State<HomePage> {
               onPressed: () async {
                 await WaitingForNfcTap.showLoading(
                   context: context,
-                  job: NfcBadgeRepository().writeOverNfc(image),
+                  job: const NfcBadgeRepository().writeOverNfc(image),
                 );
               },
               child: const Text('Write over NFC'),

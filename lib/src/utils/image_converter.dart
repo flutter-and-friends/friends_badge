@@ -1,5 +1,5 @@
 import 'package:flutter/foundation.dart';
-import 'package:friends_badge/src/utils/badge_size.dart';
+import 'package:friends_badge/src/utils/badge_specification.dart';
 import 'package:friends_badge/src/utils/color_palette.dart';
 import 'package:image/image.dart' as img;
 
@@ -10,18 +10,16 @@ class ImageConverter {
 
   @internal
   List<Uint8List> convertImage(
-    img.Image image,
-    ColorPalette palette, {
-    required BadgeSize size,
+    img.Image image, {
+    required BadgeSpecification badge,
     required bool shouldCrop,
   }) {
     final preparedImage = prepareImage(
       image,
-      palette: palette,
-      size: size,
+      badge: badge,
       crop: shouldCrop,
     );
-    return switch (palette) {
+    return switch (badge.colorPalette) {
       ColorPalette.blackWhite => gray2BinaryBW(preparedImage),
       ColorPalette.blackWhiteRed => gray2BinaryBWR(preparedImage),
       ColorPalette.blackWhiteYellowRed => gray2BinaryBWYR(preparedImage),
@@ -31,21 +29,20 @@ class ImageConverter {
   @internal
   img.Image prepareImage(
     img.Image image, {
-    ColorPalette palette = ColorPalette.blackWhiteYellowRed,
-    BadgeSize size = BadgeSize.size3_7inch,
+    required BadgeSpecification badge,
     bool crop = true,
   }) {
     final resizedImage = resizeImage(
       image,
-      size,
+      badge,
       crop: crop,
     );
-    return dither(resizedImage, palette);
+    return dither(resizedImage, badge.colorPalette);
   }
 
   img.Image resizeImage(
     img.Image src,
-    BadgeSize size, {
+    BadgeSpecification size, {
     required bool crop,
   }) {
     if (src.width == size.width && src.height == size.height) {
