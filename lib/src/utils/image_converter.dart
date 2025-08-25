@@ -11,23 +11,87 @@ class ImageConverter {
   @internal
   List<Uint8List> convertImage(
     img.Image image,
-    ColorPalette palette, [
+    ColorPalette palette, {
     BadgeSize size = BadgeSize.size3_7inch,
-  ]) {
-    final resizedImage = resizeImage(
+    bool shouldCrop = true,
+  }) {
+    final preparedImage = prepareImage(
       image,
-      size,
+      palette: palette,
+      size: size,
+      crop: shouldCrop,
     );
-    final ditheredImage = noDither(resizedImage, palette);
     return switch (palette) {
-      ColorPalette.blackWhite => gray2BinaryBW(ditheredImage),
-      ColorPalette.blackWhiteRed => gray2BinaryBWR(ditheredImage),
-      ColorPalette.blackWhiteYellowRed => gray2BinaryBWYR(ditheredImage),
+      ColorPalette.blackWhite => gray2BinaryBW(preparedImage),
+      ColorPalette.blackWhiteRed => gray2BinaryBWR(preparedImage),
+      ColorPalette.blackWhiteYellowRed => gray2BinaryBWYR(preparedImage),
     };
   }
 
-  img.Image resizeImage(img.Image image, BadgeSize size) {
+  img.Image prepareImage(
+    img.Image image, {
+    ColorPalette palette = ColorPalette.blackWhiteYellowRed,
+    BadgeSize size = BadgeSize.size3_7inch,
+    bool crop = true,
+  }) {
+    final resizedImage = resizeImage(
+      image,
+      size,
+      crop: crop,
+    );
+    return dither(resizedImage, palette);
+  }
+
+  img.Image resizeImage(
+    img.Image src,
+    BadgeSize size, {
+    required bool crop,
+  }) {
+    if (src.width == size.width && src.height == size.height) {
+      return src;
+    }
+    var image = src;
+
+    if (crop) {
+      final aspectRatio = size.width / size.height;
+      final imageAspectRatio = image.width / image.height;
+
+      final int cropWidth;
+      final int cropHeight;
+      if (imageAspectRatio > aspectRatio) {
+        // Image is wider than target aspect ratio
+        image = img.copyResize(src, height: size.height);
+        cropHeight = image.height;
+        cropWidth = (cropHeight * aspectRatio).round();
+      } else {
+        // Image is taller than target aspect ratio
+        image = img.copyResize(src, width: size.width);
+        cropWidth = image.width;
+        cropHeight = (cropWidth / aspectRatio).round();
+      }
+
+      final offsetX = ((image.width - cropWidth) / 2).round();
+      final offsetY = ((image.height - cropHeight) / 2).round();
+
+      return img.copyCrop(
+        image,
+        x: offsetX,
+        y: offsetY,
+        width: cropWidth,
+        height: cropHeight,
+      );
+    }
+
     return img.copyResize(image, width: size.width, height: size.height);
+  }
+
+  /// Dithers the image with the specified palette using the default dithering
+  /// algorithm (currently Floyd Steinberg).
+  img.Image dither(
+    img.Image src, [
+    ColorPalette palette = ColorPalette.blackWhiteYellowRed,
+  ]) {
+    return img.ditherImage(src, quantizer: palette.quantizer);
   }
 
   /// Converts an image to two separate 1-bit-per-pixel byte arrays.
@@ -191,106 +255,5 @@ class ImageConverter {
     // The original Java function returned a byte[][], so we wrap the result
     // in a list to match that structure.
     return [outputBytes];
-  }
-
-  /// Dithers the image with the specified palette using the default dithering
-  /// algorithm (currently no dithering).
-  img.Image dither(
-    img.Image src, [
-    ColorPalette palette = ColorPalette.blackWhiteYellowRed,
-  ]) {
-    return floydSteinbergDither(src, palette);
-  }
-
-  img.Image noDither(img.Image src, ColorPalette palette) {
-    final image = img.Image(width: src.width, height: src.height);
-
-    for (var y = 0; y < src.height; y++) {
-      for (var x = 0; x < src.width; x++) {
-        final oldPixel = src.getPixel(x, y);
-        final newPixel = _findNearestColor(oldPixel, palette);
-        image.setPixel(x, y, newPixel);
-      }
-    }
-    return image;
-  }
-
-  img.Image floydSteinbergDither(img.Image src, ColorPalette palette) {
-    final image = img.Image.from(src);
-
-    for (var y = 0; y < image.height; y++) {
-      for (var x = 0; x < image.width; x++) {
-        final oldPixel = image.getPixel(x, y);
-        final newPixel = _findNearestColor(oldPixel, palette);
-        image.setPixel(x, y, newPixel);
-
-        final error = (
-          (oldPixel.r - newPixel.r).toInt(),
-          (oldPixel.g - newPixel.g).toInt(),
-          (oldPixel.b - newPixel.b).toInt(),
-        );
-
-        _distributeError(image, x + 1, y, error, 7 / 16.0);
-        _distributeError(
-          image,
-          x - 1,
-          y + 1,
-          error,
-          3 / 16,
-        );
-        _distributeError(image, x, y + 1, error, 5 / 16.0);
-        _distributeError(
-          image,
-          x + 1,
-          y + 1,
-          error,
-          1 / 16,
-        );
-      }
-    }
-
-    return image;
-  }
-
-  void _distributeError(
-    img.Image image,
-    int x,
-    int y,
-    (num, num, num) error,
-    double factor,
-  ) {
-    final pixel = image.getPixel(x, y);
-    pixel.r = (pixel.r + error.$1 * factor).clamp(0, 255);
-    pixel.g = (pixel.g + error.$2 * factor).clamp(0, 255);
-    pixel.b = (pixel.b + error.$3 * factor).clamp(0, 255);
-
-    if (x >= 0 && x < image.width && y >= 0 && y < image.height) {
-      final pixel = image.getPixel(x, y);
-      pixel.r = (pixel.r.toInt() + (error.$1 * factor).round()).clamp(0, 255);
-      pixel.g = (pixel.g.toInt() + (error.$2 * factor).round()).clamp(0, 255);
-      pixel.b = (pixel.b.toInt() + (error.$3 * factor).round()).clamp(0, 255);
-    }
-  }
-
-  img.Color _findNearestColor(img.Color color, ColorPalette palette) {
-    var closestColor = palette.colors[0];
-    var minDistance = double.maxFinite;
-
-    for (final c in palette.colors) {
-      final distance = _colorDistance(color, c);
-      if (distance < minDistance) {
-        minDistance = distance;
-        closestColor = c;
-      }
-    }
-
-    return closestColor;
-  }
-
-  double _colorDistance(img.Color c1, img.Color c2) {
-    final r = c1.r - c2.r;
-    final g = c1.g - c2.g;
-    final b = c1.b - c2.b;
-    return (r * r + g * g + b * b).toDouble();
   }
 }
