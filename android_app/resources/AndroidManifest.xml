@@ -1,0 +1,242 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    android:versionCode="1"
+    android:versionName="2.1.6"
+    android:compileSdkVersion="28"
+    android:compileSdkVersionCodename="9"
+    package="cn.highlight.work_card_write"
+    platformBuildVersionCode="28"
+    platformBuildVersionName="9">
+    <uses-sdk
+        android:minSdkVersion="21"
+        android:targetSdkVersion="28"/>
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES"/>
+    <uses-permission android:name="android.permission.READ_LOGS"/>
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+    <uses-permission android:name="android.permission.BLUETOOTH_PRIVILEGED"/>
+    <uses-permission android:name="android.permission.BLUETOOTH"/>
+    <uses-permission android:name="android.permission.BLUETOOTH_CONNECT"/>
+    <uses-permission android:name="android.permission.BLUETOOTH_SCAN"/>
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN"/>
+    <uses-permission android:name="android.permission.BLUETOOTH_ADVERTISE"/>
+    <uses-permission android:name="android.permission.BLUETOOTH_CONNECT"/>
+    <uses-permission android:name="android.permission.REQUEST_BLUETOOTH_SCAN_PERMISSION"/>
+    <uses-permission android:name="android.permission.WAKE_LOCK"/>
+    <uses-permission android:name="android.permission.DISABLE_KEYGUARD"/>
+    <uses-permission android:name="android.permission.VIBRATE"/>
+    <uses-permission android:name="android.permission.CAMERA"/>
+    <uses-permission android:name="android.permission.MOUNT_UNMOUNT_FILESYSTEMS"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission-sdk-23 android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    <uses-feature
+        android:name="android.hardware.bluetooth_le"
+        android:required="true"/>
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
+    <uses-feature
+        android:name="android.hardware.nfc"
+        android:required="true"/>
+    <uses-permission android:name="android.permission.NFC"/>
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES"/>
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
+    <application
+        android:theme="@style/AppTheme"
+        android:label="@string/app_name"
+        android:icon="@mipmap/highlight1"
+        android:name="cn.highlight.work_card_write.MyApplication"
+        android:allowBackup="true"
+        android:supportsRtl="true"
+        android:usesCleartextTraffic="true"
+        android:appComponentFactory="androidx.core.app.CoreComponentFactory">
+        <activity android:name="cn.highlight.work_card_write.activity.UserInfoActivity"/>
+        <activity android:name="cn.highlight.work_card_write.activity.Identity2Activity"/>
+        <activity android:name="cn.highlight.work_card_write.activity.ServiceActivity"/>
+        <activity android:name="cn.highlight.work_card_write.activity.LoginActivity"/>
+        <activity android:name="cn.highlight.work_card_write.activity.IdentityActivity"/>
+        <activity
+            android:theme="@android:style/Theme.NoTitleBar"
+            android:name="cn.highlight.work_card_write.activity.LauncherActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.hardware.usb.action.USB_DEVICE_ATTACHED"/>
+                <action android:name="android.hardware.usb.action.USB_DEVICE_DETACHED"/>
+            </intent-filter>
+            <meta-data
+                android:name="android.hardware.usb.action.USB_DEVICE_ATTACHED"
+                android:resource="@xml/device_filter"/>
+        </activity>
+        <activity
+            android:name="cn.highlight.work_card_write.activity.HomeActivity"
+            android:launchMode="singleTask"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="stateAlwaysHidden"/>
+        <activity
+            android:name="cn.highlight.work_card_write.activity.PhotoTakeActivity"
+            android:launchMode="singleTask"
+            android:screenOrientation="portrait"/>
+        <activity
+            android:name="cn.highlight.work_card_write.activity.CropActivity"
+            android:launchMode="singleTask"
+            android:screenOrientation="portrait"/>
+        <activity
+            android:name="cn.highlight.work_card_write.activity.Crop2Activity"
+            android:launchMode="singleTask"
+            android:screenOrientation="portrait"/>
+        <activity
+            android:name="cn.highlight.work_card_write.activity.ModelActivity"
+            android:launchMode="singleTask"
+            android:screenOrientation="portrait"/>
+        <activity
+            android:name="cn.highlight.work_card_write.activity.Model2Activity"
+            android:launchMode="singleTask"
+            android:screenOrientation="portrait"/>
+        <activity
+            android:name="cn.highlight.work_card_write.activity.WriteActivity"
+            android:launchMode="singleTask"
+            android:screenOrientation="portrait"/>
+        <activity
+            android:name="cn.highlight.work_card_write.activity.CardActivity"
+            android:launchMode="singleTask"
+            android:screenOrientation="portrait"/>
+        <activity
+            android:name="cn.highlight.work_card_write.activity.LanguageActivity"
+            android:launchMode="singleTask"
+            android:screenOrientation="portrait"/>
+        <activity
+            android:name="cn.highlight.work_card_write.activity.InstructionActivity"
+            android:launchMode="singleTask"
+            android:screenOrientation="portrait"/>
+        <activity
+            android:name="cn.highlight.work_card_write.activity.NFCLocation1Activity"
+            android:launchMode="singleTask"
+            android:screenOrientation="portrait"/>
+        <activity
+            android:name="cn.highlight.work_card_write.activity.NFCLocationActivity"
+            android:launchMode="singleTask"
+            android:screenOrientation="portrait"/>
+        <meta-data
+            android:name="design_width_in_dp"
+            android:value="1080"/>
+        <meta-data
+            android:name="design_height_in_dp"
+            android:value="1776"/>
+        <activity
+            android:theme="@style/SelTheme"
+            android:name="com.yuyh.library.imgsel.p017ui.ISListActivity"/>
+        <activity
+            android:theme="@style/Theme.AppCompat.NoActionBar"
+            android:name="com.yuyh.library.imgsel.p017ui.ISCameraActivity"/>
+        <meta-data
+            android:name="APP_ID"
+            android:value="cn.highlight.work_card_write"/>
+        <provider
+            android:name="com.yuyh.library.imgsel.utils.ISFileProvider"
+            android:exported="false"
+            android:authorities="cn.highlight.work_card_write.image_provider"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/provider_paths"/>
+        </provider>
+        <activity
+            android:theme="@style/versionCheckLibvtransparentTheme"
+            android:name="com.allenliu.versionchecklib.core.VersionDialogActivity"
+            android:launchMode="singleTask"/>
+        <provider
+            android:name="com.allenliu.versionchecklib.core.VersionFileProvider"
+            android:exported="false"
+            android:authorities="cn.highlight.work_card_write.versionProvider"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/versionchecklib_file_paths"/>
+        </provider>
+        <activity
+            android:theme="@style/versionCheckLibvtransparentTheme"
+            android:name="com.allenliu.versionchecklib.core.PermissionDialogActivity"
+            android:launchMode="singleTask"/>
+        <service
+            android:name="com.allenliu.versionchecklib.core.MyService"
+            android:enabled="true"
+            android:exported="true"/>
+        <service
+            android:name="com.allenliu.versionchecklib.p011v2.p012ui.VersionService"
+            android:exported="false"
+            android:priority="1000"/>
+        <activity
+            android:theme="@style/versionCheckLibvtransparentTheme"
+            android:name="com.allenliu.versionchecklib.p011v2.p012ui.UIActivity"
+            android:launchMode="singleTask"/>
+        <activity
+            android:theme="@style/versionCheckLibvtransparentTheme"
+            android:name="com.allenliu.versionchecklib.p011v2.p012ui.DownloadingActivity"
+            android:launchMode="singleTask"/>
+        <activity
+            android:theme="@style/versionCheckLibvtransparentTheme"
+            android:name="com.allenliu.versionchecklib.p011v2.p012ui.DownloadFailedActivity"
+            android:launchMode="singleTask"/>
+        <activity android:name="com.soundcloud.android.crop.CropImageActivity"/>
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:exported="false"
+            android:authorities="cn.highlight.work_card_write.fileprovider"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths"/>
+        </provider>
+        <activity
+            android:theme="@style/MultipleImageSelectTheme"
+            android:label="@string/app_name"
+            android:name="com.darsh.multipleimageselect.activities.AlbumSelectActivity"
+            android:configChanges="screenSize|orientation">
+            <intent-filter>
+                <category android:name="android.intent.category.DEFAULT"/>
+            </intent-filter>
+        </activity>
+        <activity
+            android:theme="@style/MultipleImageSelectTheme"
+            android:label="@string/app_name"
+            android:name="com.darsh.multipleimageselect.activities.ImageSelectActivity"
+            android:configChanges="screenSize|orientation">
+            <intent-filter>
+                <category android:name="android.intent.category.DEFAULT"/>
+            </intent-filter>
+        </activity>
+        <activity
+            android:theme="@style/ActivityTranslucent"
+            android:name="com.blankj.utilcode.util.PermissionUtils.PermissionActivity"
+            android:multiprocess="true"
+            android:configChanges="screenSize|orientation|keyboardHidden"
+            android:windowSoftInputMode="stateAlwaysHidden"/>
+        <provider
+            android:name="com.blankj.utilcode.util.Utils.FileProvider4UtilCode"
+            android:exported="false"
+            android:multiprocess="true"
+            android:authorities="cn.highlight.work_card_write.utilcode.provider"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/util_code_provider_paths"/>
+        </provider>
+        <activity
+            android:theme="@style/Permission.Theme"
+            android:name="com.yanzhenjie.permission.bridge.BridgeActivity"/>
+        <provider
+            android:name="com.yanzhenjie.permission.FileProvider"
+            android:exported="false"
+            android:authorities="cn.highlight.work_card_write.file.path.share"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/permission_file_paths"/>
+        </provider>
+    </application>
+</manifest>
