@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<LinearLayout android:orientation="vertical" android:layout_width="@dimen/dp_30" android:layout_height="wrap_content" android:layout_marginEnd="@dimen/dp_20"
-  xmlns:android="http://schemas.android.com/apk/res/android">
-    <LinearLayout android:gravity="center" android:id="@id/item" android:layout_width="@dimen/dp_30" android:layout_height="@dimen/dp_30">
-        <ImageView android:layout_gravity="center" android:id="@id/item_bg" android:background="@drawable/shape_so_bai_st_0_co_25" android:layout_width="@dimen/dp_25" android:layout_height="@dimen/dp_25" />
-    </LinearLayout>
-</LinearLayout>

@@ -127,6 +127,10 @@ class NfcBadgeRepository {
     bool shouldCrop,
     StreamController<double> controller,
   ) async {
+    // Supported protocols on Android:
+    // android.nfc.tech.IsoDep
+    // android.nfc.tech.NfcA
+    // android.nfc.tech.Ndef
     final isoDep = IsoDepAndroid.from(tag);
     if (isoDep == null) {
       controller.addError(
@@ -237,6 +241,7 @@ class NfcBadgeRepository {
     bool shouldCrop,
     StreamController<double> controller,
   ) async {
+    // @TODO: Try using this for iOS: NFCISO7816Tag
     throw UnimplementedError(
       'iOS support is not implemented yet',
     );
