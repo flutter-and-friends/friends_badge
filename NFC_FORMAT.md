@@ -2,6 +2,10 @@
 
 This document outlines the NFC data format used for communication between the mobile application and the smart badge. The communication is based on the ISO 14443-4 (ISO-DEP) standard, using `NfcA` technology.
 
+## Tag Type
+
+The badge is an **NFC FORUM TYPE 4 TAG**.
+
 ## High-Level Communication Flow
 
 The communication process for writing data (e.g., an image or template) to the badge follows these steps:
