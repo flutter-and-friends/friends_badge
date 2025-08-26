@@ -36,21 +36,21 @@ class NfcBadgeRepository {
 
   /// Whether NFC badge writing is supported on the current platform.
   /// Currently, only Android is supported.
-  /// 
+  ///
   /// On iOS, NFC is available but writing to the badge is not implemented yet.
-  /// 
+  ///
   /// Make sure to check this property before attempting to write.
-  /// 
+  ///
   /// If false, calling [writeOverNfc] will result in an error.
-  bool get supported => Platform.isAndroid;
+  bool get isSupported => Platform.isAndroid;
 
   /// Writes the given [image] to an NFC badge.
   /// If [shouldCrop] is true, the image will be cropped to fit the badge's
   /// aspect ratio.
-  /// 
+  ///
   /// Returns a [Stream] that completes when the write operation is done or
   /// fails.
-  /// 
+  ///
   /// The stream emits progress updates as double values between 0.0 and 1.0.
   ///
   /// Make sure to call this method in a context where NFC is available and
@@ -61,51 +61,62 @@ class NfcBadgeRepository {
   }) {
     final controller = StreamController<double>();
 
-    // NfcManager.instance.isAvailable();
-    NfcManager.instance
-        .startSession(
-          alertMessageIos: 'Hold your device near the NFC badge',
-          pollingOptions: {
-            NfcPollingOption.iso14443,
-          },
-          onDiscovered: (tag) async {
-            try {
-              if (Platform.isAndroid) {
-                await _writeOverNfcAndroid(
-                  tag,
-                  image,
-                  shouldCrop,
-                  controller,
-                );
-              } else if (Platform.isIOS) {
-                await _writeOverNfcIos(
-                  tag,
-                  image,
-                  shouldCrop,
-                  controller,
-                );
-              } else {
-                throw UnsupportedError('Unsupported platform');
-              }
+    Future(() async {
+      final isNfcAvailable = await NfcManager.instance.isAvailable();
+      if (!isNfcAvailable) {
+        controller.addError(
+          Exception('NFC is not available on this device'),
+          StackTrace.current,
+        );
+        controller.close();
+        return controller.stream;
+      }
 
-              // ignore: avoid_catches_without_on_clauses
-            } catch (e, stackTrace) {
-              controller.addError(e, stackTrace);
-            } finally {
-              NfcManager.instance.stopSession();
-              controller.close();
-            }
-          },
-        )
-        .onError((error, stackTrace) {
-          debugPrint('NFC session error: $error');
-          debugPrintStack(stackTrace: stackTrace);
-          controller.addError(
-            error ?? 'Something went wrong when setting up the NfcManager',
-            stackTrace,
-          );
-          controller.close();
-        });
+      NfcManager.instance
+          .startSession(
+            alertMessageIos: 'Hold your device near the NFC badge',
+            pollingOptions: {
+              NfcPollingOption.iso14443,
+            },
+            onDiscovered: (tag) async {
+              try {
+                if (Platform.isAndroid) {
+                  await _writeOverNfcAndroid(
+                    tag,
+                    image,
+                    shouldCrop,
+                    controller,
+                  );
+                } else if (Platform.isIOS) {
+                  await _writeOverNfcIos(
+                    tag,
+                    image,
+                    shouldCrop,
+                    controller,
+                  );
+                } else {
+                  throw UnsupportedError('Unsupported platform');
+                }
+
+                // ignore: avoid_catches_without_on_clauses
+              } catch (e, stackTrace) {
+                controller.addError(e, stackTrace);
+              } finally {
+                NfcManager.instance.stopSession();
+                controller.close();
+              }
+            },
+          )
+          .onError((error, stackTrace) {
+            debugPrint('NFC session error: $error');
+            debugPrintStack(stackTrace: stackTrace);
+            controller.addError(
+              error ?? 'Something went wrong when setting up the NfcManager',
+              stackTrace,
+            );
+            controller.close();
+          });
+    });
 
     return controller.stream;
   }
