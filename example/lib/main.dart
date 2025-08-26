@@ -76,7 +76,7 @@ class _HomePageState extends State<HomePage> {
               onPressed: () async {
                 await WaitingForNfcTap.showLoading(
                   context: context,
-                  job: FriendsBadge.nfcBadgeRepository.writeOverNfc(
+                  job: FriendsBadge.writeOverNfc(
                     image,
                   ),
                 );

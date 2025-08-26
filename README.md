@@ -36,11 +36,12 @@ to your badge:
 final image = FriendsBadge.createBadgeImage(yourImage);
 
 // Then, write the image to the badge over NFC.
+await FriendsBadge.writeOverNfc(image);
+
+// Optionally, you can show a loading indicator while writing the image.
 await WaitingForNfcTap.showLoading(
   context: context,
-  job: FriendsBadge.nfcBadgeRepository.writeOverNfc(
-    image,
-  ),
+  job: FriendsBadge.writeOverNfc(image),
 );
 ```
 

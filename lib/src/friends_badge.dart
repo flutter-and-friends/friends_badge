@@ -9,17 +9,29 @@ import 'package:image/image.dart' as img;
 /// ```dart
 /// final image = FriendsBadge.createBadgeImage(yourImage);
 ///
+/// // To write the image to an NFC badge, you can use:
+/// await FriendsBadge.writeBadge(image);
+///
+/// // Or, if you want to show a loading indicator while waiting for an NFC tap:
 /// await WaitingForNfcTap.showLoading(
 ///   context: context,
-///   job: FriendsBadge.nfcBadgeRepository.writeOverNfc(
-///     image,
-///   ),
+///   job: FriendsBadge.writeOverNfc(image),
 /// );
 /// ```
 class FriendsBadge {
   const FriendsBadge._();
 
-  static const nfcBadgeRepository = NfcBadgeRepository();
+  static const _nfcBadgeRepository = NfcBadgeRepository();
+
+  static Stream<double> writeOverNfc(
+    BadgeImage image, {
+    DitherKernel kernel = img.DitherKernel.floydSteinberg,
+    bool shouldCrop = true,
+  }) => _nfcBadgeRepository.writeOverNfc(
+    image,
+    kernel: kernel,
+    shouldCrop: shouldCrop,
+  );
 
   /// Creates a [BadgeImage] from the given [image].
   ///
