@@ -1,6 +1,6 @@
 name: friends_badge
 description: "Control the Flutter & Friends conference badge."
-version: 0.1.0
+version: 0.1.1
 repository: https://github.com/spydon/friends_badge
 
 environment:
@@ -26,6 +26,7 @@ melos:
       releaseUrl: true
       includeCommitId: true
       linkToCommits: true
+      workspaceChangelog: false
 
   scripts:
     analyze:
