@@ -44,16 +44,15 @@ jobs:
         with:
           fatal-infos: true
 
-  # TODO(spydon): Re-add in next PR when docs are fixed.
-  #markdown-lint:
-  #  runs-on: ubuntu-latest
-  #  steps:
-  #    - uses: actions/checkout@v4
-  #    - uses: actions/setup-node@v4
-  #      with:
-  #        node-version: 18
-  #    - run: npm install -g markdownlint-cli
-  #    - run: markdownlint . -p .markdownlintignore -c .markdownlint.yaml
+  markdown-lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 18
+      - run: npm install -g markdownlint-cli
+      - run: markdownlint . -p .markdownlintignore -c .markdownlint.yaml
   # END LINTING STAGE
 
   # BEGIN TESTING STAGE

@@ -7,11 +7,11 @@ conference badge.
 
 ## Features
 
-* Write images to e-paper badges over NFC
-* Automatically detects the badge model and specifications
-* Supports different color palettes (B&W, BWR, BWYR)
-* Dithers images for optimal display on the e-paper screen
-* Crops and resizes images to fit the badge's aspect ratio
+- Write images to e-paper badges over NFC
+- Automatically detects the badge model and specifications
+- Supports different color palettes (B&W, BWR, BWYR)
+- Dithers images for optimal display on the e-paper screen
+- Crops and resizes images to fit the badge's aspect ratio
 
 ## Usage
 
