@@ -1,116 +1,130 @@
+import 'dart:typed_data';
+
+import 'package:example/nullability_extensions.dart';
+import 'package:example/template_editor_screen.dart';
+import 'package:example/waiting_for_nfc_tap.dart';
 import 'package:flutter/material.dart';
 import 'package:friends_badge/friends_badge.dart';
+import 'package:image/image.dart' as img;
 
 void main() {
-  runApp(const MainApp());
+  runApp(const MyApp());
 }
 
-class MainApp extends StatelessWidget {
-  const MainApp({super.key});
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
-      home: NfcReaderScreen(),
+    return MaterialApp(
+      title: 'Friends Badge Example',
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+      ),
+      home: const HomePage(),
     );
   }
 }
 
-class NfcReaderScreen extends StatefulWidget {
-  const NfcReaderScreen({super.key});
+class HomePage extends StatefulWidget {
+  const HomePage({super.key});
 
   @override
-  State<NfcReaderScreen> createState() => _NfcReaderScreenState();
+  State<HomePage> createState() => _HomePageState();
 }
 
-class _NfcReaderScreenState extends State<NfcReaderScreen> {
-  bool _isLoading = false;
-  String? _nfcResult;
-  String? _nfcTagId;
+class _HomePageState extends State<HomePage> {
+  img.Image? image;
 
-  Future<void> _readNfc() async {
-    setState(() {
-      _isLoading = true;
-      _nfcResult = null;
-      _nfcTagId = null;
-    });
+  img.Image? get ditheredImage => image?.let(
+    (e) => const NfcBadgeRepository().createPreviewImage(e),
+  );
 
-    final result = await readNfcTag();
+  Uint8List? get imageBytes => image?.let(
+    (image) => Uint8List.fromList(img.encodePng(image)),
+  );
 
-    setState(() {
-      _isLoading = false;
-      _nfcResult = result?.toString() ?? 'No NFC tag found or NFC unavailable';
-      _nfcTagId = result != null ? String.fromCharCodes(result) : null;
-    });
-  }
+  Uint8List? get ditheredImageBytes =>
+      ditheredImage?.let((image) => Uint8List.fromList(img.encodePng(image)));
 
-  Future<void> _connectToBle() async {
-    if (_nfcTagId == null) return;
-
-    setState(() {
-      _isLoading = true;
-    });
-
-    try {
-      final device = await findBleDeviceById(_nfcTagId!);
-      if (device != null) {
-        final data = await listServicesAndCharacteristics(device);
-        setState(() {
-          _nfcResult =
-              'Connected to BLE device with ID: $_nfcTagId\n'
-              '$data';
-        });
-      } else {
-        setState(() {
-          _nfcResult = 'BLE device with ID $_nfcTagId not found';
-        });
+  @override
+  void initState() {
+    final image = this.image = img.Image(width: 240, height: 416);
+    for (var y = 0; y < image.height; y++) {
+      for (var x = 0; x < image.width; x++) {
+        // Draw circles with radius 8 in a grid pattern
+        final centerX = ((x ~/ 32) * 32) + 16;
+        final centerY = ((y ~/ 32) * 32) + 16;
+        final dx = x - centerX;
+        final dy = y - centerY;
+        if (dx * dx + dy * dy <= 128) {
+          // radius^2 = 8*8 = 64
+          image.setPixel(x, y, img.ColorRgb8(255, 255, 0));
+        } else {
+          image.setPixel(x, y, img.ColorRgb8(0, 0, 0));
+        }
       }
-    } catch (e) {
-      setState(() {
-        _nfcResult = 'Error: $e';
-      });
-    } finally {
-      setState(() {
-        _isLoading = false;
-      });
     }
+
+    super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('NFC Reader'),
+        title: const Text('Friends Badge Example'),
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
+      body: ListView(
+        children: [
+          if (image case final image?)
             ElevatedButton(
-              onPressed: _isLoading ? null : _readNfc,
-              child: const Text('Read NFC Tag'),
+              onPressed: () async {
+                await WaitingForNfcTap.showLoading(
+                  context: context,
+                  job: const NfcBadgeRepository().writeOverNfc(image),
+                );
+              },
+              child: const Text('Write over NFC'),
             ),
-            if (_nfcTagId != null)
-              ElevatedButton(
-                onPressed: _isLoading ? null : _connectToBle,
-                child: const Text('Connect to BLE Device'),
-              ),
-            if (_isLoading)
-              const Padding(
-                padding: EdgeInsets.all(16.0),
-                child: CircularProgressIndicator(),
-              ),
-            if (_nfcResult != null)
-              Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Text(
-                  _nfcResult!,
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(fontSize: 16),
+          ElevatedButton(
+            onPressed: () async {
+              final result = await Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const TemplateEditorScreen(),
                 ),
+              );
+              if (result is img.Image) {
+                setState(() {
+                  image = result;
+                });
+              }
+            },
+            child: const Text('Create Template'),
+          ),
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Row(
+                spacing: 24,
+                children: [
+                  if (imageBytes case final imageBytes?)
+                    Image.memory(
+                      imageBytes,
+                      height: 300,
+                    ),
+                  if (ditheredImageBytes case final ditheredImageBytes?)
+                    Image.memory(
+                      ditheredImageBytes,
+                      height: 300,
+                    ),
+                ],
               ),
-          ],
-        ),
+            ),
+          ),
+        ],
       ),
     );
   }

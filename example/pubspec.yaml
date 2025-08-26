@@ -10,7 +10,9 @@ dependencies:
   flutter:
     sdk: flutter
   friends_badge:
-    path: ..
+    path: ../
+  image: ^4.0.17
+  image_picker: ^1.0.7
 
 dev_dependencies:
   flame_lint: ^1.4.1
