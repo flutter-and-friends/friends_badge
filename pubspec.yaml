@@ -4,8 +4,8 @@ version: 0.1.0
 repository: https://github.com/spydon/friends_badge
 
 environment:
-  sdk: ^3.8.1
-  flutter: ">=3.32.5"
+  sdk: ^3.9.0
+  flutter: ">=3.35.0"
 
 dependencies:
   flutter:
@@ -15,4 +15,4 @@ dependencies:
   nfc_manager: ^4.0.2
 
 dev_dependencies:
-  flame_lint: ^1.4.0
+  flame_lint: ^1.4.2
