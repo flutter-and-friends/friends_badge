@@ -7,7 +7,6 @@ import 'package:friends_badge/src/utils/image_converter.dart';
 import 'package:image/image.dart' as img;
 import 'package:nfc_manager/nfc_manager.dart';
 import 'package:nfc_manager/nfc_manager_android.dart';
-import 'package:nfc_manager/nfc_manager_ios.dart';
 
 /// Repository for writing images to NFC badges.
 ///
@@ -35,11 +34,23 @@ import 'package:nfc_manager/nfc_manager_ios.dart';
 class NfcBadgeRepository {
   const NfcBadgeRepository();
 
+  /// Whether NFC badge writing is supported on the current platform.
+  /// Currently, only Android is supported.
+  /// 
+  /// On iOS, NFC is available but writing to the badge is not implemented yet.
+  /// 
+  /// Make sure to check this property before attempting to write.
+  /// 
+  /// If false, calling [writeOverNfc] will result in an error.
+  bool get supported => Platform.isAndroid;
+
   /// Writes the given [image] to an NFC badge.
   /// If [shouldCrop] is true, the image will be cropped to fit the badge's
   /// aspect ratio.
+  /// 
   /// Returns a [Stream] that completes when the write operation is done or
   /// fails.
+  /// 
   /// The stream emits progress updates as double values between 0.0 and 1.0.
   ///
   /// Make sure to call this method in a context where NFC is available and
@@ -226,19 +237,8 @@ class NfcBadgeRepository {
     bool shouldCrop,
     StreamController<double> controller,
   ) async {
-    final nfc = MiFareIos.from(tag);
-    if (nfc == null) {
-      controller.addError(
-        Exception('Tag is not Mifare compatible'),
-        StackTrace.current,
-      );
-      return;
-    }
-    // nfc.sendCommand(instructionClass: instructionClass,
-    //     instructionCode: instructionCode,
-    //     p1Parameter: p1Parameter,
-    //     p2Parameter: p2Parameter,
-    //     data: data,
-    //     expectedResponseLength: expectedResponseLength)
+    throw UnimplementedError(
+      'iOS support is not implemented yet',
+    );
   }
 }
