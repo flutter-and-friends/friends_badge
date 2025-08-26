@@ -54,3 +54,7 @@ if (image != null) {
 ## Example
 
 For a complete example, see the `example` directory.
+
+## Documentation
+
+For detailed documentation, see the `docs` directory.
