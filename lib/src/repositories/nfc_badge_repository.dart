@@ -10,39 +10,17 @@ import 'package:nfc_manager/nfc_manager.dart';
 import 'package:nfc_manager/nfc_manager_android.dart';
 
 /// Repository for writing images to NFC badges.
-///
-/// Usage:
-/// ```dart
-/// final repository = FriendsBadge.nfcBadgeRepository;
-///
-/// final image = img.decodeImage(yourImageBytes);
-/// if (image != null) {
-///   repository
-///       .writeOverNfc(image)
-///       .listen(
-///         (progress) {
-///           // Update progress UI
-///         },
-///         onError: (error) {
-///           // Handle error
-///         },
-///         onDone: () {
-///           // Write operation completed
-///         },
-///       );
-/// }
-/// ```
 class NfcBadgeRepository {
   const NfcBadgeRepository();
 
-  /// Whether NFC badge writing is supported on the current platform.
+  /// Returns `true` if NFC badge writing is supported on the current platform.
   /// Currently, only Android is supported.
   ///
   /// On iOS, NFC is available but writing to the badge is not implemented yet.
   ///
   /// Make sure to check this property before attempting to write.
   ///
-  /// If false, calling [writeOverNfc] will result in an error.
+  /// If this returns `false`, calling [writeOverNfc] will result in an error.
   bool get isSupported => Platform.isAndroid;
 
   /// Writes the given [image] to an NFC badge.

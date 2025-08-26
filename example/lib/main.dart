@@ -2,7 +2,6 @@ import 'dart:typed_data';
 
 import 'package:example/nullability_extensions.dart';
 import 'package:example/template_editor_screen.dart';
-import 'package:example/waiting_for_nfc_tap.dart';
 import 'package:flutter/material.dart';
 import 'package:friends_badge/friends_badge.dart';
 import 'package:image/image.dart' as img;

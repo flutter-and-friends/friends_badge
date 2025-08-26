@@ -6,6 +6,11 @@ import 'package:image/image.dart' as img;
 
 export 'package:image/image.dart' show DitherKernel;
 
+/// Represents an image that can be displayed on an e-paper badge.
+///
+/// This class holds the image data in a format that is suitable for the badge.
+/// It also provides methods for dithering and converting the image to a byte
+/// stream that can be sent to the badge.
 class BadgeImage {
   /// The scaled down image data. Not yet dithered or converted to binary.
   final img.Image _backingImage;
@@ -40,6 +45,7 @@ class BadgeImage {
 
   static List<img.DitherKernel> allSupportedKernels = img.DitherKernel.values;
 
+  /// Returns a dithered version of the image using the given [kernel].
   img.Image getDitheredImage(img.DitherKernel kernel) {
     return _imageConverter.dither(
       img.Image.from(_backingImage),
@@ -48,6 +54,9 @@ class BadgeImage {
     );
   }
 
+  /// Returns the image as a PNG-encoded byte list.
+  ///
+  /// If a [kernel] is provided, the image is dithered before being encoded.
   Uint8List getImageBytes([img.DitherKernel? kernel]) {
     if (kernel == null) {
       return Uint8List.fromList(img.encodePng(_backingImage));
@@ -55,6 +64,10 @@ class BadgeImage {
     return Uint8List.fromList(img.encodePng(getDitheredImage(kernel)));
   }
 
+  /// Returns a smaller "peek" image as a PNG-encoded byte list.
+  ///
+  /// This is useful for displaying a preview of the image in the UI.
+  /// If a [kernel] is provided, the image is dithered before being encoded.
   Uint8List getPeekImageBytes([img.DitherKernel? kernel]) {
     if (kernel == null) {
       return Uint8List.fromList(img.encodePng(_peekBackingImage));
