@@ -48,9 +48,6 @@ await WaitingForNfcTap.showLoading(
 The `showLoading` method will display a progress indicator while the image is
 being written to the badge.
 
-For more advanced use cases, you can access the `NfcBadgeRepository` directly
-via `FriendsBadge.nfcBadgeRepository`.
-
 ## Example
 
 For a complete example, see the `example` directory.
