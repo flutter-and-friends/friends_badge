@@ -24,7 +24,8 @@ class FriendsBadge {
   /// Creates a [BadgeImage] from the given [image].
   ///
   /// The [image] is resized and cropped to fit the badge's specifications.
-  /// By default, it uses the specifications for the 3.7-inch passive BWRY badge.
+  /// By default, it uses the specifications for the 3.7-inch passive BWRY
+  /// badge.
   static BadgeImage createBadgeImage(
     img.Image image, {
     BadgeSpecification badgeSpecification =
