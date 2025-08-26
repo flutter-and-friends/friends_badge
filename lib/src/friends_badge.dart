@@ -22,6 +22,9 @@ class FriendsBadge {
   const FriendsBadge._();
 
   static const _nfcBadgeRepository = NfcBadgeRepository();
+  
+  /// Returns `true` if NFC badge writing is supported on the current platform.
+  static bool get isNfcSupported => _nfcBadgeRepository.isSupported;
 
   static Stream<double> writeOverNfc(
     BadgeImage image, {
