@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
+import 'package:friends_badge/friends_badge.dart';
 import 'package:friends_badge/src/utils/badge_specification.dart';
 import 'package:friends_badge/src/utils/image_converter.dart';
 import 'package:image/image.dart' as img;
@@ -12,7 +13,7 @@ import 'package:nfc_manager/nfc_manager_android.dart';
 ///
 /// Usage:
 /// ```dart
-/// final repository = NfcBadgeRepository();
+/// final repository = FriendsBadge.nfcBadgeRepository;
 ///
 /// final image = img.decodeImage(yourImageBytes);
 /// if (image != null) {
@@ -56,7 +57,8 @@ class NfcBadgeRepository {
   /// Make sure to call this method in a context where NFC is available and
   /// permissions are granted.
   Stream<double> writeOverNfc(
-    img.Image image, {
+    BadgeImage image, {
+    DitherKernel kernel = img.DitherKernel.floydSteinberg,
     bool shouldCrop = true,
   }) {
     final controller = StreamController<double>();
@@ -83,14 +85,14 @@ class NfcBadgeRepository {
                 if (Platform.isAndroid) {
                   await _writeOverNfcAndroid(
                     tag,
-                    image,
+                    image.getDitheredImage(kernel),
                     shouldCrop,
                     controller,
                   );
                 } else if (Platform.isIOS) {
                   await _writeOverNfcIos(
                     tag,
-                    image,
+                    image.getDitheredImage(kernel),
                     shouldCrop,
                     controller,
                   );
@@ -119,17 +121,6 @@ class NfcBadgeRepository {
     });
 
     return controller.stream;
-  }
-
-  /// Creates a preview image suitable for display on the badge.
-  /// The image is processed to match the badge's color capabilities and
-  /// aspect ratio using the specifications from
-  /// `BadgeSpecification.size3_7inchPassiveBWRY`.
-  img.Image? createPreviewImage(img.Image e) {
-    return const ImageConverter().prepareImage(
-      e,
-      badge: BadgeSpecification.size3_7inchPassiveBWRY,
-    );
   }
 
   Future<void> _writeOverNfcAndroid(
