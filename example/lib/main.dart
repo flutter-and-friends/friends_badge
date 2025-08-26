@@ -2,7 +2,6 @@ import 'dart:typed_data';
 
 import 'package:example/nullability_extensions.dart';
 import 'package:example/template_editor_screen.dart';
-import 'package:example/waiting_for_nfc_tap.dart';
 import 'package:flutter/material.dart';
 import 'package:friends_badge/friends_badge.dart';
 import 'package:image/image.dart' as img;
@@ -34,22 +33,16 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  img.Image? image;
+  BadgeImage? image;
 
-  img.Image? get ditheredImage => image?.let(
-    (e) => const NfcBadgeRepository().createPreviewImage(e),
-  );
-
-  Uint8List? get imageBytes => image?.let(
-    (image) => Uint8List.fromList(img.encodePng(image)),
-  );
+  Uint8List? get imageBytes => image?.let((image) => image.getImageBytes());
 
   Uint8List? get ditheredImageBytes =>
-      ditheredImage?.let((image) => Uint8List.fromList(img.encodePng(image)));
+      image?.let((image) => image.getImageBytes(DitherKernel.atkinson));
 
   @override
   void initState() {
-    final image = this.image = img.Image(width: 240, height: 416);
+    final image = img.Image(width: 240, height: 416);
     for (var y = 0; y < image.height; y++) {
       for (var x = 0; x < image.width; x++) {
         // Draw circles with radius 8 in a grid pattern
@@ -65,6 +58,7 @@ class _HomePageState extends State<HomePage> {
         }
       }
     }
+    this.image = FriendsBadge.createBadgeImage(image);
 
     super.initState();
   }
@@ -82,7 +76,9 @@ class _HomePageState extends State<HomePage> {
               onPressed: () async {
                 await WaitingForNfcTap.showLoading(
                   context: context,
-                  job: const NfcBadgeRepository().writeOverNfc(image),
+                  job: FriendsBadge.writeOverNfc(
+                    image,
+                  ),
                 );
               },
               child: const Text('Write over NFC'),
@@ -97,7 +93,7 @@ class _HomePageState extends State<HomePage> {
               );
               if (result is img.Image) {
                 setState(() {
-                  image = result;
+                  image = FriendsBadge.createBadgeImage(result);
                 });
               }
             },
