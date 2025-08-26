@@ -26,6 +26,7 @@ melos:
       releaseUrl: true
       includeCommitId: true
       linkToCommits: true
+      workspaceChangelog: false
 
   scripts:
     analyze:
