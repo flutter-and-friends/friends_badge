@@ -2,6 +2,9 @@ name: friends_badge
 description: "Control the Flutter & Friends conference badge."
 version: 0.1.2+1
 repository: https://github.com/flutter-and-friends/friends_badge
+workspace:
+  - example
+  - apps/speed_writer
 
 environment:
   sdk: ^3.9.0

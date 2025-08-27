@@ -1,0 +1,26 @@
+name: speed_writer
+description: "An app to write to the Flutter & Friends badges from a CSV file."
+publish_to: 'none'
+resolution: workspace
+version: 0.1.0
+
+environment:
+  sdk: ^3.9.0
+
+dependencies:
+  flutter:
+    sdk: flutter
+  friends_badge: ^0.1.2
+  image: ^4.5.4
+
+dev_dependencies:
+  flame_lint: ^1.4.2
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/beaver
+    - assets/capybara
+    - assets/cats
+    - assets/raccoon
+    - assets/red-panda

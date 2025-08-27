@@ -2,6 +2,7 @@ name: example
 description: "An example app for how to use the friends_badge package."
 publish_to: 'none'
 version: 0.1.0
+resolution: workspace
 
 environment:
   sdk: ^3.8.1
@@ -9,13 +10,12 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  friends_badge:
-    path: ../
-  image: ^4.0.17
-  image_picker: ^1.0.7
+  friends_badge: ^0.1.2
+  image: ^4.5.4
+  image_picker: ^1.2.0
 
 dev_dependencies:
-  flame_lint: ^1.4.1
+  flame_lint: ^1.4.2
 
 flutter:
   uses-material-design: true
