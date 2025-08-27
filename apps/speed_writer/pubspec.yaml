@@ -19,8 +19,9 @@ dev_dependencies:
 flutter:
   uses-material-design: true
   assets:
-    - assets/beaver
-    - assets/capybara
-    - assets/cats
-    - assets/raccoon
-    - assets/red-panda
+    - assets/
+    - assets/beaver/
+    - assets/capybara/
+    - assets/cats/
+    - assets/raccoon/
+    - assets/red-panda/

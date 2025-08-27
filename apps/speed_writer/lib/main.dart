@@ -1,15 +1,11 @@
 import 'dart:convert';
-import 'dart:io';
 import 'dart:math';
-import 'dart:typed_data';
-import 'dart:ui';
+import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter/services.dart';
 import 'package:friends_badge/friends_badge.dart';
-import 'package:nfc_manager/nfc_manager.dart';
-import 'package:path/path.dart' as path;
-
 import 'package:image/image.dart' as img;
 
 void main() {
@@ -38,9 +34,10 @@ class BadgeWriterScreen extends StatefulWidget {
 
 class _BadgeWriterScreenState extends State<BadgeWriterScreen> {
   final GlobalKey _badgeKey = GlobalKey();
-  final List<String> _attendees = [];
+  final List<(String, String)> _attendees = [];
   int _currentAttendeeIndex = 0;
   String? _randomImagePath;
+  bool _isWriting = false; // New state variable
 
   @override
   void initState() {
@@ -50,40 +47,78 @@ class _BadgeWriterScreenState extends State<BadgeWriterScreen> {
   }
 
   Future<void> _loadAttendees() async {
-    final csvFile = File('assets/attendees.csv');
-    final csvContent = await csvFile.readAsString();
+    final csvContent = await rootBundle.loadString('assets/attendees.csv');
+    final lines = LineSplitter.split(csvContent);
     setState(() {
-      _attendees.addAll(LineSplitter.split(csvContent));
+      _attendees.addAll([
+        for (final line in lines)
+          if (line.trim().isNotEmpty) (line.split(',')[0], line.split(',')[1]),
+      ]);
     });
   }
 
-  void _loadRandomImage() {
-    final assetsDir = Directory('assets');
-    final pngFiles = assetsDir
-        .listSync(recursive: true)
-        .where((file) => file.path.endsWith('.png'))
-        .map((file) => file.path)
+  Future<void> _loadRandomImage() async {
+    final manifestContent = await rootBundle.loadString('AssetManifest.json');
+    final manifestMap = json.decode(manifestContent) as Map<String, dynamic>;
+
+    final paths = manifestMap.keys
+        .where((String key) => key.toLowerCase().endsWith('.png'))
         .toList();
 
-    if (pngFiles.isNotEmpty) {
+    if (paths.isNotEmpty) {
       final random = Random();
       setState(() {
-        _randomImagePath = pngFiles[random.nextInt(pngFiles.length)];
+        _randomImagePath = paths[random.nextInt(paths.length)];
       });
     }
   }
 
   Future<void> _writeToNfc() async {
+    setState(() {
+      _isWriting = true; // Start the loader
+    });
+
     try {
-      final boundary = RenderRepaintBoundary();
       final renderObject = _badgeKey.currentContext?.findRenderObject();
       if (renderObject is RenderRepaintBoundary) {
-        final image = await renderObject.toImage(pixelRatio: 3.0);
-        await FriendsBadge.writeOverNfc(image);
+        final image = await convertUiImageToImagePackage(
+          await renderObject.toImage(),
+        );
+        await WaitingForNfcTap.showLoading(
+          context: context,
+          job: BadgeImage(image).writeToBadge(),
+        );
       }
+      // ignore: avoid_catches_without_on_clauses
     } catch (e) {
       debugPrint('Error writing to NFC: $e');
+    } finally {
+      setState(() {
+        _isWriting = false; // Stop the loader
+      });
     }
+  }
+
+  Future<img.Image> convertUiImageToImagePackage(ui.Image uiImage) async {
+    // Convert ui.Image to ByteData in RGBA format
+    final byteData = await uiImage.toByteData();
+
+    if (byteData == null) {
+      throw Exception('Failed to convert ui.Image to ByteData');
+    }
+
+    // Get the raw bytes
+    final bytes = byteData.buffer.asUint8List();
+
+    // Create img.Image from raw RGBA bytes
+    final image = img.Image.fromBytes(
+      width: uiImage.width,
+      height: uiImage.height,
+      bytes: bytes.buffer,
+      numChannels: 4, // RGBA = 4 channels
+    );
+
+    return image;
   }
 
   void _nextAttendee() {
@@ -96,34 +131,95 @@ class _BadgeWriterScreenState extends State<BadgeWriterScreen> {
   @override
   Widget build(BuildContext context) {
     final attendeeName = _attendees.isNotEmpty
-        ? _attendees[_currentAttendeeIndex]
+        ? _attendees[_currentAttendeeIndex].$1
+        : 'Loading...';
+    final attendeeFlair = _attendees.isNotEmpty
+        ? _attendees[_currentAttendeeIndex].$2
         : 'Loading...';
 
     return Scaffold(
       appBar: AppBar(title: const Text('Badge Writer')),
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          RepaintBoundary(
-            key: _badgeKey,
-            child: Column(
-              children: [
-                if (_randomImagePath != null) Image.asset(_randomImagePath!),
-                Text(attendeeName, style: const TextStyle(fontSize: 24)),
-                Image.asset('assets/logo_simple.png'),
-              ],
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            RepaintBoundary(
+              key: _badgeKey,
+              child: Stack(
+                children: [
+                  ColoredBox(
+                    color: Colors.white,
+                    child: Column(
+                      children: [
+                        const SizedBox(height: 20),
+                        if (_randomImagePath != null)
+                          SizedBox(
+                            width: 256,
+                            height: 256,
+                            child: Image.asset(_randomImagePath!),
+                          ),
+                        Text(
+                          attendeeName,
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(
+                            fontSize: 32,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.orange,
+                          ),
+                        ),
+                        SizedBox(
+                          width: 200,
+                          child: Image.asset('assets/logo_simple.png'),
+                        ),
+                        const SizedBox(width: 260, height: 20),
+                      ],
+                    ),
+                  ),
+                  Positioned(
+                    top: 40,
+                    right: -60,
+                    child: Transform.rotate(
+                      angle: pi / 4,
+                      child: Container(
+                        color: Colors.red,
+                        width: 240,
+                        child: Text(
+                          attendeeFlair,
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
-          ),
-          const SizedBox(height: 20),
-          ElevatedButton(
-            onPressed: _writeToNfc,
-            child: const Text('Write to NFC'),
-          ),
-          ElevatedButton(
-            onPressed: _nextAttendee,
-            child: const Text('Next'),
-          ),
-        ],
+            const SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: _isWriting
+                  ? null
+                  : _writeToNfc, // Disable button while writing
+              child: _isWriting
+                  ? const SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                      ),
+                    )
+                  : const Text('Write to badge'),
+            ),
+            ElevatedButton(
+              onPressed: _nextAttendee,
+              child: const Text('Next'),
+            ),
+          ],
+        ),
       ),
     );
   }
