@@ -33,12 +33,13 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  BadgeImage? image;
+  BadgeImage? badgeImage;
 
-  Uint8List? get imageBytes => image?.let((image) => image.getImageBytes());
+  Uint8List? get imageBytes =>
+      badgeImage?.let((image) => image.getImageBytes());
 
   Uint8List? get ditheredImageBytes =>
-      image?.let((image) => image.getImageBytes(DitherKernel.atkinson));
+      badgeImage?.let((image) => image.getImageBytes(DitherKernel.atkinson));
 
   @override
   void initState() {
@@ -58,7 +59,7 @@ class _HomePageState extends State<HomePage> {
         }
       }
     }
-    this.image = FriendsBadge.createBadgeImage(image);
+    badgeImage = BadgeImage(image);
 
     super.initState();
   }
@@ -71,14 +72,12 @@ class _HomePageState extends State<HomePage> {
       ),
       body: ListView(
         children: [
-          if (image case final image?)
+          if (badgeImage case final image?)
             ElevatedButton(
               onPressed: () async {
                 await WaitingForNfcTap.showLoading(
                   context: context,
-                  job: FriendsBadge.writeOverNfc(
-                    image,
-                  ),
+                  job: image.writeToBadge(),
                 );
               },
               child: const Text('Write over NFC'),
@@ -93,7 +92,7 @@ class _HomePageState extends State<HomePage> {
               );
               if (result is img.Image) {
                 setState(() {
-                  image = FriendsBadge.createBadgeImage(result);
+                  badgeImage = BadgeImage(result);
                 });
               }
             },
