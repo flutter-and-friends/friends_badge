@@ -37,7 +37,7 @@ class ImageConverter {
       badge,
       crop: crop,
     );
-    return dither(resizedImage, badge.colorPalette);
+    return dither(resizedImage, palette: badge.colorPalette);
   }
 
   img.Image resizeImage(
@@ -86,13 +86,14 @@ class ImageConverter {
   /// Dithers the image with the specified palette using the default dithering
   /// algorithm (currently Floyd Steinberg).
   img.Image dither(
-    img.Image src, [
+    img.Image src, {
     ColorPalette palette = ColorPalette.blackWhiteYellowRed,
-  ]) {
+    img.DitherKernel kernel = img.DitherKernel.atkinson,
+  }) {
     return img.ditherImage(
       src,
       quantizer: palette.quantizer,
-      kernel: img.DitherKernel.atkinson,
+      kernel: kernel,
     );
   }
 

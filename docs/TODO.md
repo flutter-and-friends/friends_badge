@@ -26,9 +26,12 @@
 - [x] Implement BLE device selection in the example app.
 
 ## Phase 4: Reading config from badge
+
 - [x] Implement reading the badge configuration over NFC.
-  * Find native implementation in [WriteActivity.java:927](android_app/decompiled_apk/decompiled_java/cn/highlight/work_card_write/activity/WriteActivity.java)
-- [ ] Add a way to select the dither method. 
+  - Find native implementation
+      in [WriteActivity.java:927](android_app/decompiled_apk/decompiled_java/cn/highlight/work_card_write/activity/WriteActivity.java)
+- [ ] Add a way to select the dither method.
 
 ## Phase 5: iOS support
+
 - [ ] Implement NFC support for iOS... if possible

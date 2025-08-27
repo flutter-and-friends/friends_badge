@@ -44,14 +44,14 @@ class WaitingForNfcTap extends StatelessWidget {
     );
   }
 
-  static Future<void> showLoading<T>({
+  static Future<void> showLoading({
     required BuildContext context,
     required Stream<double> job,
   }) async {
     final completer = Completer<BuildContext>();
     final progressNotifier = ValueNotifier<double>(0);
 
-    showDialog(
+    showDialog<void>(
       context: context,
       builder: (context) {
         if (!completer.isCompleted) {
