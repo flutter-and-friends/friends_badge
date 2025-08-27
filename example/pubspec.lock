@@ -323,7 +323,7 @@ packages:
     source: hosted
     version: "1.2.1"
   nfc_manager:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: nfc_manager
       sha256: "164cc0223dee528d4d05a542da921f0b3a31ca0312400701c93ebf4ce757f676"
