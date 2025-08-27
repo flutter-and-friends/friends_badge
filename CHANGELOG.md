@@ -1,3 +1,7 @@
+## 0.1.3
+
+ - **FEAT**: iOS support ([#12](https://github.com/flutter-and-friends/friends_badge/issues/12)). ([8d1ca654](https://github.com/flutter-and-friends/friends_badge/commit/8d1ca654a0381bd572c3531f5ea2750899abae26))
+
 ## 0.1.2+1
 
  - **REFACTOR**: Use BadgeImage for full API ([#10](https://github.com/flutter-and-friends/friends_badge/issues/10)). ([b876771d](https://github.com/flutter-and-friends/friends_badge/commit/b876771d6cab35028eb93a35d6160bae96efa95b))
