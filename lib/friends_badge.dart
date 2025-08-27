@@ -2,6 +2,5 @@
 /// via NFC.
 library friends_badge;
 
-export 'src/data/badge_image.dart';
-export 'src/friends_badge.dart';
+export 'src/badge_image.dart';
 export 'src/widgets/waiting_for_nfc_tap.dart';

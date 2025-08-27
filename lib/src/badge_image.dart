@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:friends_badge/friends_badge.dart';
+import 'package:friends_badge/src/repositories/nfc_badge_repository.dart';
 import 'package:friends_badge/src/utils/badge_specification.dart';
 import 'package:friends_badge/src/utils/image_converter.dart';
 import 'package:image/image.dart' as img;
@@ -18,19 +19,9 @@ class BadgeImage {
   /// A super scaled down version of the backing image for quick previews.
   final img.Image _peekBackingImage;
 
-  const BadgeImage._(this._backingImage, this._peekBackingImage);
-
-  static const _imageConverter = ImageConverter();
-
-  static const _badgeSpecification = BadgeSpecification.size3_7inchPassiveBWRY;
-
   /// Creates a [BadgeImage] from the given [image].
   /// The image is resized and cropped to fit the badge's specifications.
-  ///
-  /// This is not supposed to be used directly. Use
-  /// [FriendsBadge.createBadgeImage] instead.
-  @internal
-  factory BadgeImage.fromImage(
+  factory BadgeImage(
     img.Image image, {
     BadgeSpecification badgeSpecification = _badgeSpecification,
   }) {
@@ -43,7 +34,30 @@ class BadgeImage {
     return BadgeImage._(resizedImage, peekImage);
   }
 
+  const BadgeImage._(this._backingImage, this._peekBackingImage);
+
+  static const _imageConverter = ImageConverter();
+
+  static const _badgeSpecification = BadgeSpecification.size3_7inchPassiveBWRY;
+
+  static const _nfcBadgeRepository = NfcBadgeRepository();
+
+  /// Returns `true` if NFC badge writing is supported on the current platform.
+  static bool get isNfcSupported => _nfcBadgeRepository.isSupported;
+
   static List<img.DitherKernel> allSupportedKernels = img.DitherKernel.values;
+
+  /// Writes this [BadgeImage] to the badge, using NFC and BLE.
+  Stream<double> writeToBadge({
+    DitherKernel kernel = img.DitherKernel.floydSteinberg,
+    bool shouldCrop = true,
+  }) {
+    return _nfcBadgeRepository.writeOverNfc(
+      this,
+      kernel: kernel,
+      shouldCrop: shouldCrop,
+    );
+  }
 
   /// Returns a dithered version of the image using the given [kernel].
   img.Image getDitheredImage(img.DitherKernel kernel) {

@@ -33,15 +33,15 @@ to your badge:
 
 ```dart
 // First, create a BadgeImage from an image.
-final image = FriendsBadge.createBadgeImage(yourImage);
+final image = BadgeImage(yourImage);
 
-// Then, write the image to the badge over NFC.
-await FriendsBadge.writeOverNfc(image);
+// Then, write the image to the badge using NFC and BLE.
+await image.writeToBadge();
 
 // Optionally, you can show a loading indicator while writing the image.
 await WaitingForNfcTap.showLoading(
   context: context,
-  job: FriendsBadge.writeOverNfc(image),
+  job: image.writeToBadge();
 );
 ```
 
@@ -54,4 +54,12 @@ For a complete example, see the `example` directory.
 
 ## Documentation
 
-For detailed documentation, see the `docs` directory.
+For detailed documentation about how the protocol works, see the following files in the
+`docs` directory:
+
+- [BLE Format](docs/BLE_FORMAT.md)
+- [Data Format](docs/DATA_FORMAT.md)
+- [End-to-End Example](docs/END_TO_END_EXAMPLE.md)
+- [Image Format](docs/IMAGE_FORMAT.md)
+- [NFC Format](docs/NFC_FORMAT.md)
+- [Notes](docs/NOTES.md)
