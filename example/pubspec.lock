@@ -193,7 +193,7 @@ packages:
       path: ".."
       relative: true
     source: path
-    version: "0.1.2+1"
+    version: "0.1.3"
   http:
     dependency: transitive
     description:
@@ -325,10 +325,11 @@ packages:
   nfc_manager:
     dependency: "direct overridden"
     description:
-      name: nfc_manager
-      sha256: "164cc0223dee528d4d05a542da921f0b3a31ca0312400701c93ebf4ce757f676"
-      url: "https://pub.dev"
-    source: hosted
+      path: "packages/nfc_manager"
+      ref: FixIosBackgroundIsolateError
+      resolved-ref: "8b5223edcd7d81eb75f9bc99970f8891a0251c8c"
+      url: "https://github.com/SuperMari000/flutter-nfc-manager.git"
+    source: git
     version: "4.0.2"
   path:
     dependency: transitive
