@@ -8,6 +8,7 @@ import 'package:friends_badge/src/utils/image_converter.dart';
 import 'package:image/image.dart' as img;
 import 'package:nfc_manager/nfc_manager.dart';
 import 'package:nfc_manager/nfc_manager_android.dart';
+import 'package:nfc_manager/nfc_manager_ios.dart';
 
 /// Repository for writing images to NFC badges.
 class NfcBadgeRepository {
@@ -221,9 +222,16 @@ class NfcBadgeRepository {
     bool shouldCrop,
     StreamController<double> controller,
   ) async {
-    // @TODO: Try using this for iOS: NFCISO7816Tag
-    throw UnimplementedError(
-      'iOS support is not implemented yet',
-    );
+    final nfc = Iso7816Ios.from(tag);
+    if (nfc == null) {
+      controller.addError(
+        Exception('Tag is not Iso7816 compatible'),
+        StackTrace.current,
+      );
+      return;
+    }
+
+    print(nfc);
+    print(nfc.initialSelectedAID);
   }
 }
