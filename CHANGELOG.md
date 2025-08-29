@@ -1,3 +1,7 @@
+## 0.1.3+1
+
+ - **DOCS**: Update README with NFC writing instructions ([#14](https://github.com/flutter-and-friends/friends_badge/issues/14)). ([c286358e](https://github.com/flutter-and-friends/friends_badge/commit/c286358ea076a642db9e22828d311b001db787c6))
+
 ## 0.1.3
 
  - **FEAT**: iOS support ([#12](https://github.com/flutter-and-friends/friends_badge/issues/12)). ([8d1ca654](https://github.com/flutter-and-friends/friends_badge/commit/8d1ca654a0381bd572c3531f5ea2750899abae26))
