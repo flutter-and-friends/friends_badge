@@ -1,7 +1,9 @@
 import 'dart:convert';
+import 'dart:io';
 import 'dart:math';
 import 'dart:ui' as ui;
 
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
@@ -225,9 +227,19 @@ class _BadgeWriterScreenState extends State<BadgeWriterScreen> {
               onPressed: _nextAttendee,
               child: const Text('Next'),
             ),
-            ElevatedButton(
-              onPressed: _showEditDialog,
-              child: const Text('Edit'),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                ElevatedButton(
+                  onPressed: _showEditDialog,
+                  child: const Text('Edit'),
+                ),
+                const SizedBox(width: 10),
+                ElevatedButton(
+                  onPressed: _pickAndLoadCsv,
+                  child: const Text('CSV'),
+                ),
+              ],
             ),
           ],
         ),
@@ -282,5 +294,30 @@ class _BadgeWriterScreenState extends State<BadgeWriterScreen> {
         );
       },
     );
+  }
+
+  Future<void> _pickAndLoadCsv() async {
+    final result = await FilePicker.platform.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: ['csv'],
+    );
+
+    if (result != null && result.files.isNotEmpty) {
+      final file = result.files.first;
+      final csvContent = await File(file.path!).readAsString();
+
+      final lines = LineSplitter.split(csvContent);
+      setState(() {
+        _attendees.clear();
+        _attendees.addAll([
+          for (final line in lines)
+            if (line.trim().isNotEmpty)
+              (line.split(',')[0], line.split(',')[1]),
+        ]);
+        _currentAttendeeIndex = 0;
+        _attendeeName = null;
+        _flair = null;
+      });
+    }
   }
 }
