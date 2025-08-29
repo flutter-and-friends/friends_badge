@@ -36,6 +36,8 @@ class _BadgeWriterScreenState extends State<BadgeWriterScreen> {
   final GlobalKey _badgeKey = GlobalKey();
   final List<(String, String)> _attendees = [];
   int _currentAttendeeIndex = 0;
+  String? _attendeeName;
+  String? _flair;
   String? _randomImagePath;
   bool _isWriting = false; // New state variable
 
@@ -130,12 +132,16 @@ class _BadgeWriterScreenState extends State<BadgeWriterScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final attendeeName = _attendees.isNotEmpty
-        ? _attendees[_currentAttendeeIndex].$1
-        : 'Loading...';
-    final attendeeFlair = _attendees.isNotEmpty
-        ? _attendees[_currentAttendeeIndex].$2
-        : 'Loading...';
+    final attendeeName =
+        _attendeeName ??
+        (_attendees.isNotEmpty
+            ? _attendees[_currentAttendeeIndex].$1
+            : 'Loading...');
+    final attendeeFlair =
+        _flair ??
+        (_attendees.isNotEmpty
+            ? _attendees[_currentAttendeeIndex].$2
+            : 'Loading...');
 
     return Scaffold(
       appBar: AppBar(title: const Text('Badge Writer')),
@@ -147,7 +153,8 @@ class _BadgeWriterScreenState extends State<BadgeWriterScreen> {
               key: _badgeKey,
               child: Stack(
                 children: [
-                  ColoredBox(
+                  Container(
+                    width: 260,
                     color: Colors.white,
                     child: Column(
                       children: [
@@ -218,9 +225,62 @@ class _BadgeWriterScreenState extends State<BadgeWriterScreen> {
               onPressed: _nextAttendee,
               child: const Text('Next'),
             ),
+            ElevatedButton(
+              onPressed: _showEditDialog,
+              child: const Text('Edit'),
+            ),
           ],
         ),
       ),
+    );
+  }
+
+  Future<void> _showEditDialog() async {
+    final nameController = TextEditingController(text: _attendeeName ?? '');
+    final flairController = TextEditingController(text: _flair ?? '');
+
+    await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Edit Attendee'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: nameController,
+                decoration: const InputDecoration(labelText: 'Name'),
+              ),
+              TextField(
+                controller: flairController,
+                decoration: const InputDecoration(labelText: 'Flair'),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                setState(() {
+                  _attendeeName = null;
+                  _flair = null;
+                });
+                Navigator.of(context).pop();
+              },
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                setState(() {
+                  _attendeeName = nameController.text;
+                  _flair = flairController.text;
+                });
+                Navigator.of(context).pop();
+              },
+              child: const Text('Save'),
+            ),
+          ],
+        );
+      },
     );
   }
 }
