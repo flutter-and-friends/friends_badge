@@ -1,0 +1,4 @@
+enum PreferredWriteTechnology {
+  ble,
+  nfc,
+}

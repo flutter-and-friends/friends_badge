@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:friends_badge/friends_badge.dart';
+import 'package:friends_badge/src/repositories/ble_badge_repository.dart';
 import 'package:friends_badge/src/repositories/nfc_implementations/android_nfc_implementation.dart';
 import 'package:friends_badge/src/repositories/nfc_implementations/ios_nfc_implementation.dart';
 import 'package:image/image.dart' as img;
@@ -40,7 +41,7 @@ class NfcBadgeRepository {
   }) {
     final controller = StreamController<double>();
 
-    Future(() async {
+    Future<void>(() async {
       final isNfcAvailable = await NfcManager.instance.isAvailable();
       if (!isNfcAvailable) {
         controller.addError(
@@ -48,7 +49,7 @@ class NfcBadgeRepository {
           StackTrace.current,
         );
         controller.close();
-        return controller.stream;
+        return;
       }
 
       NfcManager.instance
@@ -56,6 +57,10 @@ class NfcBadgeRepository {
             alertMessageIos: 'Hold your device near the NFC badge',
             pollingOptions: {
               NfcPollingOption.iso14443,
+            },
+            onSessionErrorIos: (error) {
+              NfcManager.instance.stopSession();
+              controller.addError(error);
             },
             onDiscovered: (tag) async {
               try {
@@ -98,5 +103,55 @@ class NfcBadgeRepository {
     });
 
     return controller.stream;
+  }
+
+  Future<BadgeId> getNfcTag() {
+    final controller = Completer<BadgeId>();
+
+    Future<void>(() async {
+      final isNfcAvailable = await NfcManager.instance.isAvailable();
+      if (!isNfcAvailable) {
+        controller.completeError(
+          Exception('NFC is not available on this device'),
+          StackTrace.current,
+        );
+        return;
+      }
+
+      NfcManager.instance
+          .startSession(
+            alertMessageIos: 'Hold your device near the NFC badge',
+            pollingOptions: {
+              NfcPollingOption.iso14443,
+            },
+            onSessionErrorIos: (error) {
+              NfcManager.instance.stopSession();
+              controller.completeError(error);
+            },
+            onDiscovered: (tag) async {
+              if (Platform.isAndroid) {
+                controller.complete(
+                  const AndroidNfcImplementation().getBadgeIdFromTag(tag),
+                );
+              } else if (Platform.isIOS) {
+                controller.complete(
+                  const IosNfcImplementation().getBadgeIdFromTag(tag),
+                );
+              } else {
+                throw UnsupportedError('Unsupported platform');
+              }
+            },
+          )
+          .onError((error, stackTrace) {
+            debugPrint('NFC session error: $error');
+            debugPrintStack(stackTrace: stackTrace);
+            controller.completeError(
+              error ?? 'Something went wrong when setting up the NfcManager',
+              stackTrace,
+            );
+          });
+    });
+
+    return controller.future;
   }
 }

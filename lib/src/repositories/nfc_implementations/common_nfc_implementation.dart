@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/foundation.dart';
+import 'package:friends_badge/src/repositories/ble_badge_repository.dart';
 import 'package:friends_badge/src/utils/badge_specification.dart';
 import 'package:friends_badge/src/utils/image_converter.dart';
 import 'package:image/image.dart' as img;
@@ -14,6 +15,8 @@ abstract class CommonNfcImplementation {
   const CommonNfcImplementation();
 
   NfcWriter initNfcWriter(NfcTag tag);
+
+  BadgeId getBadgeIdFromTag(NfcTag tag);
 
   Future<void> writeOverNfc(
     NfcTag tag,

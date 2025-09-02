@@ -2,9 +2,11 @@ import 'dart:io';
 
 import 'package:flutter/services.dart';
 import 'package:friends_badge/friends_badge.dart';
+import 'package:friends_badge/src/repositories/ble_badge_repository.dart';
 import 'package:friends_badge/src/repositories/nfc_badge_repository.dart';
 import 'package:friends_badge/src/utils/badge_specification.dart';
 import 'package:friends_badge/src/utils/image_converter.dart';
+import 'package:friends_badge/src/utils/preferred_write_technology.dart';
 import 'package:image/image.dart' as img;
 
 export 'package:image/image.dart' show DitherKernel;
@@ -43,6 +45,7 @@ class BadgeImage {
   static const _badgeSpecification = BadgeSpecification.size3_7inchPassiveBWRY;
 
   static const _nfcBadgeRepository = NfcBadgeRepository();
+  static const _bleBadgeRepository = BleBadgeRepository();
 
   /// Returns `true` if NFC badge writing is supported on the current platform.
   static bool get isNfcSupported => _nfcBadgeRepository.isSupported;
@@ -52,12 +55,27 @@ class BadgeImage {
   /// Writes this [BadgeImage] to the badge, using NFC and BLE.
   Stream<double> writeToBadge({
     DitherKernel kernel = img.DitherKernel.floydSteinberg,
+    PreferredWriteTechnology preferredTechnology = PreferredWriteTechnology.ble,
     bool shouldCrop = true,
-  }) {
+  }) async* {
     if (Platform.isIOS) {
       HapticFeedback.mediumImpact();
     }
-    return _nfcBadgeRepository.writeOverNfc(
+    try {
+      if (preferredTechnology == PreferredWriteTechnology.ble &&
+          await _bleBadgeRepository.deviceSupportsBle) {
+        await _bleBadgeRepository.turnOn();
+        final badgeId = await _nfcBadgeRepository.getNfcTag();
+        yield* _bleBadgeRepository.writeOverBle(
+          this,
+          badgeId: badgeId,
+          kernel: kernel,
+          shouldCrop: shouldCrop,
+        );
+        return;
+      }
+    } on Object catch (_) {}
+    yield* _nfcBadgeRepository.writeOverNfc(
       this,
       kernel: kernel,
       shouldCrop: shouldCrop,

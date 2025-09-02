@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/foundation.dart';
+import 'package:friends_badge/src/repositories/ble_badge_repository.dart';
 import 'package:friends_badge/src/repositories/nfc_implementations/common_nfc_implementation.dart';
 import 'package:nfc_manager/nfc_manager.dart';
 import 'package:nfc_manager/nfc_manager_ios.dart';
@@ -18,6 +19,15 @@ class _Iso7816IosNfcWriter implements NfcWriter {
 
 class IosNfcImplementation extends CommonNfcImplementation {
   const IosNfcImplementation();
+
+  @override
+  BadgeId getBadgeIdFromTag(NfcTag tag) {
+    final nfc = Iso7816Ios.from(tag);
+    if (nfc == null) {
+      throw Exception('Tag is not Iso7816 compatible');
+    }
+    return BadgeId(nfc.identifier);
+  }
 
   @override
   NfcWriter initNfcWriter(NfcTag tag) {
