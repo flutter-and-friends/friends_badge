@@ -1,4 +1,6 @@
-import 'package:flutter/foundation.dart';
+import 'dart:io';
+
+import 'package:flutter/services.dart';
 import 'package:friends_badge/friends_badge.dart';
 import 'package:friends_badge/src/repositories/nfc_badge_repository.dart';
 import 'package:friends_badge/src/utils/badge_specification.dart';
@@ -52,6 +54,9 @@ class BadgeImage {
     DitherKernel kernel = img.DitherKernel.floydSteinberg,
     bool shouldCrop = true,
   }) {
+    if (Platform.isIOS) {
+      HapticFeedback.mediumImpact();
+    }
     return _nfcBadgeRepository.writeOverNfc(
       this,
       kernel: kernel,
