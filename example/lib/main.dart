@@ -77,7 +77,9 @@ class _HomePageState extends State<HomePage> {
               onPressed: () async {
                 await WaitingForNfcTap.showLoading(
                   context: context,
-                  job: image.writeToBadge(),
+                  job: image.writeToBadge(
+                    // preferredTechnology: PreferredWriteTechnology.ble,
+                  ),
                 );
               },
               child: const Text('Write over NFC'),

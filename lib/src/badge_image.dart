@@ -6,7 +6,6 @@ import 'package:friends_badge/src/repositories/ble_badge_repository.dart';
 import 'package:friends_badge/src/repositories/nfc_badge_repository.dart';
 import 'package:friends_badge/src/utils/badge_specification.dart';
 import 'package:friends_badge/src/utils/image_converter.dart';
-import 'package:friends_badge/src/utils/preferred_write_technology.dart';
 import 'package:image/image.dart' as img;
 
 export 'package:image/image.dart' show DitherKernel;
@@ -55,7 +54,7 @@ class BadgeImage {
   /// Writes this [BadgeImage] to the badge, using NFC and BLE.
   Stream<double> writeToBadge({
     DitherKernel kernel = img.DitherKernel.floydSteinberg,
-    PreferredWriteTechnology preferredTechnology = PreferredWriteTechnology.ble,
+    PreferredWriteTechnology preferredTechnology = PreferredWriteTechnology.nfc,
     bool shouldCrop = true,
   }) async* {
     if (Platform.isIOS) {
@@ -69,6 +68,7 @@ class BadgeImage {
         yield* _bleBadgeRepository.writeOverBle(
           this,
           badgeId: badgeId,
+          badgeSpec: BadgeSpecification.size3_7inchPassiveBWRY,
           kernel: kernel,
           shouldCrop: shouldCrop,
         );
