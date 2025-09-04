@@ -5,6 +5,11 @@ A Flutter package for writing images to e-paper badges.
 With this package you can control what is displayed on the Flutter & Friends
 conference badge.
 
+> [!NOTE]
+> iOS doesn't like that there is no content on the NFC storage, so just write
+> anything to the badge before the first time you are trying to use it. It
+> could just be a space. You can easily do this with apps like NFC Tools.
+
 ## Features
 
 - Write images to e-paper badges over NFC
