@@ -167,13 +167,19 @@ class _BadgeWriterScreenState extends State<BadgeWriterScreen> {
                             height: 256,
                             child: Image.asset(_randomImagePath!),
                           ),
-                        Text(
-                          attendeeName,
-                          textAlign: TextAlign.center,
-                          style: const TextStyle(
-                            fontSize: 32,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.orange,
+                        SizedBox(
+                          height: 50,
+                          child: FittedBox(
+                            fit: BoxFit.scaleDown,
+                            child: Text(
+                              attendeeName,
+                              textAlign: TextAlign.center,
+                              style: const TextStyle(
+                                fontSize: 32,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.orange,
+                              ),
+                            ),
                           ),
                         ),
                         SizedBox(
