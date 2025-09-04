@@ -39,6 +39,7 @@ class NfcBadgeRepository {
     bool shouldCrop = true,
   }) {
     final controller = StreamController<double>();
+    final ditheredImage = image.getDitheredImage(kernel);
 
     Future(() async {
       final isNfcAvailable = await NfcManager.instance.isAvailable();
@@ -62,14 +63,14 @@ class NfcBadgeRepository {
                 if (Platform.isAndroid) {
                   await const AndroidNfcImplementation().writeOverNfc(
                     tag,
-                    image.getDitheredImage(kernel),
+                    ditheredImage,
                     controller,
                     shouldCrop: shouldCrop,
                   );
                 } else if (Platform.isIOS) {
                   await const IosNfcImplementation().writeOverNfc(
                     tag,
-                    image.getDitheredImage(kernel),
+                    ditheredImage,
                     controller,
                     shouldCrop: shouldCrop,
                   );
