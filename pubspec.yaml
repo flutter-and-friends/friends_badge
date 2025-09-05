@@ -1,6 +1,6 @@
 name: friends_badge
 description: "Control the Flutter & Friends conference badge."
-version: 0.1.4
+version: 0.1.5
 repository: https://github.com/flutter-and-friends/friends_badge
 
 environment:
