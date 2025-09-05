@@ -1,3 +1,9 @@
+## 0.1.5
+
+ - **FIX**: Tag is out of date ([#20](https://github.com/flutter-and-friends/friends_badge/issues/20)). ([ae9de286](https://github.com/flutter-and-friends/friends_badge/commit/ae9de2867a588073aecabb95a11d4ebb1eb016c5))
+ - **FEAT**: Vibrate iOS devices when tapping NFC ([#18](https://github.com/flutter-and-friends/friends_badge/issues/18)). ([5969ad3b](https://github.com/flutter-and-friends/friends_badge/commit/5969ad3ba84d46a18749ebb3f4725fea810beea1))
+ - **DOCS**: Add note about writing space with iOS ([#19](https://github.com/flutter-and-friends/friends_badge/issues/19)). ([833234ef](https://github.com/flutter-and-friends/friends_badge/commit/833234efb2568e5fb3f36a2080d2b183d8198f89))
+
 ## 0.1.4
 
  - **DOCS**: Update README with NFC writing instructions ([#14](https://github.com/flutter-and-friends/friends_badge/issues/14)). ([c286358e](https://github.com/flutter-and-friends/friends_badge/commit/c286358ea076a642db9e22828d311b001db787c6))
