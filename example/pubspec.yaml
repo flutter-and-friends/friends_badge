@@ -1,5 +1,6 @@
 name: example
 description: "An example app for how to use the friends_badge package."
+resolution: workspace
 publish_to: 'none'
 version: 0.1.0
 
