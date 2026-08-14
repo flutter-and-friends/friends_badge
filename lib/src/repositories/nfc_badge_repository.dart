@@ -42,6 +42,10 @@ class NfcBadgeRepository {
     final ditheredImage = image.getDitheredImage(kernel);
 
     Future(() async {
+      // `isAvailable` is deprecated in nfc_manager >=4.1.0, but its
+      // replacement `checkAvailability` does not exist in 4.0.2, which is the
+      // lowest version supported by this package.
+      // ignore: deprecated_member_use
       final isNfcAvailable = await NfcManager.instance.isAvailable();
       if (!isNfcAvailable) {
         controller.addError(
