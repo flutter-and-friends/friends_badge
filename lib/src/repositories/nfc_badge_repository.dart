@@ -42,10 +42,10 @@ class NfcBadgeRepository {
     final ditheredImage = image.getDitheredImage(kernel);
 
     Future(() async {
-      final isNfcAvailable = await NfcManager.instance.isAvailable();
-      if (!isNfcAvailable) {
+      final availability = await NfcManager.instance.checkAvailability();
+      if (availability != NfcAvailability.enabled) {
         controller.addError(
-          Exception('NFC is not available on this device'),
+          Exception('NFC is not available on this device ($availability)'),
           StackTrace.current,
         );
         controller.close();

@@ -4,15 +4,18 @@ version: 0.1.5
 repository: https://github.com/flutter-and-friends/friends_badge
 
 environment:
-  sdk: ^3.9.0
-  flutter: ">=3.35.0"
+  sdk: ^3.11.4
+  flutter: ">=3.41.6"
+
+workspace:
+  - example
 
 dependencies:
   flutter:
     sdk: flutter
   flutter_blue_plus: ^1.35.5
   image: ^4.5.4
-  nfc_manager: ^4.0.2
+  nfc_manager: ^4.2.1
 
 dev_dependencies:
   flame_lint: ^1.4.2
