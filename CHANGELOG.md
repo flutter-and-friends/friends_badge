@@ -1,3 +1,7 @@
+## 0.1.5+1
+
+ - **FIX**: Remove stale nfc_manager git override that broke pub resolution ([#26](https://github.com/flutter-and-friends/friends_badge/issues/26)). ([f7595d1b](https://github.com/flutter-and-friends/friends_badge/commit/f7595d1bca618065be8b831e49b4604013e4dcf3))
+
 ## 0.1.5
 
  - **FIX**: Tag is out of date ([#20](https://github.com/flutter-and-friends/friends_badge/issues/20)). ([ae9de286](https://github.com/flutter-and-friends/friends_badge/commit/ae9de2867a588073aecabb95a11d4ebb1eb016c5))
