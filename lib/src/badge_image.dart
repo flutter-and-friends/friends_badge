@@ -50,9 +50,14 @@ class BadgeImage {
   static List<img.DitherKernel> allSupportedKernels = img.DitherKernel.values;
 
   /// Writes this [BadgeImage] to the badge, using NFC and BLE.
+  ///
+  /// If [ndef] is provided, the NDEF message is written to the badge's
+  /// Type 4 NDEF file after the image flash completes. The NDEF write is
+  /// purely additive — it does not interfere with the image-chunk protocol.
   Stream<double> writeToBadge({
     DitherKernel kernel = img.DitherKernel.floydSteinberg,
     bool shouldCrop = true,
+    NdefMessage? ndef,
   }) {
     if (Platform.isIOS) {
       HapticFeedback.mediumImpact();
@@ -61,6 +66,7 @@ class BadgeImage {
       this,
       kernel: kernel,
       shouldCrop: shouldCrop,
+      ndef: ndef,
     );
   }
 
