@@ -1,3 +1,7 @@
+## 0.2.0
+
+ - Graduate package to a stable release. See pre-releases prior to this version for changelog entries.
+
 ## 0.2.0-dev.3
 
  - **REFACTOR**: Use BadgeImage for full API ([#10](https://github.com/flutter-and-friends/friends_badge/issues/10)). ([b876771d](https://github.com/flutter-and-friends/friends_badge/commit/b876771d6cab35028eb93a35d6160bae96efa95b))
