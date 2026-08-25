@@ -26,6 +26,10 @@ class NfcBadgeRepository {
   /// If [shouldCrop] is true, the image will be cropped to fit the badge's
   /// aspect ratio.
   ///
+  /// If [ndef] is provided, the NDEF message is written to the badge after
+  /// the image flash completes. The NDEF write is purely additive — it does
+  /// not interfere with the image-chunk protocol.
+  ///
   /// Returns a [Stream] that completes when the write operation is done or
   /// fails.
   ///
@@ -37,6 +41,7 @@ class NfcBadgeRepository {
     BadgeImage image, {
     DitherKernel kernel = img.DitherKernel.floydSteinberg,
     bool shouldCrop = true,
+    NdefMessage? ndef,
   }) {
     final controller = StreamController<double>();
     final ditheredImage = image.getDitheredImage(kernel);
@@ -66,6 +71,7 @@ class NfcBadgeRepository {
                     ditheredImage,
                     controller,
                     shouldCrop: shouldCrop,
+                    ndef: ndef,
                   );
                 } else if (Platform.isIOS) {
                   await const IosNfcImplementation().writeOverNfc(
@@ -73,6 +79,7 @@ class NfcBadgeRepository {
                     ditheredImage,
                     controller,
                     shouldCrop: shouldCrop,
+                    ndef: ndef,
                   );
                 } else {
                   throw UnsupportedError('Unsupported platform');

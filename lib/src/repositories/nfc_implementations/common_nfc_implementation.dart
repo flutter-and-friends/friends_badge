@@ -1,6 +1,8 @@
 import 'dart:async';
 
 import 'package:flutter/foundation.dart';
+import 'package:friends_badge/src/ndef/ndef.dart';
+import 'package:friends_badge/src/ndef/ndef_badge_writer.dart';
 import 'package:friends_badge/src/utils/badge_specification.dart';
 import 'package:friends_badge/src/utils/image_converter.dart';
 import 'package:image/image.dart' as img;
@@ -15,11 +17,19 @@ abstract class CommonNfcImplementation {
 
   NfcWriter initNfcWriter(NfcTag tag);
 
+  /// Builds an [IsoDepTransceiver] over the same physical tag as
+  /// [initNfcWriter], suitable for NFC Forum Type 4 APDUs.
+  ///
+  /// Distinct from [NfcWriter] because Type 4 APDU handling must inspect
+  /// the status word, which `NfcWriter.writeBytes` strips on iOS.
+  IsoDepTransceiver initIsoDepTransceiver(NfcTag tag);
+
   Future<void> writeOverNfc(
     NfcTag tag,
     img.Image image,
     StreamController<double> controller, {
     required bool shouldCrop,
+    NdefMessage? ndef,
   }) async {
     final nfc = initNfcWriter(tag);
 
@@ -100,5 +110,12 @@ abstract class CommonNfcImplementation {
       Uint8List.fromList([0xd0, 0xd1, 0x03, 0x00, 0x00]),
     );
     debugPrint('Total bytes sent: $totalBytesSent');
+
+    // 4. Optionally write the NDEF message after the image flash completes.
+    if (ndef != null) {
+      debugPrint('Writing NDEF message (${ndef.records.length} records)');
+      final transceiver = initIsoDepTransceiver(tag);
+      await const NdefBadgeWriter().write(transceiver, ndef);
+    }
   }
 }
