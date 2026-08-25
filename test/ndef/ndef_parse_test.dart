@@ -391,5 +391,268 @@ void main() {
       expect(person.role, isEmpty);
       expect(person.urls, isEmpty);
     });
+
+    group('v2 tagged segments', () {
+      test('decodes installId only', () {
+        final message = NdefMessage([
+          NdefRecord.text('Alice · Dev · example.com · id:abc-123'),
+        ]);
+        final person = BadgePerson.fromNdefMessage(message);
+
+        expect(person.name, equals('Alice'));
+        expect(person.role, equals('Dev'));
+        expect(person.urls, equals(['example.com']));
+        expect(person.installId, equals('abc-123'));
+        expect(person.capybaraId, isNull);
+      });
+
+      test('decodes capybaraId only', () {
+        final message = NdefMessage([
+          NdefRecord.text('Alice · Dev · example.com · capy:coffee_mode'),
+        ]);
+        final person = BadgePerson.fromNdefMessage(message);
+
+        expect(person.name, equals('Alice'));
+        expect(person.role, equals('Dev'));
+        expect(person.urls, equals(['example.com']));
+        expect(person.installId, isNull);
+        expect(person.capybaraId, equals('coffee_mode'));
+      });
+
+      test('decodes both installId and capybaraId', () {
+        final message = NdefMessage([
+          NdefRecord.text(
+            'Alice · Dev · example.com · id:abc-123 · capy:coffee_mode',
+          ),
+        ]);
+        final person = BadgePerson.fromNdefMessage(message);
+
+        expect(person.urls, equals(['example.com']));
+        expect(person.installId, equals('abc-123'));
+        expect(person.capybaraId, equals('coffee_mode'));
+      });
+
+      test('decodes neither (v1 payload)', () {
+        final message = NdefMessage([
+          NdefRecord.text('Alice · Dev · example.com'),
+        ]);
+        final person = BadgePerson.fromNdefMessage(message);
+
+        expect(person.urls, equals(['example.com']));
+        expect(person.installId, isNull);
+        expect(person.capybaraId, isNull);
+      });
+
+      test('URLs after a tagged segment are still collected', () {
+        // Non-canonical ordering — a hand-written badge might place tagged
+        // segments before some URLs. Decoder must be order-tolerant.
+        final message = NdefMessage([
+          NdefRecord.text(
+            'Alice · Dev · id:abc-123 · example.com · x.com/alice',
+          ),
+        ]);
+        final person = BadgePerson.fromNdefMessage(message);
+
+        expect(person.installId, equals('abc-123'));
+        expect(person.urls, equals(['example.com', 'x.com/alice']));
+      });
+
+      test('unknown tagged segments are ignored', () {
+        final message = NdefMessage([
+          NdefRecord.text(
+            'Alice · Dev · example.com · v3:whatever · foo:bar',
+          ),
+        ]);
+        final person = BadgePerson.fromNdefMessage(message);
+
+        expect(person.urls, equals(['example.com']));
+        expect(person.installId, isNull);
+        expect(person.capybaraId, isNull);
+      });
+
+      test('URL schemes that look like tags are kept as URLs', () {
+        final message = NdefMessage([
+          NdefRecord.text(
+            'Alice · Dev · https://example.com · mailto:a@b.c · tel:+123',
+          ),
+        ]);
+        final person = BadgePerson.fromNdefMessage(message);
+
+        expect(
+          person.urls,
+          equals(['https://example.com', 'mailto:a@b.c', 'tel:+123']),
+        );
+      });
+
+      test('empty role with tagged segments', () {
+        final message = NdefMessage([
+          NdefRecord.text('Alice ·  · example.com · id:abc · capy:coffee'),
+        ]);
+        final person = BadgePerson.fromNdefMessage(message);
+
+        expect(person.name, equals('Alice'));
+        expect(person.role, isEmpty);
+        expect(person.urls, equals(['example.com']));
+        expect(person.installId, equals('abc'));
+        expect(person.capybaraId, equals('coffee'));
+      });
+
+      test('name-only payload has null tagged fields', () {
+        final message = NdefMessage([NdefRecord.text('Alice')]);
+        final person = BadgePerson.fromNdefMessage(message);
+
+        expect(person.name, equals('Alice'));
+        expect(person.role, isEmpty);
+        expect(person.urls, isEmpty);
+        expect(person.installId, isNull);
+        expect(person.capybaraId, isNull);
+      });
+
+      test('no T record at all leaves tagged fields null', () {
+        final message = NdefMessage([
+          NdefRecord.uri(Uri.parse('https://example.com')),
+        ]);
+        final person = BadgePerson.fromNdefMessage(message);
+
+        expect(person.installId, isNull);
+        expect(person.capybaraId, isNull);
+      });
+    });
+
+    group('NdefRecord.badgePerson (contract-level writer)', () {
+      test('encodes name and role only', () {
+        final record = NdefRecord.badgePerson(name: 'Alice', role: 'Dev');
+        expect(record.isText, isTrue);
+        expect(record.decodeText().text, equals('Alice · Dev'));
+      });
+
+      test('encodes empty role as an empty segment', () {
+        final record = NdefRecord.badgePerson(name: 'Alice', role: '');
+        expect(record.decodeText().text, equals('Alice · '));
+      });
+
+      test('encodes urls in order', () {
+        final record = NdefRecord.badgePerson(
+          name: 'Alice',
+          role: 'Dev',
+          urls: ['example.com', 'x.com/alice'],
+        );
+        expect(
+          record.decodeText().text,
+          equals('Alice · Dev · example.com · x.com/alice'),
+        );
+      });
+
+      test('encodes installId as a tagged segment after urls', () {
+        final record = NdefRecord.badgePerson(
+          name: 'Alice',
+          role: 'Dev',
+          urls: ['example.com'],
+          installId: 'abc-123',
+        );
+        expect(
+          record.decodeText().text,
+          equals('Alice · Dev · example.com · id:abc-123'),
+        );
+      });
+
+      test('encodes capybaraId as a tagged segment after urls', () {
+        final record = NdefRecord.badgePerson(
+          name: 'Alice',
+          role: 'Dev',
+          urls: ['example.com'],
+          capybaraId: 'coffee_mode',
+        );
+        expect(
+          record.decodeText().text,
+          equals('Alice · Dev · example.com · capy:coffee_mode'),
+        );
+      });
+
+      test('encodes both tagged segments in canonical order id then capy',
+          () {
+        final record = NdefRecord.badgePerson(
+          name: 'Alice',
+          role: 'Dev',
+          urls: ['example.com'],
+          installId: 'abc-123',
+          capybaraId: 'coffee_mode',
+        );
+        expect(
+          record.decodeText().text,
+          equals(
+            'Alice · Dev · example.com · id:abc-123 · capy:coffee_mode',
+          ),
+        );
+      });
+
+      test('round-trips through BadgePerson.fromNdefMessage', () {
+        final record = NdefRecord.badgePerson(
+          name: 'Johannes Pietilä Löhnn',
+          role: 'Organizer',
+          urls: ['x.com/johannes', 'linkedin.com/in/johannes'],
+          installId: 'f47ac10b-58cc-4372-a567-0e02b2c3d479',
+          capybaraId: 'coffee_mode',
+        );
+        final message = NdefMessage([
+          NdefRecord.uri(Uri.parse('https://linkedin.com/in/johannes')),
+          record,
+        ]);
+        final person = BadgePerson.fromNdefMessage(message);
+
+        expect(person.name, equals('Johannes Pietilä Löhnn'));
+        expect(person.role, equals('Organizer'));
+        expect(
+          person.urls,
+          equals(['x.com/johannes', 'linkedin.com/in/johannes']),
+        );
+        expect(
+          person.installId,
+          equals('f47ac10b-58cc-4372-a567-0e02b2c3d479'),
+        );
+        expect(person.capybaraId, equals('coffee_mode'));
+        expect(
+          person.primaryUri,
+          equals(Uri.parse('https://linkedin.com/in/johannes')),
+        );
+      });
+
+      test('round-trips a name-only payload', () {
+        final record = NdefRecord.badgePerson(name: 'Alice', role: '');
+        final person = BadgePerson.fromNdefMessage(NdefMessage([record]));
+
+        expect(person.name, equals('Alice'));
+        expect(person.role, isEmpty);
+        expect(person.urls, isEmpty);
+        expect(person.installId, isNull);
+        expect(person.capybaraId, isNull);
+      });
+
+      test('round-trips with only installId', () {
+        final record = NdefRecord.badgePerson(
+          name: 'Alice',
+          role: 'Dev',
+          installId: 'xyz',
+        );
+        final person = BadgePerson.fromNdefMessage(NdefMessage([record]));
+
+        expect(person.installId, equals('xyz'));
+        expect(person.capybaraId, isNull);
+        expect(person.urls, isEmpty);
+      });
+
+      test('round-trips with only capybaraId', () {
+        final record = NdefRecord.badgePerson(
+          name: 'Alice',
+          role: 'Dev',
+          capybaraId: 'sleepy',
+        );
+        final person = BadgePerson.fromNdefMessage(NdefMessage([record]));
+
+        expect(person.installId, isNull);
+        expect(person.capybaraId, equals('sleepy'));
+        expect(person.urls, isEmpty);
+      });
+    });
   });
 }

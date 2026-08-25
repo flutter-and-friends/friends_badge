@@ -58,6 +58,11 @@ class NdefRecord {
   /// NFC Forum well-known type "T" (Text), as defined by the Text RTD spec.
   ///
   /// Encoded as UTF-8 with the given [languageCode] (default `en`).
+  ///
+  /// This is the low-level primitive. For the badge's person payload
+  /// (`Name · Role · urls… · id:… · capy:…`), prefer
+  /// [NdefRecord.badgePerson] — it encodes the published wire contract so
+  /// app code never string-munges the format.
   factory NdefRecord.text(String text, {String languageCode = 'en'}) {
     final languageBytes = ascii.encode(languageCode);
     if (languageBytes.length > 63) {
@@ -78,6 +83,49 @@ class NdefRecord {
       type: Uint8List.fromList(const [0x54]), // "T"
       payload: payload,
     );
+  }
+
+  /// Contract-level builder for the badge's person Text record (v2 wire
+  /// format).
+  ///
+  /// Produces a Text record with segments joined by `" · "` (space,
+  /// U+00B7 MIDDLE DOT, space) in canonical order:
+  ///
+  /// ```
+  /// name · role · url1 · … · urlN · id:<installId> · capy:<capybaraId>
+  /// ```
+  ///
+  /// - [name] and [role] are required; [role] may be the empty string
+  ///   (encoded as an empty segment: `"Name ·  · url"`).
+  /// - [urls] may be empty. Each entry is written verbatim — the encoder
+  ///   does not add or strip a scheme.
+  /// - [installId] is the badge owner's app install ID (random UUID
+  ///   generated at first app run). When non-null, appended as the tagged
+  ///   segment `id:<installId>`.
+  /// - [capybaraId] is the bundled capybara asset name (e.g.
+  ///   `"coffee_mode"`) when the badge image is a bundled capybara. When
+  ///   non-null, appended as the tagged segment `capy:<capybaraId>`.
+  ///
+  /// The tagged segments, when present, are always the LAST segments and
+  /// always in the order `id:` then `capy:`.
+  ///
+  /// See [NdefRecord.text] for the low-level primitive and
+  /// `BadgePerson.fromNdefMessage` for the symmetric decoder.
+  factory NdefRecord.badgePerson({
+    required String name,
+    required String role,
+    List<String> urls = const [],
+    String? installId,
+    String? capybaraId,
+  }) {
+    final segments = <String>[
+      name,
+      role,
+      ...urls,
+      if (installId != null) 'id:$installId',
+      if (capybaraId != null) 'capy:$capybaraId',
+    ];
+    return NdefRecord.text(segments.join(' · '));
   }
 
   /// Type Name Format: NFC Forum well-known type.
