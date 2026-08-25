@@ -75,7 +75,8 @@ class NdefRecord {
     final textBytes = utf8.encode(text);
     final payloadLength = 1 + languageBytes.length + textBytes.length;
     final payload = Uint8List(payloadLength)
-      ..[0] = languageBytes.length // UTF-8 (bit7=0) + 6-bit length
+      ..[0] = languageBytes
+          .length // UTF-8 (bit7=0) + 6-bit length
       ..setRange(1, 1 + languageBytes.length, languageBytes)
       ..setRange(1 + languageBytes.length, payloadLength, textBytes);
     return NdefRecord(
@@ -181,12 +182,10 @@ class NdefRecord {
   }
 
   /// `true` if this record is a well-known URI record (TNF=1, type="U").
-  bool get isUri =>
-      tnf == tnfWellKnown && type.length == 1 && type[0] == 0x55;
+  bool get isUri => tnf == tnfWellKnown && type.length == 1 && type[0] == 0x55;
 
   /// `true` if this record is a well-known Text record (TNF=1, type="T").
-  bool get isText =>
-      tnf == tnfWellKnown && type.length == 1 && type[0] == 0x54;
+  bool get isText => tnf == tnfWellKnown && type.length == 1 && type[0] == 0x54;
 
   /// Decodes the payload as an NFC Forum URI record.
   ///
@@ -283,7 +282,8 @@ class DecodedTextRecord {
   final String languageCode;
 
   @override
-  String toString() => 'DecodedTextRecord(language: $languageCode, '
+  String toString() =>
+      'DecodedTextRecord(language: $languageCode, '
       'text: "$text")';
 }
 

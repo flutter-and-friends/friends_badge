@@ -154,9 +154,26 @@ class BadgePerson {
   /// as unknown tags. Mirrors the well-known prefixes in the NFC Forum URI
   /// RTD table, restricted to the schemes users actually type.
   static const Set<String> _kUriSchemes = {
-    'http', 'https', 'tel', 'mailto', 'ftp', 'ftps', 'sftp', 'smb', 'nfs',
-    'dav', 'news', 'telnet', 'imap', 'rtsp', 'urn', 'pop', 'sip', 'sips',
-    'tftp', 'file',
+    'http',
+    'https',
+    'tel',
+    'mailto',
+    'ftp',
+    'ftps',
+    'sftp',
+    'smb',
+    'nfs',
+    'dav',
+    'news',
+    'telnet',
+    'imap',
+    'rtsp',
+    'urn',
+    'pop',
+    'sip',
+    'sips',
+    'tftp',
+    'file',
   };
 
   /// True if [segment] starts with an unknown `<tag>:` prefix that should
@@ -178,7 +195,8 @@ class BadgePerson {
   }
 
   @override
-  String toString() => 'BadgePerson(name: "$name", role: "$role", '
+  String toString() =>
+      'BadgePerson(name: "$name", role: "$role", '
       'urls: $urls, primaryUri: $primaryUri, '
       'installId: $installId, capybaraId: $capybaraId)';
 }

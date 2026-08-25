@@ -152,8 +152,7 @@ void main() {
       expect(record.decodeText, throwsFormatException);
     });
 
-    test('throws when the payload is shorter than the declared language',
-        () {
+    test('throws when the payload is shorter than the declared language', () {
       final record = NdefRecord(
         tnf: NdefRecord.tnfWellKnown,
         type: Uint8List.fromList(const [0x54]),
@@ -569,8 +568,7 @@ void main() {
         );
       });
 
-      test('encodes both tagged segments in canonical order id then capy',
-          () {
+      test('encodes both tagged segments in canonical order id then capy', () {
         final record = NdefRecord.badgePerson(
           name: 'Alice',
           role: 'Dev',

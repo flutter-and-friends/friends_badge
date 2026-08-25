@@ -76,8 +76,18 @@ void main() {
         transceiver.sent[0],
         equals(
           Uint8List.fromList([
-            0x00, 0xA4, 0x04, 0x00, 0x07,
-            0xD2, 0x76, 0x00, 0x00, 0x85, 0x01, 0x01,
+            0x00,
+            0xA4,
+            0x04,
+            0x00,
+            0x07,
+            0xD2,
+            0x76,
+            0x00,
+            0x00,
+            0x85,
+            0x01,
+            0x01,
           ]),
         ),
       );
@@ -106,8 +116,13 @@ void main() {
         transceiver.sent[4],
         equals(
           Uint8List.fromList([
-            0x00, 0xD6, 0x00, 0x00, 0x02,
-            (nlen >> 8) & 0xFF, nlen & 0xFF,
+            0x00,
+            0xD6,
+            0x00,
+            0x00,
+            0x02,
+            (nlen >> 8) & 0xFF,
+            nlen & 0xFF,
           ]),
         ),
       );
@@ -117,7 +132,11 @@ void main() {
         transceiver.sent[5],
         equals(
           Uint8List.fromList([
-            0x00, 0xD6, 0x00, 0x02, serialized.length,
+            0x00,
+            0xD6,
+            0x00,
+            0x02,
+            serialized.length,
             ...serialized,
           ]),
         ),
@@ -156,28 +175,32 @@ void main() {
       expect(transceiver.sent[6][3], equals(0x01)); // P2 (offset LSB) = 257
     });
 
-    test('uses the NDEF file ID discovered in the Capability Container',
-        () async {
-      final transceiver = FakeTransceiver([
-        _ok(),
-        _ok(),
-        _ccSuccess(ndefFileId: 0xBEEF), // non-default file ID
-        _ok(),
-        _ok(),
-        _ok(),
-      ]);
+    test(
+      'uses the NDEF file ID discovered in the Capability Container',
+      () async {
+        final transceiver = FakeTransceiver([
+          _ok(),
+          _ok(),
+          _ccSuccess(ndefFileId: 0xBEEF), // non-default file ID
+          _ok(),
+          _ok(),
+          _ok(),
+        ]);
 
-      await const NdefBadgeWriter().write(
-        transceiver,
-        NdefMessage([NdefRecord.text('hi')]),
-      );
+        await const NdefBadgeWriter().write(
+          transceiver,
+          NdefMessage([NdefRecord.text('hi')]),
+        );
 
-      // APDU #4 must SELECT 0xBEEF, not the default 0xE104
-      expect(
-        transceiver.sent[3],
-        equals(Uint8List.fromList([0x00, 0xA4, 0x00, 0x00, 0x02, 0xBE, 0xEF])),
-      );
-    });
+        // APDU #4 must SELECT 0xBEEF, not the default 0xE104
+        expect(
+          transceiver.sent[3],
+          equals(
+            Uint8List.fromList([0x00, 0xA4, 0x00, 0x00, 0x02, 0xBE, 0xEF]),
+          ),
+        );
+      },
+    );
 
     test('throws when SELECT NDEF app fails', () async {
       final transceiver = FakeTransceiver([
@@ -199,44 +222,49 @@ void main() {
       );
     });
 
-    test('throws when the Capability Container layout is unrecognised',
-        () async {
-      final badCc = Uint8List.fromList([
-        ...List.filled(15, 0xAA),
-        0x90, 0x00,
-      ]);
-      final transceiver = FakeTransceiver([
-        _ok(),
-        _ok(),
-        badCc,
-      ]);
+    test(
+      'throws when the Capability Container layout is unrecognised',
+      () async {
+        final badCc = Uint8List.fromList([
+          ...List.filled(15, 0xAA),
+          0x90,
+          0x00,
+        ]);
+        final transceiver = FakeTransceiver([
+          _ok(),
+          _ok(),
+          badCc,
+        ]);
 
-      expect(
-        () => const NdefBadgeWriter().write(
-          transceiver,
-          NdefMessage([NdefRecord.text('hi')]),
-        ),
-        throwsStateError,
-      );
-    });
+        expect(
+          () => const NdefBadgeWriter().write(
+            transceiver,
+            NdefMessage([NdefRecord.text('hi')]),
+          ),
+          throwsStateError,
+        );
+      },
+    );
 
-    test('throws when the message does not fit the CC-declared capacity',
-        () async {
-      final longText = 'x' * 2000;
-      final transceiver = FakeTransceiver([
-        _ok(),
-        _ok(),
-        _ccSuccess(maxNdefSize: 128), // smaller than the message
-      ]);
+    test(
+      'throws when the message does not fit the CC-declared capacity',
+      () async {
+        final longText = 'x' * 2000;
+        final transceiver = FakeTransceiver([
+          _ok(),
+          _ok(),
+          _ccSuccess(maxNdefSize: 128), // smaller than the message
+        ]);
 
-      expect(
-        () => const NdefBadgeWriter().write(
-          transceiver,
-          NdefMessage([NdefRecord.text(longText)]),
-        ),
-        throwsArgumentError,
-      );
-    });
+        expect(
+          () => const NdefBadgeWriter().write(
+            transceiver,
+            NdefMessage([NdefRecord.text(longText)]),
+          ),
+          throwsArgumentError,
+        );
+      },
+    );
 
     test('throws when UPDATE BINARY fails', () async {
       final transceiver = FakeTransceiver([

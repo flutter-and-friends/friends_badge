@@ -26,16 +26,23 @@ class FakeTransceiver implements IsoDepTransceiver {
 /// Builds a valid 15-byte Capability Container R-APDU.
 Uint8List _ccSuccess({int ndefFileId = 0xE104, int maxNdefSize = 1024}) {
   return Uint8List.fromList([
-    0x00, 0x0F,
+    0x00,
+    0x0F,
     0x20,
-    0x01, 0x00,
-    0x01, 0x00,
-    0x04, 0x06,
-    (ndefFileId >> 8) & 0xFF, ndefFileId & 0xFF,
-    (maxNdefSize >> 8) & 0xFF, maxNdefSize & 0xFF,
+    0x01,
+    0x00,
+    0x01,
+    0x00,
+    0x04,
+    0x06,
+    (ndefFileId >> 8) & 0xFF,
+    ndefFileId & 0xFF,
+    (maxNdefSize >> 8) & 0xFF,
+    maxNdefSize & 0xFF,
     0x00,
     0x00,
-    0x90, 0x00,
+    0x90,
+    0x00,
   ]);
 }
 
@@ -43,8 +50,7 @@ Uint8List _ok() => Uint8List.fromList([0x90, 0x00]);
 Uint8List _fail(int sw1, int sw2) => Uint8List.fromList([sw1, sw2]);
 
 /// Wraps [data] as a successful R-APDU (data + 90 00).
-Uint8List _dataOk(List<int> data) =>
-    Uint8List.fromList([...data, 0x90, 0x00]);
+Uint8List _dataOk(List<int> data) => Uint8List.fromList([...data, 0x90, 0x00]);
 
 void main() {
   group('NdefBadgeReader', () {
@@ -83,8 +89,18 @@ void main() {
         transceiver.sent[0],
         equals(
           Uint8List.fromList([
-            0x00, 0xA4, 0x04, 0x00, 0x07,
-            0xD2, 0x76, 0x00, 0x00, 0x85, 0x01, 0x01,
+            0x00,
+            0xA4,
+            0x04,
+            0x00,
+            0x07,
+            0xD2,
+            0x76,
+            0x00,
+            0x00,
+            0x85,
+            0x01,
+            0x01,
           ]),
         ),
       );
@@ -154,36 +170,41 @@ void main() {
         transceiver.sent[6],
         equals(
           Uint8List.fromList([
-            0x00, 0xB0, 0x01, 0x01,
+            0x00,
+            0xB0,
+            0x01,
+            0x01,
             nlen - 255,
           ]),
         ),
       );
     });
 
-    test('uses the NDEF file ID discovered in the Capability Container',
-        () async {
-      final message = NdefMessage([NdefRecord.text('hi')]);
-      final serialized = message.serialize();
+    test(
+      'uses the NDEF file ID discovered in the Capability Container',
+      () async {
+        final message = NdefMessage([NdefRecord.text('hi')]);
+        final serialized = message.serialize();
 
-      final transceiver = FakeTransceiver([
-        _ok(),
-        _ok(),
-        _ccSuccess(ndefFileId: 0xBEEF),
-        _ok(),
-        _dataOk([0x00, serialized.length]),
-        _dataOk(serialized),
-      ]);
+        final transceiver = FakeTransceiver([
+          _ok(),
+          _ok(),
+          _ccSuccess(ndefFileId: 0xBEEF),
+          _ok(),
+          _dataOk([0x00, serialized.length]),
+          _dataOk(serialized),
+        ]);
 
-      await const NdefBadgeReader().read(transceiver);
+        await const NdefBadgeReader().read(transceiver);
 
-      expect(
-        transceiver.sent[3],
-        equals(
-          Uint8List.fromList([0x00, 0xA4, 0x00, 0x00, 0x02, 0xBE, 0xEF]),
-        ),
-      );
-    });
+        expect(
+          transceiver.sent[3],
+          equals(
+            Uint8List.fromList([0x00, 0xA4, 0x00, 0x00, 0x02, 0xBE, 0xEF]),
+          ),
+        );
+      },
+    );
 
     test('throws on an empty NDEF file (NLEN=0)', () async {
       final transceiver = FakeTransceiver([
@@ -226,19 +247,21 @@ void main() {
       );
     });
 
-    test('throws when the Capability Container layout is unrecognised',
-        () async {
-      final transceiver = FakeTransceiver([
-        _ok(),
-        _ok(),
-        _dataOk(List.filled(15, 0xAA)),
-      ]);
+    test(
+      'throws when the Capability Container layout is unrecognised',
+      () async {
+        final transceiver = FakeTransceiver([
+          _ok(),
+          _ok(),
+          _dataOk(List.filled(15, 0xAA)),
+        ]);
 
-      expect(
-        () => const NdefBadgeReader().read(transceiver),
-        throwsStateError,
-      );
-    });
+        expect(
+          () => const NdefBadgeReader().read(transceiver),
+          throwsStateError,
+        );
+      },
+    );
 
     test('throws when the message READ returns an empty chunk', () async {
       final message = NdefMessage([NdefRecord.text('hello')]);
@@ -275,44 +298,48 @@ void main() {
       );
     });
 
-    test('full round-trip: write then read yields the original message',
-        () async {
-      final original = NdefMessage([
-        NdefRecord.uri(Uri.parse('https://example.com')),
-        NdefRecord.text('Johannes Pietilä Löhnn · Organizer · x.com/johannes'),
-      ]);
-      final serialized = original.serialize();
+    test(
+      'full round-trip: write then read yields the original message',
+      () async {
+        final original = NdefMessage([
+          NdefRecord.uri(Uri.parse('https://example.com')),
+          NdefRecord.text(
+            'Johannes Pietilä Löhnn · Organizer · x.com/johannes',
+          ),
+        ]);
+        final serialized = original.serialize();
 
-      final transceiver = FakeTransceiver([
-        _ok(),
-        _ok(),
-        _ccSuccess(),
-        _ok(),
-        _dataOk([
-          (serialized.length >> 8) & 0xFF,
-          serialized.length & 0xFF,
-        ]),
-        _dataOk(serialized),
-      ]);
+        final transceiver = FakeTransceiver([
+          _ok(),
+          _ok(),
+          _ccSuccess(),
+          _ok(),
+          _dataOk([
+            (serialized.length >> 8) & 0xFF,
+            serialized.length & 0xFF,
+          ]),
+          _dataOk(serialized),
+        ]);
 
-      final read = await const NdefBadgeReader().read(transceiver);
+        final read = await const NdefBadgeReader().read(transceiver);
 
-      expect(read.records, hasLength(2));
-      expect(
-        read.records[0].decodeUri(),
-        equals(Uri.parse('https://example.com')),
-      );
-      expect(
-        read.records[1].decodeText().text,
-        equals('Johannes Pietilä Löhnn · Organizer · x.com/johannes'),
-      );
+        expect(read.records, hasLength(2));
+        expect(
+          read.records[0].decodeUri(),
+          equals(Uri.parse('https://example.com')),
+        );
+        expect(
+          read.records[1].decodeText().text,
+          equals('Johannes Pietilä Löhnn · Organizer · x.com/johannes'),
+        );
 
-      // And through the convenience decoder:
-      final person = BadgePerson.fromNdefMessage(read);
-      expect(person.name, equals('Johannes Pietilä Löhnn'));
-      expect(person.role, equals('Organizer'));
-      expect(person.urls, equals(['x.com/johannes']));
-      expect(person.primaryUri, equals(Uri.parse('https://example.com')));
-    });
+        // And through the convenience decoder:
+        final person = BadgePerson.fromNdefMessage(read);
+        expect(person.name, equals('Johannes Pietilä Löhnn'));
+        expect(person.role, equals('Organizer'));
+        expect(person.urls, equals(['x.com/johannes']));
+        expect(person.primaryUri, equals(Uri.parse('https://example.com')));
+      },
+    );
   });
 }

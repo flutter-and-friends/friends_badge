@@ -16,7 +16,13 @@ abstract class IsoDepTransceiver {
 
 /// NFC Forum Type 4 Tag Application DF name.
 const List<int> _kNdefTagApplicationDfName = [
-  0xD2, 0x76, 0x00, 0x00, 0x85, 0x01, 0x01,
+  0xD2,
+  0x76,
+  0x00,
+  0x00,
+  0x85,
+  0x01,
+  0x01,
 ];
 
 /// File ID of the Capability Container on a Type 4 tag.
