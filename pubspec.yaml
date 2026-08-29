@@ -4,8 +4,8 @@ version: 0.2.0
 repository: https://github.com/flutter-and-friends/friends_badge
 
 environment:
-  sdk: ^3.11.4
-  flutter: ">=3.41.6"
+  sdk: ^3.13.0
+  flutter: ">=3.47.0"
 
 workspace:
   - example
@@ -13,7 +13,6 @@ workspace:
 dependencies:
   flutter:
     sdk: flutter
-  flutter_blue_plus: ^1.35.5
   image: ^4.5.4
   nfc_manager: ^4.2.1
 
@@ -21,7 +20,7 @@ dev_dependencies:
   flame_lint: ^1.4.2
   flutter_test:
     sdk: flutter
-  melos: ^7.1.0
+  melos: ^8.5.0
 
 melos:
   useRootAsPackage: true

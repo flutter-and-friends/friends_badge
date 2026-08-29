@@ -35,9 +35,7 @@ const int _kMaxReadBinaryChunkSize = 255;
 /// `90 00`, or if the Capability Container layout is not recognised.
 /// Throws [FormatException] if the bytes read from the tag do not parse as a
 /// valid NDEF message.
-class NdefBadgeReader {
-  const NdefBadgeReader();
-
+class const NdefBadgeReader() {
   /// Reads and parses an [NdefMessage] from the badge over [transceiver].
   Future<NdefMessage> read(IsoDepTransceiver transceiver) async {
     // 1. SELECT NDEF Tag Application.

@@ -53,9 +53,7 @@ const int _kMaxUpdateBinaryChunkSize = 255;
 /// All commands are sent over the same ISO-DEP transport used for the
 /// existing image-chunk protocol (0xD0/0xD1). NDEF write is purely
 /// additive — it does not interfere with the image protocol.
-class NdefBadgeWriter {
-  const NdefBadgeWriter();
-
+class const NdefBadgeWriter() {
   /// Writes [message] to the badge over [transceiver].
   ///
   /// Throws [StateError] if any APDU response has a status word other than

@@ -2,7 +2,7 @@ import 'package:image/image.dart' as img;
 
 typedef ColorPaletteColor = ({int r, int g, int b});
 
-enum ColorPalette {
+enum ColorPalette(final List<ColorPaletteColor> paletteValues) {
   blackWhite(
     [(r: 0, g: 0, b: 0), (r: 255, g: 255, b: 255)],
   ),
@@ -22,22 +22,15 @@ enum ColorPalette {
     ],
   );
 
-  final List<ColorPaletteColor> paletteValues;
-
   img.Quantizer get quantizer => ColorPaletteQuantizer(this);
 
   List<img.Color> get colors => paletteValues
       .map((e) => img.ColorRgb8(e.r, e.g, e.b))
       .toList(growable: false);
-
-  const ColorPalette(this.paletteValues);
 }
 
-class ColorPaletteQuantizer extends img.Quantizer {
-  final ColorPalette colorPalette;
-
-  ColorPaletteQuantizer(this.colorPalette);
-
+class ColorPaletteQuantizer(final ColorPalette colorPalette)
+    extends img.Quantizer {
   @override
   late img.Palette palette = _createPalette();
 

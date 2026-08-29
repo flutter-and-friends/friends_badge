@@ -1,6 +1,6 @@
 /// This package provides a set of tools to program e-paper badges
 /// via NFC.
-library friends_badge;
+library;
 
 export 'src/badge_image.dart';
 export 'src/ndef/badge_person.dart';

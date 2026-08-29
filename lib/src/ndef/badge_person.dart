@@ -8,16 +8,14 @@ import 'package:friends_badge/src/ndef/ndef.dart';
 /// Decoding is deliberately tolerant: a missing U record, a missing T
 /// record, or an unexpected payload shape degrade to empty/null fields
 /// rather than throwing.
-class BadgePerson {
-  const BadgePerson({
-    required this.name,
-    required this.role,
-    required this.urls,
-    required this.primaryUri,
-    required this.installId,
-    required this.capybaraId,
-  });
-
+class const BadgePerson({
+  required this.name,
+  required this.role,
+  required this.urls,
+  required this.primaryUri,
+  required this.installId,
+  required this.capybaraId,
+}) {
   /// Decode a badge [NdefMessage] into a [BadgePerson].
   ///
   /// The expected wire format (published by `friends-badge-ndef`, v2) is:
@@ -53,7 +51,7 @@ class BadgePerson {
   /// If no Text record is present, [name] and [role] are empty strings,
   /// [urls] is empty, and [installId]/[capybaraId] are `null`. If no URI
   /// record is present, [primaryUri] is `null`.
-  factory BadgePerson.fromNdefMessage(NdefMessage message) {
+  factory fromNdefMessage(NdefMessage message) {
     Uri? primaryUri;
     var name = '';
     var role = '';

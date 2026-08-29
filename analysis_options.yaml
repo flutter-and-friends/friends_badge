@@ -8,3 +8,8 @@ analyzer:
     - macos/**
     - linux/**
 include: package:flame_lint/analysis_options.yaml
+
+linter:
+  rules:
+    - simplify_variable_pattern
+    - use_null_aware_elements

@@ -4,12 +4,10 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:friends_badge/friends_badge.dart';
 
 /// Scripted [IsoDepTransceiver] that records C-APDUs and replays R-APDUs.
-class FakeTransceiver implements IsoDepTransceiver {
+class FakeTransceiver(final List<Uint8List> responses)
+    implements IsoDepTransceiver {
   final List<Uint8List> sent = [];
-  final List<Uint8List> responses;
   int _responseIndex = 0;
-
-  FakeTransceiver(this.responses);
 
   @override
   Future<Uint8List> transceive(Uint8List commandApdu) async {

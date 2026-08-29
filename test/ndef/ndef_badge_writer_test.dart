@@ -6,12 +6,10 @@ import 'package:friends_badge/src/ndef/ndef_badge_writer.dart';
 
 /// Fake [IsoDepTransceiver] that records every C-APDU it receives and
 /// replays scripted R-APDUs from [responses].
-class FakeTransceiver implements IsoDepTransceiver {
+class FakeTransceiver(final List<Uint8List> responses)
+    implements IsoDepTransceiver {
   final List<Uint8List> sent = [];
-  final List<Uint8List> responses;
   int _responseIndex = 0;
-
-  FakeTransceiver(this.responses);
 
   @override
   Future<Uint8List> transceive(Uint8List commandApdu) async {
