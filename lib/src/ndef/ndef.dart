@@ -6,12 +6,12 @@ import 'dart:typed_data';
 /// Records are the atomic unit of an [NdefMessage]. This model implements the
 /// subset of the NDEF specification needed to communicate with the badge:
 /// short records (SR=1), no ID field, no chunking.
-class NdefRecord {
-  NdefRecord({
-    required this.tnf,
-    required this.type,
-    required this.payload,
-  }) {
+class NdefRecord({
+  required this.tnf,
+  required this.type,
+  required this.payload,
+}) {
+  this {
     if (type.length > 255) {
       throw ArgumentError.value(
         type.length,
@@ -19,7 +19,7 @@ class NdefRecord {
         'Type length must fit in a single byte (<=255).',
       );
     }
-    if (payload.length > 0xFFFFFFFF) {
+    if (payload.length > 0xFFFF_FFFF) {
       throw ArgumentError.value(
         payload.length,
         'payload.length',
@@ -32,7 +32,7 @@ class NdefRecord {
   ///
   /// The [uri] is compressed using the URI prefix table (e.g. `https://`
   /// collapses to a single identifier byte).
-  factory NdefRecord.uri(Uri uri) {
+  factory uri(Uri uri) {
     final uriString = uri.toString();
     var identifier = 0x00;
     var remainder = uriString;
@@ -63,7 +63,7 @@ class NdefRecord {
   /// (`Name · Role · urls… · id:… · capy:…`), prefer
   /// [NdefRecord.badgePerson] — it encodes the published wire contract so
   /// app code never string-munges the format.
-  factory NdefRecord.text(String text, {String languageCode = 'en'}) {
+  factory text(String text, {String languageCode = 'en'}) {
     final languageBytes = ascii.encode(languageCode);
     if (languageBytes.length > 63) {
       throw ArgumentError.value(
@@ -112,7 +112,7 @@ class NdefRecord {
   ///
   /// See [NdefRecord.text] for the low-level primitive and
   /// `BadgePerson.fromNdefMessage` for the symmetric decoder.
-  factory NdefRecord.badgePerson({
+  factory badgePerson({
     required String name,
     required String role,
     List<String> urls = const [],
@@ -272,9 +272,10 @@ class NdefRecord {
 
 /// The decoded contents of a Text record: the text itself plus its language
 /// code (e.g. `"en"`).
-class DecodedTextRecord {
-  const DecodedTextRecord({required this.text, required this.languageCode});
-
+class const DecodedTextRecord({
+  required this.text,
+  required this.languageCode,
+}) {
   /// The decoded text.
   final String text;
 
@@ -329,8 +330,8 @@ const List<String> _uriPrefixes = [
 ];
 
 /// An NFC Forum NDEF message: an ordered sequence of [NdefRecord]s.
-class NdefMessage {
-  NdefMessage(this.records) {
+class NdefMessage(this.records) {
+  this {
     if (records.isEmpty) {
       throw ArgumentError.value(
         records,
@@ -364,7 +365,7 @@ class NdefMessage {
   /// Handles both short- and long-record framing and joins chunked records
   /// (CF flag) into a single record. Throws [FormatException] on malformed
   /// input.
-  factory NdefMessage.parse(Uint8List bytes) {
+  factory parse(Uint8List bytes) {
     if (bytes.isEmpty) {
       throw const FormatException('NDEF message is empty');
     }

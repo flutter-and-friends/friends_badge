@@ -5,13 +5,10 @@ import 'package:flutter/foundation.dart';
 import 'package:friends_badge/friends_badge.dart';
 import 'package:friends_badge/src/repositories/nfc_implementations/android_nfc_implementation.dart';
 import 'package:friends_badge/src/repositories/nfc_implementations/ios_nfc_implementation.dart';
-import 'package:image/image.dart' as img;
 import 'package:nfc_manager/nfc_manager.dart';
 
 /// Repository for writing images to NFC badges.
-class NfcBadgeRepository {
-  const NfcBadgeRepository();
-
+class const NfcBadgeRepository() {
   /// Returns `true` if NFC badge writing is supported on the current platform.
   /// Currently, only Android is supported.
   ///
@@ -39,7 +36,7 @@ class NfcBadgeRepository {
   /// permissions are granted.
   Stream<double> writeOverNfc(
     BadgeImage image, {
-    DitherKernel kernel = img.DitherKernel.floydSteinberg,
+    DitherKernel kernel = .floydSteinberg,
     bool shouldCrop = true,
     NdefMessage? ndef,
   }) {
@@ -48,7 +45,7 @@ class NfcBadgeRepository {
 
     Future(() async {
       final availability = await NfcManager.instance.checkAvailability();
-      if (availability != NfcAvailability.enabled) {
+      if (availability != .enabled) {
         controller.addError(
           Exception('NFC is not available on this device ($availability)'),
           StackTrace.current,
@@ -61,7 +58,7 @@ class NfcBadgeRepository {
           .startSession(
             alertMessageIos: 'Hold your device near the NFC badge',
             pollingOptions: {
-              NfcPollingOption.iso14443,
+              .iso14443,
             },
             onDiscovered: (tag) async {
               try {

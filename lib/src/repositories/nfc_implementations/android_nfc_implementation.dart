@@ -6,22 +6,15 @@ import 'package:friends_badge/src/repositories/nfc_implementations/common_nfc_im
 import 'package:nfc_manager/nfc_manager.dart';
 import 'package:nfc_manager/nfc_manager_android.dart';
 
-class _IsoDepNfcWriter implements NfcWriter {
-  final IsoDepAndroid _isoDep;
-
-  _IsoDepNfcWriter(this._isoDep);
-
+class _IsoDepNfcWriter(final IsoDepAndroid _isoDep) implements NfcWriter {
   @override
   Future<Uint8List> writeBytes(Uint8List bytes) {
     return _isoDep.transceive(bytes);
   }
 }
 
-class _IsoDepTransceiverAndroid implements IsoDepTransceiver {
-  final IsoDepAndroid _isoDep;
-
-  _IsoDepTransceiverAndroid(this._isoDep);
-
+class _IsoDepTransceiverAndroid(final IsoDepAndroid _isoDep)
+    implements IsoDepTransceiver {
   @override
   Future<Uint8List> transceive(Uint8List commandApdu) {
     // IsoDepAndroid.transceive returns the full R-APDU including SW1-SW2.
@@ -29,9 +22,7 @@ class _IsoDepTransceiverAndroid implements IsoDepTransceiver {
   }
 }
 
-class AndroidNfcImplementation extends CommonNfcImplementation {
-  const AndroidNfcImplementation();
-
+class const AndroidNfcImplementation() extends CommonNfcImplementation {
   @override
   NfcWriter initNfcWriter(NfcTag tag) {
     final isoDep = IsoDepAndroid.from(tag);

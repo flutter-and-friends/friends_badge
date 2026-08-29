@@ -12,9 +12,7 @@ abstract class NfcWriter {
   Future<Uint8List> writeBytes(Uint8List bytes);
 }
 
-abstract class CommonNfcImplementation {
-  const CommonNfcImplementation();
-
+abstract class const CommonNfcImplementation() {
   NfcWriter initNfcWriter(NfcTag tag);
 
   /// Builds an [IsoDepTransceiver] over the same physical tag as

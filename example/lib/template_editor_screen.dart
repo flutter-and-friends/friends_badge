@@ -4,9 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:image/image.dart' as img;
 import 'package:image_picker/image_picker.dart';
 
-class TemplateEditorScreen extends StatefulWidget {
-  const TemplateEditorScreen({super.key});
-
+class const TemplateEditorScreen({super.key}) extends StatefulWidget {
   @override
   State<TemplateEditorScreen> createState() => _TemplateEditorScreenState();
 }
@@ -16,7 +14,7 @@ class _TemplateEditorScreenState extends State<TemplateEditorScreen> {
 
   Future<void> _pickImage() async {
     final picker = ImagePicker();
-    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+    final pickedFile = await picker.pickImage(source: .gallery);
 
     if (pickedFile != null) {
       setState(() {

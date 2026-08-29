@@ -6,22 +6,15 @@ import 'package:friends_badge/src/repositories/nfc_implementations/common_nfc_im
 import 'package:nfc_manager/nfc_manager.dart';
 import 'package:nfc_manager/nfc_manager_ios.dart';
 
-class _Iso7816IosNfcWriter implements NfcWriter {
-  final Iso7816Ios _iso7816;
-
-  _Iso7816IosNfcWriter(this._iso7816);
-
+class _Iso7816IosNfcWriter(final Iso7816Ios _iso7816) implements NfcWriter {
   @override
   Future<Uint8List> writeBytes(Uint8List bytes) {
     return _iso7816.sendCommandRaw(data: bytes).then((value) => value.payload);
   }
 }
 
-class _IsoDepTransceiverIos implements IsoDepTransceiver {
-  final Iso7816Ios _iso7816;
-
-  _IsoDepTransceiverIos(this._iso7816);
-
+class _IsoDepTransceiverIos(final Iso7816Ios _iso7816)
+    implements IsoDepTransceiver {
   @override
   Future<Uint8List> transceive(Uint8List commandApdu) async {
     final response = await _iso7816.sendCommandRaw(data: commandApdu);
@@ -35,9 +28,7 @@ class _IsoDepTransceiverIos implements IsoDepTransceiver {
   }
 }
 
-class IosNfcImplementation extends CommonNfcImplementation {
-  const IosNfcImplementation();
-
+class const IosNfcImplementation() extends CommonNfcImplementation {
   @override
   NfcWriter initNfcWriter(NfcTag tag) {
     final nfc = Iso7816Ios.from(tag);
