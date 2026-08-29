@@ -1,3 +1,7 @@
+## 0.2.1
+
+ - **FEAT**: Require Flutter 3.47, adopt Dart 3.13 syntax, drop flutter_blue_plus, and fix the iOS note ([#31](https://github.com/flutter-and-friends/friends_badge/issues/31)). ([f621ba2f](https://github.com/flutter-and-friends/friends_badge/commit/f621ba2fe4422088c9dd63205cb72b6cc83686bb))
+
 ## 0.2.0
 
  - Graduate package to a stable release. See pre-releases prior to this version for changelog entries.
