@@ -49,7 +49,7 @@ class BadgeImage {
 
   static List<img.DitherKernel> allSupportedKernels = img.DitherKernel.values;
 
-  /// Writes this [BadgeImage] to the badge, using NFC and BLE.
+  /// Writes this [BadgeImage] to the badge over NFC.
   ///
   /// If [ndef] is provided, the NDEF message is written to the badge's
   /// Type 4 NDEF file after the image flash completes. The NDEF write is
