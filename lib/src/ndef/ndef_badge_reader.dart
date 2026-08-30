@@ -18,8 +18,23 @@ const List<int> _kNdefTagApplicationDfName = [
 /// File ID of the Capability Container on a Type 4 tag.
 const int _kCapabilityContainerFileId = 0xE103;
 
-/// Maximum payload a single READ BINARY APDU can carry.
+/// Maximum payload a single READ BINARY APDU can carry (1-byte Le).
 const int _kMaxReadBinaryChunkSize = 255;
+
+/// The chunk size to use for READ BINARY given the MLe advertised in the
+/// Capability Container.
+///
+/// MLe is the largest R-APDU data field the tag can produce. Asking for
+/// more is a protocol violation and the conference badge firmware answers
+/// with a truncated frame (no status word) and then hangs until its
+/// battery is pulled. A CC with MLe=0 is malformed, fall back to the APDU
+/// maximum in that case.
+int readBinaryChunkSizeFor(int mle) {
+  if (mle <= 0) {
+    return _kMaxReadBinaryChunkSize;
+  }
+  return mle < _kMaxReadBinaryChunkSize ? mle : _kMaxReadBinaryChunkSize;
+}
 
 /// Reads [NdefMessage]s from an NFC Forum Type 4 tag.
 ///
@@ -58,8 +73,10 @@ class const NdefBadgeReader() {
         '${cc.map((b) => b.toRadixString(16).padLeft(2, '0')).join(' ')}',
       );
     }
+    final mle = (cc[3] << 8) | cc[4];
     final ndefFileId = (cc[9] << 8) | cc[10];
     final maxNdefFileSize = (cc[11] << 8) | cc[12];
+    final chunkSize = readBinaryChunkSizeFor(mle);
 
     // 4. SELECT NDEF file.
     await _selectFile(transceiver, ndefFileId);
@@ -85,14 +102,13 @@ class const NdefBadgeReader() {
       );
     }
 
-    // 5b. READ BINARY the NDEF message at offset 2, in 255-byte chunks.
+    // 5b. READ BINARY the NDEF message at offset 2, in chunks no larger
+    //     than the MLe the tag advertised.
     final messageBytes = Uint8List(nlen);
     var read = 0;
     while (read < nlen) {
       final remaining = nlen - read;
-      final chunkLength = remaining > _kMaxReadBinaryChunkSize
-          ? _kMaxReadBinaryChunkSize
-          : remaining;
+      final chunkLength = remaining > chunkSize ? chunkSize : remaining;
       final chunk = await _readBinary(
         transceiver,
         offset: 2 + read,

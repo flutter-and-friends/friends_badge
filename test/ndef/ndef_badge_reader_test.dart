@@ -2,6 +2,8 @@ import 'dart:typed_data';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:friends_badge/friends_badge.dart';
+import 'package:friends_badge/src/ndef/ndef_badge_reader.dart'
+    show readBinaryChunkSizeFor;
 
 /// Scripted [IsoDepTransceiver] that records C-APDUs and replays R-APDUs.
 class FakeTransceiver(final List<Uint8List> responses)
@@ -22,15 +24,20 @@ class FakeTransceiver(final List<Uint8List> responses)
 }
 
 /// Builds a valid 15-byte Capability Container R-APDU.
-Uint8List _ccSuccess({int ndefFileId = 0xE104, int maxNdefSize = 1024}) {
+Uint8List _ccSuccess({
+  int ndefFileId = 0xE104,
+  int maxNdefSize = 1024,
+  int mle = 256,
+  int mlc = 256,
+}) {
   return Uint8List.fromList([
     0x00,
     0x0F,
     0x20,
-    0x01,
-    0x00,
-    0x01,
-    0x00,
+    (mle >> 8) & 0xFF,
+    mle & 0xFF,
+    (mlc >> 8) & 0xFF,
+    mlc & 0xFF,
     0x04,
     0x06,
     (ndefFileId >> 8) & 0xFF,
@@ -176,6 +183,65 @@ void main() {
           ]),
         ),
       );
+    });
+
+    test('chunks READ BINARY by the MLe advertised in the CC', () async {
+      // The conference badge advertises MLe=16 and MLc=128. Asking it for
+      // more than 16 bytes per READ BINARY makes it answer with a truncated
+      // frame and hang.
+      final message = NdefMessage([
+        NdefRecord.uri(Uri.parse('https://x.com/spydon')),
+        NdefRecord.text(
+          'Lukas · Test · x.com/spydon · '
+          'id:cfa3e202-4a96-41ca-9381-590dd114b0e6 · capy:coder_face',
+        ),
+      ]);
+      final serialized = message.serialize();
+      final nlen = serialized.length;
+      expect(nlen, greaterThan(16));
+      final chunks = [
+        for (var i = 0; i < nlen; i += 16)
+          serialized.sublist(i, i + 16 > nlen ? nlen : i + 16),
+      ];
+
+      final transceiver = FakeTransceiver([
+        _ok(),
+        _ok(),
+        _ccSuccess(mle: 16, mlc: 128),
+        _ok(),
+        _dataOk([(nlen >> 8) & 0xFF, nlen & 0xFF]),
+        for (final chunk in chunks) _dataOk(chunk),
+      ]);
+
+      final read = await const NdefBadgeReader().read(transceiver);
+
+      expect(read.records, hasLength(2));
+      expect(
+        read.records[0].decodeUri(),
+        equals(Uri.parse('https://x.com/spydon')),
+      );
+      expect(transceiver.sent, hasLength(5 + chunks.length));
+      for (var i = 0; i < chunks.length; i++) {
+        final offset = 2 + i * 16;
+        expect(
+          transceiver.sent[5 + i],
+          equals(
+            Uint8List.fromList([
+              0x00,
+              0xB0,
+              (offset >> 8) & 0xFF,
+              offset & 0xFF,
+              chunks[i].length,
+            ]),
+          ),
+        );
+      }
+    });
+
+    test('falls back to 255-byte READ BINARY for a malformed MLe of 0', () {
+      expect(readBinaryChunkSizeFor(0), equals(255));
+      expect(readBinaryChunkSizeFor(16), equals(16));
+      expect(readBinaryChunkSizeFor(1024), equals(255));
     });
 
     test(

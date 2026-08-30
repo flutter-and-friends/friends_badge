@@ -24,14 +24,19 @@ class FakeTransceiver(final List<Uint8List> responses)
 }
 
 /// Builds a minimal valid Capability Container R-APDU:
-/// CCLEN=15, version=0x20, MLe=256, MLc=256, TLV(tag=04,len=06,
+/// CCLEN=15, version=0x20, MLe, MLc, TLV(tag=04,len=06,
 /// fileId=E104, maxSize=1024, readOpen, writeOpen), SW=90 00.
-Uint8List _ccSuccess({int ndefFileId = 0xE104, int maxNdefSize = 1024}) {
+Uint8List _ccSuccess({
+  int ndefFileId = 0xE104,
+  int maxNdefSize = 1024,
+  int mle = 256,
+  int mlc = 256,
+}) {
   return Uint8List.fromList([
     0x00, 0x0F, // CCLEN
     0x20, // mapping version 2.0
-    0x01, 0x00, // MLe
-    0x01, 0x00, // MLc
+    (mle >> 8) & 0xFF, mle & 0xFF, // MLe
+    (mlc >> 8) & 0xFF, mlc & 0xFF, // MLc
     0x04, 0x06, // NDEF File Control TLV tag + length
     (ndefFileId >> 8) & 0xFF, ndefFileId & 0xFF,
     (maxNdefSize >> 8) & 0xFF, maxNdefSize & 0xFF,
@@ -171,6 +176,39 @@ void main() {
       // Second chunk's offset in the NDEF file = 2 (NLEN) + 255
       expect(transceiver.sent[6][2], equals(0x01)); // P1 (offset MSB)
       expect(transceiver.sent[6][3], equals(0x01)); // P2 (offset LSB) = 257
+    });
+
+    test('splits UPDATE BINARY by the MLc advertised in the CC', () async {
+      // The conference badge advertises MLc=128.
+      final message = NdefMessage([NdefRecord.text('x' * 200)]);
+      final serialized = message.serialize();
+      expect(serialized.length, greaterThan(128));
+      expect(serialized.length, lessThan(255));
+
+      final transceiver = FakeTransceiver([
+        _ok(),
+        _ok(),
+        _ccSuccess(mle: 16, mlc: 128),
+        _ok(),
+        _ok(), // NLEN update
+        _ok(), // chunk 1 of 2
+        _ok(), // chunk 2 of 2
+      ]);
+
+      await const NdefBadgeWriter().write(transceiver, message);
+
+      expect(transceiver.sent, hasLength(7));
+      expect(transceiver.sent[5][4], equals(128));
+      expect(transceiver.sent[6][4], equals(serialized.length - 128));
+      // Second chunk's offset in the NDEF file = 2 (NLEN) + 128
+      expect(transceiver.sent[6][2], equals(0x00));
+      expect(transceiver.sent[6][3], equals(130));
+    });
+
+    test('falls back to 255-byte UPDATE BINARY for a malformed MLc of 0', () {
+      expect(updateBinaryChunkSizeFor(0), equals(255));
+      expect(updateBinaryChunkSizeFor(128), equals(128));
+      expect(updateBinaryChunkSizeFor(1024), equals(255));
     });
 
     test(
