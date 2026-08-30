@@ -38,6 +38,19 @@ const int kDefaultNdefFileId = 0xE104;
 /// Maximum payload a single UPDATE BINARY APDU can carry (1-byte Lc).
 const int _kMaxUpdateBinaryChunkSize = 255;
 
+/// The chunk size to use for UPDATE BINARY given the MLc advertised in the
+/// Capability Container.
+///
+/// MLc is the largest C-APDU data field the tag accepts. Sending more is a
+/// protocol violation (the conference badge advertises 128 bytes). A CC
+/// with MLc=0 is malformed, fall back to the APDU maximum in that case.
+int updateBinaryChunkSizeFor(int mlc) {
+  if (mlc <= 0) {
+    return _kMaxUpdateBinaryChunkSize;
+  }
+  return mlc < _kMaxUpdateBinaryChunkSize ? mlc : _kMaxUpdateBinaryChunkSize;
+}
+
 /// Writes [NdefMessage]s to an NFC Forum Type 4 tag.
 ///
 /// The write sequence follows the NFC Forum Type 4 Tag Operation
@@ -101,8 +114,10 @@ class const NdefBadgeWriter() {
         '${cc.map((b) => b.toRadixString(16).padLeft(2, '0')).join(' ')}',
       );
     }
+    final mlc = (cc[5] << 8) | cc[6];
     final ndefFileId = (cc[9] << 8) | cc[10];
     final maxNdefFileSize = (cc[11] << 8) | cc[12];
+    final chunkSize = updateBinaryChunkSizeFor(mlc);
     if (2 + serialized.length > maxNdefFileSize) {
       throw ArgumentError.value(
         serialized.length,
@@ -125,8 +140,14 @@ class const NdefBadgeWriter() {
       transceiver,
       offset: 0,
       data: nlen.buffer.asUint8List(),
+      chunkSize: chunkSize,
     );
-    await _updateBinary(transceiver, offset: 2, data: serialized);
+    await _updateBinary(
+      transceiver,
+      offset: 2,
+      data: serialized,
+      chunkSize: chunkSize,
+    );
   }
 
   Future<void> _select(
@@ -176,12 +197,13 @@ class const NdefBadgeWriter() {
     IsoDepTransceiver transceiver, {
     required int offset,
     required List<int> data,
+    required int chunkSize,
   }) async {
     var sent = 0;
     while (sent < data.length) {
-      final end = (sent + _kMaxUpdateBinaryChunkSize > data.length)
+      final end = (sent + chunkSize > data.length)
           ? data.length
-          : sent + _kMaxUpdateBinaryChunkSize;
+          : sent + chunkSize;
       final chunk = data.sublist(sent, end);
       final command = Uint8List.fromList([
         0x00, // CLA
