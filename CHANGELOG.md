@@ -1,3 +1,7 @@
+## 0.2.2
+
+ - **FIX**: Honor the Capability Container MLe and MLc when reading and writing NDEF ([#33](https://github.com/flutter-and-friends/friends_badge/issues/33)). ([6cfe7d5e](https://github.com/flutter-and-friends/friends_badge/commit/6cfe7d5e332dc0477f7356b332352ddc05c0817d))
+
 ## 0.2.1
 
  - **FEAT**: Require Flutter 3.47, adopt Dart 3.13 syntax, drop flutter_blue_plus, and fix the iOS note ([#31](https://github.com/flutter-and-friends/friends_badge/issues/31)). ([f621ba2f](https://github.com/flutter-and-friends/friends_badge/commit/f621ba2fe4422088c9dd63205cb72b6cc83686bb))
