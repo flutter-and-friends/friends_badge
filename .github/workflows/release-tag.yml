@@ -12,17 +12,21 @@ jobs:
     runs-on: [ ubuntu-latest ]
     if: contains(github.event.head_commit.message, 'chore(release)')
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
       - uses: subosito/flutter-action@v2
       - uses: bluefireteam/melos-action@v3
+        id: melos
         with:
           tag: true
+      # melos-action decides the tag format (`vX.Y.Z` for the root package of
+      # a `useRootAsPackage` workspace, `my_package-vX.Y.Z` otherwise), so
+      # dispatch on the tags it reports instead of rebuilding the name here.
       - run: |
-          melos exec -c1 --no-published --no-private --order-dependents -- \
-          gh workflow run release-publish.yml \
-          --ref \$MELOS_PACKAGE_NAME-v\$MELOS_PACKAGE_VERSION
+          for tag in ${{ steps.melos.outputs.tags }}; do
+            gh workflow run release-publish.yml --ref "$tag"
+          done
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 

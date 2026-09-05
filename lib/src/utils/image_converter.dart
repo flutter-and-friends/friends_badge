@@ -4,10 +4,7 @@ import 'package:friends_badge/src/utils/color_palette.dart';
 import 'package:image/image.dart' as img;
 
 @internal
-class ImageConverter {
-  @internal
-  const ImageConverter();
-
+class const ImageConverter() {
   @internal
   List<Uint8List> convertImage(
     img.Image image, {
@@ -87,8 +84,8 @@ class ImageConverter {
   /// algorithm (currently Floyd Steinberg).
   img.Image dither(
     img.Image src, {
-    ColorPalette palette = ColorPalette.blackWhiteYellowRed,
-    img.DitherKernel kernel = img.DitherKernel.atkinson,
+    ColorPalette palette = .blackWhiteYellowRed,
+    img.DitherKernel kernel = .atkinson,
   }) {
     return img.ditherImage(
       src,

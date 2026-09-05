@@ -10,9 +10,7 @@ void main() {
   runApp(const MyApp());
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
+class const MyApp({super.key}) extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -25,9 +23,7 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class HomePage extends StatefulWidget {
-  const HomePage({super.key});
-
+class const HomePage({super.key}) extends StatefulWidget {
   @override
   State<HomePage> createState() => _HomePageState();
 }
@@ -39,7 +35,7 @@ class _HomePageState extends State<HomePage> {
       badgeImage?.let((image) => image.getImageBytes());
 
   Uint8List? get ditheredImageBytes =>
-      badgeImage?.let((image) => image.getImageBytes(DitherKernel.atkinson));
+      badgeImage?.let((image) => image.getImageBytes(.atkinson));
 
   @override
   void initState() {
@@ -101,7 +97,7 @@ class _HomePageState extends State<HomePage> {
             child: const Text('Create Template'),
           ),
           SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
+            scrollDirection: .horizontal,
             child: Padding(
               padding: const EdgeInsets.all(16),
               child: Row(

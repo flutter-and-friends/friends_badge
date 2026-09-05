@@ -5,6 +5,14 @@ A Flutter package for writing images to e-paper badges.
 With this package you can control what is displayed on the Flutter & Friends
 conference badge.
 
+> [!NOTE]
+> A brand new badge has an empty NDEF file. `nfc_manager` versions before 4.2.1
+> silently dropped such tags on iOS during discovery, so the badge could never
+> be written from an iPhone until something (even a single space) had been
+> written to it with another app. This package requires `nfc_manager` 4.2.1 or
+> newer, which tolerates the empty file, so no pre-write is needed anymore. If
+> you pin an older `nfc_manager` in your app, the workaround still applies.
+
 ## Features
 
 - Write images to e-paper badges over NFC
@@ -19,7 +27,7 @@ To use this package, add `friends_badge` as a dependency in your `pubspec.yaml` 
 
 ```yaml
 dependencies:
-  friends_badge: ^0.1.0
+  friends_badge: ^0.2.0
 ```
 
 Then, import the package in your Dart code:
@@ -35,7 +43,7 @@ to your badge:
 // First, create a BadgeImage from an image.
 final image = BadgeImage(yourImage);
 
-// Then, write the image to the badge using NFC and BLE.
+// Then, write the image to the badge over NFC.
 await image.writeToBadge();
 
 // Optionally, you can show a loading indicator while writing the image.

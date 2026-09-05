@@ -3,11 +3,8 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 
-class WaitingForNfcTap extends StatelessWidget {
-  final ValueNotifier<double> progress;
-
-  const WaitingForNfcTap._(this.progress);
-
+class const WaitingForNfcTap._(final ValueNotifier<double> progress)
+    extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Center(
@@ -19,7 +16,7 @@ class WaitingForNfcTap extends StatelessWidget {
         padding: const EdgeInsets.all(24),
         child: ValueListenableBuilder(
           valueListenable: progress,
-          builder: (context, progress, child) {
+          builder: (_, progress, child) {
             return Stack(
               alignment: Alignment.center,
               children: [
@@ -84,11 +81,8 @@ class WaitingForNfcTap extends StatelessWidget {
 /// A custom clipper that creates a radial wipe clipping path.
 ///
 /// The sweep angle of the arc is determined by the [revealPercent].
-class RadialRevealClipper extends CustomClipper<Path> {
-  final double revealPercent;
-
-  RadialRevealClipper({required this.revealPercent});
-
+class RadialRevealClipper({required final double revealPercent})
+    extends CustomClipper<Path> {
   @override
   Path getClip(Size size) {
     if (revealPercent >= 1.0) {

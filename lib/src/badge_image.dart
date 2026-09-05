@@ -15,7 +15,7 @@ export 'package:image/image.dart' show DitherKernel;
 /// This class holds the image data in a format that is suitable for the badge.
 /// It also provides methods for dithering and converting the image to a byte
 /// stream that can be sent to the badge.
-class BadgeImage {
+class const BadgeImage._(this._backingImage, this._peekBackingImage) {
   /// The scaled down image data. Not yet dithered or converted to binary.
   final img.Image _backingImage;
 
@@ -24,7 +24,7 @@ class BadgeImage {
 
   /// Creates a [BadgeImage] from the given [image].
   /// The image is resized and cropped to fit the badge's specifications.
-  factory BadgeImage(
+  factory(
     img.Image image, {
     BadgeSpecification badgeSpecification = _badgeSpecification,
   }) {
@@ -36,8 +36,6 @@ class BadgeImage {
     final peekImage = img.copyResize(resizedImage, height: 100);
     return BadgeImage._(resizedImage, peekImage);
   }
-
-  const BadgeImage._(this._backingImage, this._peekBackingImage);
 
   static const _imageConverter = ImageConverter();
 
@@ -51,11 +49,23 @@ class BadgeImage {
 
   static List<img.DitherKernel> allSupportedKernels = img.DitherKernel.values;
 
-  /// Writes this [BadgeImage] to the badge, using NFC and BLE.
+  /// Writes this [BadgeImage] to the badge over NFC.
+  ///
+  /// If [ndef] is provided, the NDEF message is written to the badge's
+  /// Type 4 NDEF file after the image flash completes. The NDEF write is
+  /// purely additive — it does not interfere with the image-chunk protocol.
+  ///
+  /// When [preferredTechnology] is [PreferredWriteTechnology.ble] and BLE is
+  /// supported on this device, the image is instead transferred over BLE:
+  /// the badge id is first read over NFC (one tap) and used to match the
+  /// advertisement during the BLE scan. Any error on the BLE path falls back
+  /// to the NFC path.
   Stream<double> writeToBadge({
-    DitherKernel kernel = img.DitherKernel.floydSteinberg,
-    PreferredWriteTechnology preferredTechnology = PreferredWriteTechnology.nfc,
+    DitherKernel kernel = .floydSteinberg,
+    PreferredWriteTechnology preferredTechnology =
+        PreferredWriteTechnology.nfc,
     bool shouldCrop = true,
+    NdefMessage? ndef,
   }) async* {
     if (Platform.isIOS) {
       HapticFeedback.mediumImpact();
@@ -79,6 +89,7 @@ class BadgeImage {
       this,
       kernel: kernel,
       shouldCrop: shouldCrop,
+      ndef: ndef,
     );
   }
 
@@ -122,7 +133,7 @@ class BadgeImage {
   /// aspect ratio using the specifications from
   /// `BadgeSpecification.size3_7inchPassiveBWRY`.
   img.Image? createPreviewImage({
-    img.DitherKernel kernel = img.DitherKernel.atkinson,
+    img.DitherKernel kernel = .atkinson,
   }) {
     return const ImageConverter().dither(
       _backingImage,

@@ -1,11 +1,14 @@
 name: friends_badge
 description: "Control the Flutter & Friends conference badge."
-version: 0.1.4
+version: 0.2.2
 repository: https://github.com/flutter-and-friends/friends_badge
 
 environment:
-  sdk: ^3.9.0
-  flutter: ">=3.35.0"
+  sdk: ^3.13.0
+  flutter: ">=3.47.0"
+
+workspace:
+  - example
 
 dependencies:
   collection: ^1.19.1
@@ -14,12 +17,13 @@ dependencies:
     sdk: flutter
   flutter_blue_plus: ^1.35.5
   image: ^4.5.4
-  nfc_manager: ^4.0.2
-  nfc_manager_ndef: ^1.0.1
+  nfc_manager: ^4.2.1
 
 dev_dependencies:
   flame_lint: ^1.4.2
-  melos: ^7.1.0
+  flutter_test:
+    sdk: flutter
+  melos: ^8.5.0
 
 melos:
   useRootAsPackage: true

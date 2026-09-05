@@ -2,29 +2,22 @@ import 'package:flutter/foundation.dart';
 import 'package:friends_badge/src/utils/color_palette.dart';
 
 @internal
-enum BadgeSpecification {
+enum BadgeSpecification({
+  required final int width,
+  required final int height,
+  required final bool passive,
+  required final ColorPalette colorPalette,
+}) {
   size3_7inchPassiveBWRY(
     width: 240,
     height: 416,
     passive: true,
-    colorPalette: ColorPalette.blackWhiteYellowRed,
+    colorPalette: .blackWhiteYellowRed,
   );
-
-  final int height;
-  final int width;
-  final bool passive;
-  final ColorPalette colorPalette;
-
-  const BadgeSpecification({
-    required this.width,
-    required this.height,
-    required this.passive,
-    required this.colorPalette,
-  });
 
   static BadgeSpecification fromSpecification(Uint8List value) {
     return switch (value.first) {
-      0x04 => BadgeSpecification.size3_7inchPassiveBWRY,
+      0x04 => .size3_7inchPassiveBWRY,
       _ => throw UnsupportedError('Unsupported badge specification: $value'),
     };
   }

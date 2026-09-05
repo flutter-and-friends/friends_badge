@@ -6,13 +6,10 @@ import 'package:friends_badge/friends_badge.dart';
 import 'package:friends_badge/src/repositories/ble_badge_repository.dart';
 import 'package:friends_badge/src/repositories/nfc_implementations/android_nfc_implementation.dart';
 import 'package:friends_badge/src/repositories/nfc_implementations/ios_nfc_implementation.dart';
-import 'package:image/image.dart' as img;
 import 'package:nfc_manager/nfc_manager.dart';
 
 /// Repository for writing images to NFC badges.
-class NfcBadgeRepository {
-  const NfcBadgeRepository();
-
+class const NfcBadgeRepository() {
   /// Returns `true` if NFC badge writing is supported on the current platform.
   /// Currently, only Android is supported.
   ///
@@ -27,6 +24,10 @@ class NfcBadgeRepository {
   /// If [shouldCrop] is true, the image will be cropped to fit the badge's
   /// aspect ratio.
   ///
+  /// If [ndef] is provided, the NDEF message is written to the badge after
+  /// the image flash completes. The NDEF write is purely additive — it does
+  /// not interfere with the image-chunk protocol.
+  ///
   /// Returns a [Stream] that completes when the write operation is done or
   /// fails.
   ///
@@ -36,47 +37,47 @@ class NfcBadgeRepository {
   /// permissions are granted.
   Stream<double> writeOverNfc(
     BadgeImage image, {
-    DitherKernel kernel = img.DitherKernel.floydSteinberg,
+    DitherKernel kernel = .floydSteinberg,
     bool shouldCrop = true,
+    NdefMessage? ndef,
   }) {
     final controller = StreamController<double>();
+    final ditheredImage = image.getDitheredImage(kernel);
 
-    Future<void>(() async {
-      final isNfcAvailable = await NfcManager.instance.isAvailable();
-      if (!isNfcAvailable) {
+    Future(() async {
+      final availability = await NfcManager.instance.checkAvailability();
+      if (availability != .enabled) {
         controller.addError(
-          Exception('NFC is not available on this device'),
+          Exception('NFC is not available on this device ($availability)'),
           StackTrace.current,
         );
         controller.close();
-        return;
+        return controller.stream;
       }
 
       NfcManager.instance
           .startSession(
             alertMessageIos: 'Hold your device near the NFC badge',
             pollingOptions: {
-              NfcPollingOption.iso14443,
-            },
-            onSessionErrorIos: (error) {
-              NfcManager.instance.stopSession();
-              controller.addError(error);
+              .iso14443,
             },
             onDiscovered: (tag) async {
               try {
                 if (Platform.isAndroid) {
                   await const AndroidNfcImplementation().writeOverNfc(
                     tag,
-                    image.getDitheredImage(kernel),
+                    ditheredImage,
                     controller,
                     shouldCrop: shouldCrop,
+                    ndef: ndef,
                   );
                 } else if (Platform.isIOS) {
                   await const IosNfcImplementation().writeOverNfc(
                     tag,
-                    image.getDitheredImage(kernel),
+                    ditheredImage,
                     controller,
                     shouldCrop: shouldCrop,
+                    ndef: ndef,
                   );
                 } else {
                   throw UnsupportedError('Unsupported platform');
@@ -105,14 +106,16 @@ class NfcBadgeRepository {
     return controller.stream;
   }
 
+  /// Prompts the user to tap the badge over NFC and returns its unique
+  /// identifier, used to match the BLE scan result when writing over BLE.
   Future<BadgeId> getNfcTag() {
     final controller = Completer<BadgeId>();
 
-    Future<void>(() async {
-      final isNfcAvailable = await NfcManager.instance.isAvailable();
-      if (!isNfcAvailable) {
+    Future(() async {
+      final availability = await NfcManager.instance.checkAvailability();
+      if (availability != .enabled) {
         controller.completeError(
-          Exception('NFC is not available on this device'),
+          Exception('NFC is not available on this device ($availability)'),
           StackTrace.current,
         );
         return;
@@ -122,23 +125,27 @@ class NfcBadgeRepository {
           .startSession(
             alertMessageIos: 'Hold your device near the NFC badge',
             pollingOptions: {
-              NfcPollingOption.iso14443,
+              .iso14443,
             },
-            onSessionErrorIos: (error) {
-              NfcManager.instance.stopSession();
-              controller.completeError(error);
-            },
-            onDiscovered: (tag) async {
-              if (Platform.isAndroid) {
-                controller.complete(
-                  const AndroidNfcImplementation().getBadgeIdFromTag(tag),
-                );
-              } else if (Platform.isIOS) {
-                controller.complete(
-                  const IosNfcImplementation().getBadgeIdFromTag(tag),
-                );
-              } else {
-                throw UnsupportedError('Unsupported platform');
+            onDiscovered: (tag) {
+              try {
+                if (Platform.isAndroid) {
+                  controller.complete(
+                    const AndroidNfcImplementation().getBadgeIdFromTag(tag),
+                  );
+                } else if (Platform.isIOS) {
+                  controller.complete(
+                    const IosNfcImplementation().getBadgeIdFromTag(tag),
+                  );
+                } else {
+                  throw UnsupportedError('Unsupported platform');
+                }
+
+                // ignore: avoid_catches_without_on_clauses
+              } catch (e, stackTrace) {
+                controller.completeError(e, stackTrace);
+              } finally {
+                NfcManager.instance.stopSession();
               }
             },
           )
