@@ -1,134 +1,71 @@
 # NFC Data Format for Badge Communication
 
-This document outlines the NFC data format used for communication between the mobile application and
-the smart badge. The communication is based on the ISO 14443-4 (ISO-DEP) standard, using `NfcA`
-technology.
+This document outlines the NFC data format used for communication between the mobile application
+and the smart badge, based on ISO 14443-4 (ISO-DEP).
+
+> **Correction (2026-09-05):** the former "Active Badge Protocol" section described raw
+> `NfcA`-level `0xa2` / `0x30` page reads/writes with 4-byte chunks. That does not match the
+> vendor app, which uses **ISO-DEP APDUs** (`IsoDep`/`transceive`) — and it does not match this
+> package's NFC implementation either, which is **in production use**. The active-badge flow below
+> is the vendor-observed one, cross-checked byte-for-byte against the port. The "passive badge"
+> section at the bottom is historical and remains unverified.
 
 ## Tag Type
 
-The badge is an **NFC FORUM TYPE 4 TAG**.
+The badge is an **NFC Forum Type 4 Tag** (ISO 14443-4, `IsoDep`).
 
-## High-Level Communication Flow
+## Active Badge Protocol (vendor-observed)
 
-The communication process for writing data (e.g., an image or template) to the badge follows these
-steps:
+Used for badges that have a battery and support Bluetooth. All frames are CAPDU (CLT01-style
+custom) APDUs exchanged via `IsoDep.transceive`:
 
-1. **Tag Discovery:** The mobile app discovers the NFC tag.
-2. **Connection:** The app connects to the tag using the `NfcA` technology.
-3. **Handshake/Initiation:**
-    - The app sets the tag's status to `0` (SUCCESS) to prepare it for writing.
-    - The app reads the tag's status to ensure it's ready.
-4. **Data Transfer:**
-    - The data is sent in chunks of 4 bytes.
-    - Each chunk is wrapped in a specific command structure.
-    - The app waits for a successful response after sending each chunk.
-5. **Termination:**
-    - After all data chunks are sent, the app sets the tag's status to `0x200` to indicate the end
-      of the transfer.
-    - The connection is closed.
+### Command structure
 
-## Active Badge Protocol
+| Field | CLA | INS/CMD | P1/P2 | Data |
+|:------|:----|:--------|:------|:-----|
+| Spec query | `D0` | `D1` | `03 00` | `01` (payload length) |
+| Start transfer | `D0` | `D1` | `00 00` | `00` |
+| Data chunk | `D0` | `D1` | `01` (plane 0, more) / `02` (plane 0, last) / `04` (plane 1, more) / `05` (plane 1, last) | `00` + LEN + ≤248-byte payload |
+| Commit | `D0` | `D1` | `03 00` | `00` |
 
-This protocol is used for badges that have a battery and support Bluetooth.
+### Sequence
 
-### Command Structure
+This is the flow the port implements (`common_nfc_implementation.dart`) and
+that is in production use over NFC. The vendor app additionally sends the
+start command in step 3; the port omits it and badges accept the transfer
+without it — treat it as **optional**.
 
-**Note:** The NFC command structure is different from the BLE command structure.
-See [BLE_FORMAT.md](BLE_FORMAT.md) for more details.
+1. Connect via `IsoDep` after tap.
+2. **Spec query:** `D0 D1 03 00 01` → badge reports model/spec (e.g. bytes mapping `03/04/05` to
+   the 3.7″ BWR/BWRY/BW variants).
+3. *(optional, vendor-app only)* **Start transfer:** `D0 D1 00 00 00`.
+4. **Plane 0 data:** chunks of up to **248 bytes**, wrapped as
+   `D0 D1 <01|02> 00 <LEN> <payload>` — `01` while more chunks follow, `02` on the last chunk.
+5. **Plane 1 data (BWR/BWRY):** same chunks with `04|05` in the first parameter byte.
+6. **Commit/display:** `D0 D1 03 00 00`.
 
-The communication relies on a set of commands, all of which are sent using the `transceive` method.
+The vendor app checks `9000` status words on each exchange; the port does not
+verify them in the transfer path (and the iOS `NfcWriter` strips the status
+words from responses), and this has no observed negative effect.
 
-#### Write
+There is **no per-chunk checksum** on the NFC path; same image bit packing as BLE
+(see [DATA_FORMAT.md](DATA_FORMAT.md)).
 
-This command is used to write a 4-byte chunk of data to the badge.
+## Passive Badge Protocol (from earlier analysis — not device-verified)
 
-- **Command Byte:** `0xa2`
-- **Address/Counter:** A single byte representing the address or a sequence number for the data
-  chunk.
-- **Data Payload:** 4 bytes of data.
-
-**Packet Format:**
-
-| Byte 0 | Byte 1          | Bytes 2-5   |
-|:-------|:----------------|:------------|
-| `0xa2` | Address/Counter | 4-byte data |
-
-#### Set Status Command
-
-This command is used to set the status of the badge.
-
-- **Command Bytes:** `0xa2`, `0x06`
-- **Status Code:** A 2-byte status code.
-
-**Packet Format:**
-
-| Byte 0 | Byte 1 | Bytes 2-3     | Bytes 4-5      |
-|:-------|:-------|:--------------|:---------------|
-| `0xa2` | `0x06` | 2-byte status | `0x00`, `0x00` |
-
-#### Read Status Command
-
-This command is used to read the current status of the badge.
-
-- **Command Bytes:** `0x30`, `0x06`
-
-**Packet Format:**
-
-| Byte 0 | Byte 1 |
-|:-------|:-------|
-| `0x30` | `0x06` |
-
-### Status Codes
-
-The following status codes have been identified:
-
-| Status Code | Hex Value | Description                                |
-|:------------|:----------|:-------------------------------------------|
-| `SUCCESS`   | `0x0000`  | Operation successful / Ready for next step |
-| `S1`        | `0x0100`  | Unknown                                    |
-| `S2`        | `0x0200`  | End of data transfer                       |
-| `S4`        | `0x0400`  | Unknown                                    |
-| `S6`        | `0x0600`  | Unknown                                    |
-| `S7`        | `0x0700`  | Unknown                                    |
-| `S8`        | `0x0800`  | Unknown                                    |
-| `ERROR`     | `-1`      | An error occurred                          |
-
-### Example Write Sequence
-
-1. **Connect to the tag.**
-2. **Send "Set Status" command with status `0x0000` (SUCCESS).**
-    - `transceive([0xa2, 0x06, 0x00, 0x00, 0x00, 0x00])`
-3. **Send "Read Status" command.**
-    - `transceive([0x30, 0x06])`
-    - Expect a response indicating success.
-4. **For each 4-byte chunk of data:**
-    - **Send "Write Command" with the data chunk.**
-        - `transceive([0xa2, address, data[0], data[1], data[2], data[3]])`
-    - Increment the address/counter.
-5. **After all chunks are sent, send "Set Status" command with status `0x0200` (S2).**
-    - `transceive([0xa2, 0x06, 0x02, 0x00, 0x00, 0x00])`
-6. **Close the connection.**
-
-## Passive Badge Protocol
-
-This protocol is used for badges that are powered by the NFC field itself (no battery).
+Used for badges powered by the NFC field itself (no battery). This section is retained from the
+original reverse-engineering notes and has **not** been cross-checked against decompiled code;
+treat as tentative.
 
 ### Commands
 
-The communication relies on a set of commands, all of which are sent using the `transceive` method.
+- **Handshake:** `C0 C1 00 00 00`
+- **Write:** `D0 D1 <02 last | 01 more> 00 <LEN> <payload>` (chunked)
+- **Terminate:** `D0 D1 03 00 00`
 
-#### Handshake Command
+### Status codes (earlier analysis)
 
-- **Command Bytes:** `0xc0`, `0xc1`, `0x00`, `0x00`, `0x00`
-
-#### Write Command
-
-- **Command Bytes:** `0xd0`, `0xd1`
-- **Is Last Chunk:** `0x02` if it is the last chunk, `0x01` otherwise.
-- **Unknown:** `0x00`
-- **Chunk Length:** The length of the data chunk.
-- **Data Payload:** The data chunk.
-
-#### Terminate Command
-
-- **Command Bytes:** `0xd0`, `0xd1`, `0x03`, `0x00`, `0x00`
+| Code | Value | Description |
+|:-----|:------|:------------|
+| SUCCESS | `0x0000` | Ready / operation successful |
+| end-of-transfer | `0x0200` | Marks end of data transfer |

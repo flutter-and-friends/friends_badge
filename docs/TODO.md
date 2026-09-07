@@ -28,9 +28,19 @@
 ## Phase 4: Reading config from badge
 
 - [x] Implement reading the badge configuration over NFC.
-  - Find native implementation
-      in [WriteActivity.java:927](android_app/decompiled_apk/decompiled_java/cn/highlight/work_card_write/activity/WriteActivity.java)
 - [ ] Add a way to select the dither method.
+
+## Phase 6: BLE support
+
+- [x] Reverse-engineer the exact vendor protocol from the decompiled APK
+  (canonical reference: [badge-ble-protocol.md](badge-ble-protocol.md)).
+- [x] Implement to spec: MTU 247, A5 framing with big-endian offsets and
+  plane byte, telemetry CRC (custom variant), start/refresh handshake,
+  vendor pacing.
+- [x] **Device-verified:** full image transfer renders correctly on a real
+  3.7" badge (2026-09-05). Formerly-uncertain protocol details
+  (ACK layouts, CRC-on-the-wire, chunking, scan matching) confirmed on
+  device — see §7 of the protocol reference.
 
 ## Phase 5: iOS support
 

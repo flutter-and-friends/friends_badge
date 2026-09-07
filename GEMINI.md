@@ -10,22 +10,26 @@ usage.
 
 ## Current Status
 
-The project is in the initial restructuring phase. The following files have been created to guide
-the development process:
+The port is **working end-to-end over BLE** (device-verified 2026-09-05). Key references:
 
-- **`TODO.md`**: This file contains a detailed checklist of the development plan. Please refer to
-  this file to understand the current progress and the next steps.
-- **`NOTES.md`**: This file contains important technical details, code snippets, and potential
-  challenges that were identified during the initial analysis of the original Android application.
-- **`DATA_FORMAT.md`**, **`BLE_FORMAT.md`**, **`NFC_FORMAT.md`**, **`END_TO_END_EXAMPLE.md`**: These
-  files contain the documentation of the original Android app's communication protocols and data
-  formats.
+- **[docs/badge-ble-protocol.md](docs/badge-ble-protocol.md)** — canonical, byte-exact BLE protocol
+  (reconstructed from the decompiled vendor APK, cross-verified, device-validated). Always consult
+  this before touching transport or image-encoding code.
+- **[docs/DATA_FORMAT.md](docs/DATA_FORMAT.md)** — image bit-packing spec (column-major, per-palette
+  polarity, BWYR 2bpp).
+- **[docs/NFC_FORMAT.md](docs/NFC_FORMAT.md)** — NFC paths (active-badge ISO-DEP flow is
+  vendor-observed but **not yet device-validated**; the passive section is tentative).
+- **[docs/TODO.md](docs/TODO.md)** — current progress and remaining work.
+- **[docs/NOTES.md](docs/NOTES.md)** — gotchas for this port (some entries now marked resolved).
+
+⚠️ An earlier set of docs (pre-2026-09-05) described a wrong BLE packet envelope (`0xBB…0x7E`) and
+wrongly attributed Floyd-Steinberg dithering; those were corrected. Trust the canonical reference
+over any other summary.
 
 ## Instructions for the Next Agent
 
-1. **Review the `TODO.md` file** to understand the current state of the project and the remaining
-   tasks.
-2. **Consult the `NOTES.md` file** for technical details and potential gotchas.
-3. **Follow the development plan** outlined in `TODO.md` to continue the project.
-4. **The user has requested to start with the project restructuring.** The next step is to create
-   the `example` directory.
+1. **Read `docs/badge-ble-protocol.md` first** for anything touching BLE, image encoding, CRC, or
+   the transfer state machine.
+2. Check `docs/TODO.md` for current remaining work (NFC validation on device, dither-method
+   selection, iOS NFC support).
+3. The package pins a modern SDK; build on the host toolchain, not in the workspace container.
