@@ -11,8 +11,8 @@ workspace:
   - example
 
 dependencies:
+  async: ^2.13.0
   collection: ^1.19.1
-  crclib: ^3.0.0
   flutter:
     sdk: flutter
   flutter_blue_plus: ^1.35.5

@@ -74,7 +74,7 @@ class _HomePageState extends State<HomePage> {
                 await WaitingForNfcTap.showLoading(
                   context: context,
                   job: image.writeToBadge(
-                    // preferredTechnology: PreferredWriteTechnology.ble,
+                    preferredTechnology: PreferredWriteTechnology.ble,
                   ),
                 );
               },

@@ -80,8 +80,11 @@ class const ImageConverter() {
     return img.copyResize(image, width: size.width, height: size.height);
   }
 
-  /// Dithers the image with the specified palette using the default dithering
-  /// algorithm (currently Floyd Steinberg).
+  /// Dithers the image with the specified palette.
+  ///
+  /// Defaults to the [img package]'s Atkinson kernel — not the vendor's
+  /// two-row error-diffusion algorithm (weights 3/5/1+7), though renders are
+  /// acceptable. See docs/NOTES.md and docs/DATA_FORMAT.md.
   img.Image dither(
     img.Image src, {
     ColorPalette palette = .blackWhiteYellowRed,
@@ -94,166 +97,134 @@ class const ImageConverter() {
     );
   }
 
-  /// Converts an image to two separate 1-bit-per-pixel byte arrays.
+  /// Converts an image to 1-bit-per-pixel planes for black & white badges.
   ///
-  /// This is used for dual-layer e-ink displays (e.g., Black/White and Red).
+  /// Mirrors `ImgUtil.gray2Binary_BW`:
+  /// - Array 0 carries black/white data, 1 = black (luminance ≤ 95),
+  ///   0 = white.
+  /// - Array 1 is a red-overlay plane exactly like the vendor builds one
+  ///   for BW badges; it is never transferred to BW badges.
   ///
-  /// - The first array (`outputBytes1`) contains the Black/White data:
-  ///   - 1 for dark pixels (luminance <= 95)
-  ///   - 0 for light pixels (luminance > 95)
-  /// - The second array (`outputBytes2`) contains the Red overlay data:
-  ///   - 1 for red-like pixels
-  ///   - 0 for all other colors
-  ///
-  /// Both output arrays are stored in a vertically flipped column-major order.
+  /// Both arrays are stored in the vendor's vertically-flipped column-major
+  /// order (8 columns per byte group, rows bottom-to-top, MSB = leftmost
+  /// column of the group).
   List<Uint8List> gray2BinaryBW(img.Image image) {
-    final width = image.width;
     final height = image.height;
-    final totalPixels = width * height;
 
-    // Each byte holds data for 8 pixels (1 bit per pixel).
-    final outputSize = (totalPixels / 8).ceil();
-    final outputBytes1 = Uint8List(outputSize); // For Black/White data
-    final outputBytes2 = Uint8List(outputSize); // For Red overlay data
-
-    // Loop through each pixel of the image.
-    for (var y = 0; y < height; y++) {
-      for (var x = 0; x < width; x++) {
-        final pixel = image.getPixel(x, y);
-        final r = pixel.r;
-        final g = pixel.g;
-        final b = pixel.b;
-
-        // Calculate the first bit: Luminance (Black or White)
-        final luminance = (r * 0.3) + (g * 0.59) + (b * 0.11);
-        final value1 = (luminance <= 95) ? 1 : 0;
-
-        // Calculate the second bit: Red overlay (if applicable)
-        final isRed = r > 95 && g < 95 && b < 95;
-        final value2 = isRed ? 1 : 0;
-
-        // Calculate the index in the output array.
-        // The data is stored in a vertically-flipped, column-major order.
-        final index = (x ~/ 8) * height + (height - 1 - y);
-
-        // Pack the 1-bit values into their respective byte arrays.
-        // The bit is added from the right, shifting the existing bits to the
-        // left.
-        outputBytes1[index] = (outputBytes1[index] << 1) | value1;
-        outputBytes2[index] = (outputBytes2[index] << 1) | value2;
-      }
-    }
-
-    // The original Java function returned a byte[][], so we return a List.
-    return [outputBytes1, outputBytes2];
+    return _packBits(image, height, (pixel) => _blackBit(pixel, 1));
   }
 
   /// Converts an image to two separate 1-bit-per-pixel byte arrays.
   ///
-  /// This is used for dual-layer e-ink displays (e.g., Black/White and Red).
+  /// Mirrors `ImgUtil.gray2Binary_BWR`:
+  /// - Array 0 (plane 0) carries black/white data and is INVERTED relative
+  ///   to the BW palette: 0 for dark pixels, 1 for light pixels
+  ///   (1 = white!). Sending a BW-polarity array here produces a negative
+  ///   image on the badge.
+  /// - Array 1 (plane 1) contains the red overlay: 1 for red-like pixels
+  ///   (R > 95 and G < 95 and B < 95), 0 for everything else.
   ///
-  /// - The first array (`outputBytes1`) contains the Black/White data:
-  ///   - 1 for dark pixels (luminance <= 95)
-  ///   - 0 for light pixels (luminance > 95)
-  /// - The second array (`outputBytes2`) contains the Red overlay data:
-  ///   - 1 for red-like pixels
-  ///   - 0 for all other colors
-  ///
-  /// Both output arrays are stored in a vertically flipped column-major order.
+  /// Both arrays use the same vertically-flipped column-major order as the
+  /// BW palette.
   List<Uint8List> gray2BinaryBWR(img.Image image) {
-    final width = image.width;
     final height = image.height;
-    final totalPixels = width * height;
 
-    // Each byte holds data for 8 pixels (1 bit per pixel).
-    final outputSize = (totalPixels / 8).ceil();
-    final outputBytes1 = Uint8List(outputSize); // For Black/White data
-    final outputBytes2 = Uint8List(outputSize); // For Red overlay data
-
-    // Loop through each pixel of the image.
-    for (var y = 0; y < height; y++) {
-      for (var x = 0; x < width; x++) {
-        final pixel = image.getPixel(x, y);
-        final r = pixel.r;
-        final g = pixel.g;
-        final b = pixel.b;
-
-        // Calculate the first bit: Luminance (Black or White)
-        final luminance = (r * 0.3) + (g * 0.59) + (b * 0.11);
-        final value1 = (luminance <= 95) ? 1 : 0;
-
-        // Calculate the second bit: Red overlay (if applicable)
-        final isRed = r > 95 && g < 95 && b < 95;
-        final value2 = isRed ? 1 : 0;
-
-        // Calculate the index in the output array.
-        // The data is stored in a vertically-flipped, column-major order.
-        final index = (x ~/ 8) * height + (height - 1 - y);
-
-        // Pack the 1-bit values into their respective byte arrays.
-        // The bit is added from the right, shifting the existing bits to the
-        // left.
-        outputBytes1[index] = (outputBytes1[index] << 1) | value1;
-        outputBytes2[index] = (outputBytes2[index] << 1) | value2;
-      }
-    }
-
-    // The original Java function returned a byte[][], so we return a List.
-    return [outputBytes1, outputBytes2];
+    // Plane 0 is inverted on BWR badges: 1 means white (see protocol doc).
+    return _packBits(image, height, (pixel) => _blackBit(pixel, 0));
   }
 
-  /// Converts an image to a 2-bit-per-pixel byte array for BWYR e-ink displays.
+  /// Converts an image to a 2-bit-per-pixel byte array for BWYR e-ink
+  /// displays, mirroring `ImgUtil.gray2Binary_BWYR`.
   ///
-  /// Each pixel is mapped to a 2-bit value:
-  /// - 0 (00): Black
-  /// - 1 (01): White
-  /// - 2 (10): Yellow
-  /// - 3 (11): Red
+  /// Each pixel maps to one of four values: 0 = black (luminance ≤ 95),
+  /// 1 = white, 2 = yellow, 3 = red.
   ///
-  /// The output byte array is structured in column-major order.
+  /// Unlike the 1bpp modes the rows are NOT vertically flipped: the byte
+  /// index is `(x ~/ 4) * height + y` and pixels are packed two bits at a
+  /// time with the leftmost pixel of each group in the top bits.
   List<Uint8List> gray2BinaryBWYR(img.Image image) {
     final width = image.width;
     final height = image.height;
-    final totalPixels = width * height;
 
-    // Calculate the size of the output byte array.
-    // Each byte holds data for 4 pixels (2 bits per pixel).
-    final outputSize = (totalPixels / 4).ceil();
-    final outputBytes = Uint8List(outputSize);
+    final output = Uint8List(_packedSize(width * height, bitsPerPixel: 2));
 
-    // Iterate over each pixel of the image.
     for (var y = 0; y < height; y++) {
       for (var x = 0; x < width; x++) {
         final pixel = image.getPixel(x, y);
-        final r = pixel.r;
-        final g = pixel.g;
-        final b = pixel.b;
 
-        // 1. Determine the base color value (Black or White) by luminance.
-        final luminance = (r * 0.3) + (g * 0.59) + (b * 0.11);
-        var colorValue = (luminance <= 95) ? 0 : 1; // 0 for Black, 1 for White
-
-        // 2. Check for specific colors (Red and Yellow) and override.
-        // The conditions are mutually exclusive.
-        if (r > 95 && g > 95 && b < 95) {
-          colorValue = 2; // Yellow
-        } else if (r > 95 && g < 95 && b < 95) {
-          colorValue = 3; // Red
+        var colorValue = _isBlack(pixel) ? 0 : 1;
+        if (_isRed(pixel)) {
+          colorValue = 3;
+        } else if (isYellow(pixel)) {
+          colorValue = 2;
         }
 
-        // 3. Calculate the index in the output array.
-        // The data is stored in column-major order to match the display
-        // controller.
-        final index = ((x ~/ 4) * height) + y;
-
-        // 4. Pack the 2-bit color value into the correct byte.
-        // Each byte is filled with data from 4 horizontally adjacent pixels.
-        outputBytes[index] = (outputBytes[index] << 2) | colorValue;
+        final index = (x ~/ 4) * height + y;
+        output[index] = (output[index] << 2) | colorValue;
       }
     }
 
-    // The original Java function returned a byte[][], so we wrap the result
-    // in a list to match that structure.
-    return [outputBytes];
+    return [output];
+  }
+
+  /// Shared 1bpp packer. [blackBit] returns the bit value a pixel packs
+  /// into plane 0 (plane 1 always packs the red bit), letting the BW and
+  /// BWR palettes express their opposite black/white polarity.
+  List<Uint8List> _packBits(
+    img.Image image,
+    int height,
+    int Function(img.Pixel pixel) blackBit,
+  ) {
+    final width = image.width;
+    final outputSize = _packedSize(width * height);
+    final plane0 = Uint8List(outputSize);
+    final plane1 = Uint8List(outputSize);
+
+    for (var y = 0; y < height; y++) {
+      for (var x = 0; x < width; x++) {
+        final pixel = image.getPixel(x, y);
+
+        final index = (x ~/ 8) * height + (height - 1 - y);
+        plane0[index] = (plane0[index] << 1) | blackBit(pixel);
+        plane1[index] = (plane1[index] << 1) | (_isRed(pixel) ? 1 : 0);
+      }
+    }
+
+    return [plane0, plane1];
   }
 }
+
+/// Byte count needed to hold `pixels` bits (or 2-bit values when
+/// [bitsPerPixel] is 2).
+int _packedSize(int pixels, {int bitsPerPixel = 1}) {
+  final bits = pixels * bitsPerPixel;
+  return bits % 8 == 0 ? bits ~/ 8 : bits ~/ 8 + 1;
+}
+
+/// Luminance of a pixel using the vendor's channel weights and integer
+/// truncation (a double comparison would deviate at threshold-boundary
+/// pixels, e.g. r=95/g=96/b=95 is black for the vendor, white for `<=` on
+/// a double).
+int _luminance(img.Pixel pixel) =>
+    ((pixel.r * 0.3) + (pixel.g * 0.59) + (pixel.b * 0.11)).toInt();
+
+/// Vendor channel threshold for the luminance and each RGB channel.
+const int _channelThreshold = 95;
+
+bool _isBlack(img.Pixel pixel) => _luminance(pixel) <= _channelThreshold;
+
+bool _isRed(img.Pixel pixel) =>
+    pixel.r > _channelThreshold &&
+    pixel.g < _channelThreshold &&
+    pixel.b < _channelThreshold;
+
+bool isYellow(img.Pixel pixel) =>
+    pixel.r > _channelThreshold &&
+    pixel.g > _channelThreshold &&
+    pixel.b < _channelThreshold;
+
+/// Bit plane 0 packs for a pixel: [ifBlack] is the bit used for dark
+/// pixels (1 on BW badges, 0 on BWR badges, where plane 0 is inverted).
+int _blackBit(img.Pixel pixel, int ifBlack) =>
+    _isBlack(pixel) ? ifBlack : (ifBlack == 1 ? 0 : 1);
+
